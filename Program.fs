@@ -13,8 +13,8 @@ let main _ =
         buildings = [
             { x = 3; y = 3; owner = "red"; departments = [ Product 100; Product 100 ] }
             { x = 5; y = 7; owner = "blue"; departments = [ Product 100 ] }
-            { x = 12; y = 12; owner = "red"; departments = [ Product 100; Product 100; Product 100 ] }
-            { x = 15; y = 8; owner = "blue"; departments = [ Product 100; Product 100; Marketing ] }
+            { x = 12; y = 12; owner = "red"; departments = [ Product 100; Product 100; Product 100; Product 100 ] }
+            { x = 15; y = 8; owner = "blue"; departments = [ Product 100; Product 100; Product 100; Marketing ] }
             { x = 18; y = 6; owner = "red"; departments = [ Product 100 ] }
         ]
     }

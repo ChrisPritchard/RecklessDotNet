@@ -30,7 +30,7 @@ let quality building =
 
 let distance x y building =
     let core = (pown (x - building.x) 2) + (pown (y - building.y) 2)
-    core |> float |> sqrt |> int
+    core |> float |> sqrt |> ceil |> int
 
 let owner x y market = 
     market.buildings 
