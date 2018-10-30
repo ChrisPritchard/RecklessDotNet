@@ -32,16 +32,20 @@ let main _ =
 
     let advanceModel runState _ = 
         if wasJustPressed Keys.Escape runState then None else Some market
-
-    runGame config advanceModel (fun _ m ->
+    
+    let getView _ m =
         let buildingLocs = m.buildings |> List.map (fun b -> b.x, b.y)
         [1..m.width] |> List.collect (fun x -> 
             [1..m.height] |> List.map (fun y ->
+
                 let rect = rectFor x y
                 if List.contains (x, y) buildingLocs then 
                     Colour (rect, Color.Gray)
                 else
                     match owner x y m with
                     | None -> Colour (rect, Color.Black)
-                    | Some o -> Colour (rect, colourFor o))))
+                    | Some o -> Colour (rect, colourFor o)
+            ))
+
+    runGame config advanceModel getView
     0
