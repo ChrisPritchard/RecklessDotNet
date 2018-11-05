@@ -24,7 +24,7 @@ let issueOrder order executive =
         | Ok () -> Ok { executive with orders = order::executive.orders }
         | Error s -> Error <| sprintf "invalid order: %s" s
 
-let rec private applyOrder market order = 
+let private applyOrder market order = 
     match order.orderType with
     | BuildDepartment newDepartment ->
         let newBuildings =
@@ -39,13 +39,17 @@ let rec private applyOrder market order =
                 else ob)
         { market with buildings = newBuildings }
     | MoveExecutive executive ->
+        let department = TopFloor (Some executive)
         let currentBuilding = market.buildings |> List.find (fun b -> 
-            List.contains (TopFloor (Some executive)) b.departments)
-        let withoutTopFloor = List.except [(TopFloor (Some executive))] currentBuilding.departments
+            List.contains department b.departments)
+        let withoutTopFloor = List.except [department] currentBuilding.departments
         let newCurrentBuilding = { currentBuilding with departments = (TopFloor None)::withoutTopFloor }
-        let withoutCurrentBuilding = List.except [currentBuilding] market.buildings
-        let newMarket = { market with buildings = newCurrentBuilding::withoutCurrentBuilding }
-        applyOrder newMarket { order with orderType = BuildDepartment (TopFloor (Some executive)) }
+        
+        let newBuildings = market.buildings |> List.map (fun b -> 
+            if b = currentBuilding then newCurrentBuilding 
+            elif b = order.target then { b with departments = department::b.departments } 
+            else b)
+        { market with buildings = newBuildings }
 
 let processOrders executive market = 
     executive.orders |> List.fold applyOrder market
