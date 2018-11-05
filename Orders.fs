@@ -40,13 +40,10 @@ let private applyOrder market order =
         { market with buildings = newBuildings }
     | MoveExecutive executive ->
         let department = TopFloor (Some executive)
-        let currentBuilding = market.buildings |> List.find (fun b -> 
-            List.contains department b.departments)
-        let withoutTopFloor = List.except [department] currentBuilding.departments
-        let newCurrentBuilding = { currentBuilding with departments = (TopFloor None)::withoutTopFloor }
-        
         let newBuildings = market.buildings |> List.map (fun b -> 
-            if b = currentBuilding then newCurrentBuilding 
+            if List.contains department b.departments then 
+                let newDepartments = b.departments |> List.map (fun d -> if d = department then TopFloor None else d)
+                { b with departments = newDepartments } 
             elif b = order.target then { b with departments = department::b.departments } 
             else b)
         { market with buildings = newBuildings }
