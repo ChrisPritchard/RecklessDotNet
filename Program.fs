@@ -10,15 +10,19 @@ open Microsoft.Xna.Framework.Input
 [<EntryPoint>]
 let main _ =
     
+    let red = Player ("EvilCorp", Color.Red)
+    let blue = Player ("NashiSystems", Color.Blue)
+    let green = Player ("DragonInc", Color.Green)
+
     let market = {
         width = 20
         height = 20
         buildings = [
-            { x = 3; y = 3; owner = "red"; departments = [ Product 100; Product 100 ] }
-            { x = 5; y = 7; owner = "blue"; departments = [ Product 100 ] }
-            { x = 12; y = 12; owner = "red"; departments = [ Product 100; Product 100; Product 100; Product 100 ] }
-            { x = 15; y = 8; owner = "blue"; departments = [ Product 100; Product 100; Product 100; Marketing ] }
-            { x = 18; y = 6; owner = "red"; departments = [ Product 100 ] }
+            { x = 3; y = 3; owner = red; departments = [ Product 100; Product 100 ] }
+            { x = 5; y = 7; owner = blue; departments = [ Product 100 ] }
+            { x = 12; y = 12; owner = green; departments = [ Product 100; Product 100; Product 100; Product 100 ] }
+            { x = 15; y = 8; owner =  blue; departments = [ Product 100; Product 100; Product 100; Marketing ] }
+            { x = 18; y = 6; owner = red; departments = [ Product 100 ] }
         ]
     }
 
@@ -41,7 +45,8 @@ let main _ =
         let halfy = (snd tileSize) / 2
         let posy = (y * halfy) - (x * halfy)
         posx, basey + posy, fst tileSize, snd tileSize
-    let colourFor = function "red" -> Color.Red | _ -> Color.Blue
+
+    let colourFor (Player (_, c)) = c
 
     let advanceModel runState _ = 
         if wasJustPressed Keys.Escape runState then None else Some market
