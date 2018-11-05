@@ -24,4 +24,4 @@ and Executive = {
 }
 and ExecutiveLevel = | Junior = 1 | Intermediate = 2 | Senior = 3
 and Order = { target: Building; orderType: OrderType }
-and OrderType = BuildDepartment of Department | MoveExecutive of Executive
+and OrderType = BuildDepartment of Department | DownsizeDepartment of Department | MoveExecutive of Executive

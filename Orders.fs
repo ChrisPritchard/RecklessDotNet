@@ -8,6 +8,9 @@ let validateOrder orderType target =
     | BuildDepartment _ -> 
         if target.departments.Length = maxDepartments then Error "max departments reached"
         else Ok ()
+    | DownsizeDepartment department ->
+        if not <| List.contains department target.departments then Error "no matching department in target"
+        else Ok ()
     | MoveExecutive executive ->
         if List.contains (TopFloor None) target.departments |> not then Error "no empty executive department"
         elif executive.owner <> target.owner then Error "un-owned executive"
@@ -29,8 +32,15 @@ let rec private applyOrder market order =
                 if ob = order.target then { ob with departments = newDepartment::ob.departments }
                 else ob)
         { market with buildings = newBuildings }
+    | DownsizeDepartment department ->
+        let newBuildings =
+            market.buildings |> List.map (fun ob -> 
+                if ob = order.target then { ob with departments = List.except [department] ob.departments }
+                else ob)
+        { market with buildings = newBuildings }
     | MoveExecutive executive ->
-        let currentBuilding = market.buildings |> List.find (fun b -> List.contains (TopFloor (Some executive)) b.departments)
+        let currentBuilding = market.buildings |> List.find (fun b -> 
+            List.contains (TopFloor (Some executive)) b.departments)
         let withoutTopFloor = List.except [(TopFloor (Some executive))] currentBuilding.departments
         let newCurrentBuilding = { currentBuilding with departments = (TopFloor None)::withoutTopFloor }
         let withoutCurrentBuilding = List.except [currentBuilding] market.buildings
