@@ -19,3 +19,15 @@ let issueOrder order executive =
         match validateOrder order.orderType order.target with
         | Ok () -> Ok { executive with orders = order::executive.orders }
         | Error s -> Error <| sprintf "invalid order: %s" s
+
+let processOrders executive market = 
+    executive.orders |> List.fold (fun marketDelta o -> 
+        match o.orderType with
+        | BuildDepartment newDepartment -> 
+            let newBuildings =
+                marketDelta.buildings |> List.map (fun ob -> 
+                    if ob = o.target then { ob with departments = newDepartment::ob.departments }
+                    else ob)
+            { marketDelta with buildings = newBuildings }
+        )
+        market
