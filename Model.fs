@@ -1,5 +1,6 @@
 module Model
 
+open Constants
 open Microsoft.Xna.Framework
 
 type Player = Player of name: string * colour: Color
@@ -26,8 +27,16 @@ and ExecutiveLevel = | Junior = 1 | Intermediate = 2 | Senior = 3
 and Order = { target: Building; orderType: OrderType }
 and OrderType = BuildDepartment of Department
 
+let validateOrder orderType target = 
+    match orderType with
+    | BuildDepartment _ -> 
+        if target.departments.Length = maxDepartments then Error "max departments reached"
+        else Ok ()
+
 let issueOrder order executive = 
     if executive.orders.Length > int executive.level then Error "too many orders"
     elif order.target.owner <> executive.owner then Error "un-owned target"
-    // TODO: validate order
-    else Ok { executive with orders = order::executive.orders }
+    else
+        match validateOrder order.orderType order.target with
+        | Ok () -> Ok { executive with orders = order::executive.orders }
+        | Error s -> Error <| sprintf "invalid order: %s" s

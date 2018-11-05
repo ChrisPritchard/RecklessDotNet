@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Constants.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="Derivations.fs" />
     <Compile Include="Program.fs" />
