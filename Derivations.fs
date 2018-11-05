@@ -27,4 +27,4 @@ let owner x y market =
     |> Seq.filter (fun (b, dist, _) -> radius b >= dist)
     |> Seq.sortByDescending (fun (_, _, quality) -> quality)
     |> Seq.tryHead 
-    |> Option.bind (fun (b, _, _) -> Some b.owner)
+    |> Option.bind (fun (b, _, _) -> Some b.owner) 
