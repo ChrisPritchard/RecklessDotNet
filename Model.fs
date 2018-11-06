@@ -2,7 +2,12 @@ module Model
 
 open Microsoft.Xna.Framework
 
-type Player = Player of name: string * colour: Color
+type Player = {
+    name: string
+    //colour: Color
+    cash: int
+    ideas: int
+}
 
 type Market = {
     width: int
@@ -14,14 +19,18 @@ and Building = {
     x: int
     y: int
     departments: Department list
+    quality: int
 }
-and Department = Product of quality: int | Marketing | Research of QA: bool | TopFloor of Executive option
-and Executive = {
+and Department = Product | Marketing | Research | TopFloor
+
+type Executive = {
     name: string
-    owner: Player
+    building: Building
     level: ExecutiveLevel
     orders: Order list
 }
 and ExecutiveLevel = | Junior = 1 | Intermediate = 2 | Senior = 3
-and Order = { target: Building; orderType: OrderType }
-and OrderType = BuildDepartment of Department | DownsizeDepartment of Department | MoveExecutive of Executive
+and Order = 
+    | BuildDepartment of Department * Building 
+    | DownsizeDepartment of Building * Department
+    | CreateIdea of Department
