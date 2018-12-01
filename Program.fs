@@ -13,25 +13,12 @@ let main _ =
         x = 0
         y = 0
         departments = [
-            { 
-                departmentType = Research false 
-            }
-            { 
-                departmentType = Marketing false 
-            }
-            { 
-                departmentType = Research false 
-            }
+            Research
+            Research
+            Marketing
         ]
         extensions = []
     }
-
-    let count = office1.departments |> List.filter (fun o -> 
-            o = 
-                { 
-                    departmentType = Research false 
-                }) |> List.length
-    printfn "%i" count
     
     // let config = {
     //     clearColour = Some Color.Black
