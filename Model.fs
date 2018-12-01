@@ -1,30 +1,25 @@
 module Model
 
-type Player = {
-    name: string
+type Corporation = {
     cash: int
     ideas: int
-    buildings: Building list
+    offices: Office list
+    orders: Order list
 }
-and Building = {
+and Office = {
     x: int
     y: int
     departments: Department list
+    extensions: Extension list
 }
 and Department = 
     | Product of quality: int 
     | Marketing of used: bool 
     | Research of used: bool 
     | Acquisitions of used: bool 
-
-let advanceBuilding building =
-    let hasResearch = 
-        building.departments 
-        |> Seq.tryFind (function | Research _ -> true | _ -> false)
-        |> function | Some _ -> true | _ -> false
-    let newDepartments = 
-        building.departments 
-        |> List.map (function
-        | Product p when not hasResearch -> Product (max (p - 10) 10)
-        | d -> d)
-    { building with departments = newDepartments }
+and Extension =
+    | QA
+and Order = 
+    | BuildDepartment of Office * Department
+    | ResearchIdea of Office
+    | BuildLocation of x:int * y:int * Department
