@@ -8,21 +8,45 @@ open Microsoft.Xna.Framework.Input
 
 [<EntryPoint>]
 let main _ =
-    
-    let config = {
-        clearColour = Some Color.Black
-        fpsFont = None
-        assetsToLoad = [
-            Texture ("tile", "tile.png")
-            Texture ("office", "office.png")
+
+    let office1 = {
+        x = 0
+        y = 0
+        departments = [
+            { 
+                departmentType = Research false 
+            }
+            { 
+                departmentType = Marketing false 
+            }
+            { 
+                departmentType = Research false 
+            }
         ]
-        resolution = Windowed (800, 800)
+        extensions = []
     }
 
-    let advanceModel runState _ = 
-        if wasJustPressed Keys.Escape runState then None else Some ()
+    let count = office1.departments |> List.filter (fun o -> 
+            o = 
+                { 
+                    departmentType = Research false 
+                }) |> List.length
+    printfn "%i" count
     
-    let getView _ _ = []
+    // let config = {
+    //     clearColour = Some Color.Black
+    //     fpsFont = None
+    //     assetsToLoad = [
+    //         Texture ("tile", "tile.png")
+    //         Texture ("office", "office.png")
+    //     ]
+    //     resolution = Windowed (800, 800)
+    // }
 
-    runGame config advanceModel getView
+    // let advanceModel runState _ = 
+    //     if wasJustPressed Keys.Escape runState then None else Some ()
+    
+    // let getView _ _ = []
+
+    // runGame config advanceModel getView
     0

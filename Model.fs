@@ -12,7 +12,10 @@ and Office = {
     departments: Department list
     extensions: Extension list
 }
-and Department = 
+and Department = {
+    departmentType: DepartmentType
+} 
+and DepartmentType =
     | Product of quality: int 
     | Marketing of used: bool 
     | Research of used: bool 
