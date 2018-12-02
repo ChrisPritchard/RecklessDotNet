@@ -9,4 +9,8 @@ let endCorpTurn corp =
     ()
 
 let endTurn corps =
+    // advance corps
+    // advance offices
+    // gather all projected tiles
+    // assign profits
     corps |> Seq.map endCorpTurn
