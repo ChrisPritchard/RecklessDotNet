@@ -3,7 +3,7 @@ module Turn
 open Model
 open Constants
 
-let applyOrder office =
+let applyOfficeOrder office =
     function
     | BuildDepartment dep -> { office with departments = dep::office.departments }
     | BuildExtension ext -> { office with extensions = ext::office.extensions }
@@ -18,7 +18,7 @@ let getQualityChange office =
     (qualityAssuranceCount * 5) + (match findResearch with Some _ -> 10 | _ -> -10)
 
 let endOfficeTurn orders office =
-    let adjustedOffice = orders |> List.fold applyOrder office
+    let adjustedOffice = orders |> List.fold applyOfficeOrder office
     let qualityChange = getQualityChange office
     let adjustedDepartments = 
         office.departments 
@@ -47,6 +47,18 @@ let endCorpTurn corp =
         cash = corp.cash - totalOrderCost - totalOfficeCost
         ideas = corp.ideas + newIdeas
         orders = [] }
+
+let marketTilesFor parentMarketing office =
+    let (radius, baseQuality, localMarketing) =
+        office.departments |> List.fold (fun (r, q, m) -> 
+            function
+            | Product quality -> r + 1, q + quality, m
+            | Marketing -> r, q, m + 1
+            | _ -> r, q, m) (0, 0, 0)
+    let quality = baseQuality * pown 2 (localMarketing + parentMarketing)
+    
+    [-radius..radius] |> List.collect (fun x ->
+    [-radius..radius] |> List.map (fun y -> (x, y, quality)))
 
 let endTurn corps =
     // advance corps
