@@ -19,7 +19,11 @@ and Department =
     | Acquisitions
 and Extension =
     | QA
-and Order = 
-    | BuildDepartment of Office * Department
-    | ResearchIdea of Office
-    | BuildLocation of x:int * y:int * Department
+and Order = {
+    office: Office option
+    orderType: OrderType
+} and OrderType =
+    | BuildDepartment of Department
+    | BuildExtension of Extension
+    | ResearchIdea
+    | BuildOffice of x:int * y:int * Department

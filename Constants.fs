@@ -2,9 +2,19 @@ module Constants
 
 open Model
 
-let cost =
+let rec orderCost =
     function
-    | Product _ -> 0
-    | Marketing -> 2500
-    | Research -> 2500
-    | Acquisitions -> 3000
+    | BuildDepartment (Product _) -> 0
+    | BuildDepartment Marketing -> 2500
+    | BuildDepartment Research -> 2500
+    | BuildDepartment Acquisitions -> 3000
+    | BuildExtension QA -> 500
+    | ResearchIdea -> 1000
+    | BuildOffice (_, _, dep) -> 7500 + orderCost (BuildDepartment dep)
+
+let departmentCost = 
+    function
+    | Research -> 500
+    | Marketing -> 500
+    | Acquisitions -> 500
+    | _ -> 0
