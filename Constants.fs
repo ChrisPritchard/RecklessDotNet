@@ -17,4 +17,4 @@ let departmentCost =
     | Research -> 500
     | Marketing -> 500
     | Acquisitions -> 500
-    | _ -> 0
+    | Product _ -> 0

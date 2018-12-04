@@ -61,8 +61,19 @@ let marketTilesFor parentMarketing office =
     [-radius..radius] |> List.map (fun y -> (x, y, quality)))
 
 let endTurn corps =
-    // advance corps
-    // advance offices
-    // gather all projected tiles
-    // assign profits
-    corps |> Seq.map endCorpTurn
+    let adjustedCorps = 
+        corps |> List.map endCorpTurn
+    let allTiles = corps |> List.collect (fun c -> 
+        c.offices 
+        |> List.collect (marketTilesFor 0) 
+        |> List.map (fun (x, y, q) -> (x, y), (q, c))
+        |> List.sortBy (fun (_, (q, _)) -> q))
+    let tilesPerCorp = 
+        allTiles 
+        |> List.fold (fun map (p, (_, c)) -> Map.add p c map) Map.empty 
+        |> Map.toList
+        |> List.countBy snd
+        |> Map.ofList
+    adjustedCorps |> List.map (fun corp ->
+        let count = Map.tryFind corp tilesPerCorp |> Option.defaultValue 0
+        { corp with cash = corp.cash + (count * 100) })
