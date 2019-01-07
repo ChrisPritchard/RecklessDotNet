@@ -4,13 +4,15 @@ open Model
 
 let rec orderCost =
     function
-    | BuildDepartment (Product _) -> 0
-    | BuildDepartment Marketing -> 2500
-    | BuildDepartment Research -> 2500
-    | BuildDepartment Acquisitions -> 3000
-    | BuildExtension QA -> 500
-    | ResearchIdea -> 1000
-    | BuildOffice (_, _, dep) -> 7500 + orderCost (BuildDepartment dep)
+    | BuildDepartment (_, Product _) -> 0
+    | BuildDepartment (_, Marketing) -> 2500
+    | BuildDepartment (_, Research) -> 2500
+    | BuildDepartment (_, Acquisitions) -> 3000
+    | BuildExtension (_, QA) -> 500
+    | ResearchIdea _ -> 1000
+    | BuildOffice (_, _, _, dep) -> 
+        7500 + 
+        orderCost (BuildDepartment (Unchecked.defaultof<Office>, dep))
 
 let departmentCost = 
     function

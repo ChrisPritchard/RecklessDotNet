@@ -1,39 +1,19 @@
-﻿open Model
-
-open GameCore.GameModel
-open GameCore.GameRunner
-
-open Microsoft.Xna.Framework
-open Microsoft.Xna.Framework.Input
+﻿
+open Model
+open Turn
 
 [<EntryPoint>]
 let main _ =
 
-    let office1 = {
-        x = 0
-        y = 0
-        departments = [
-            Research
-            Research
-            Marketing
-        ]
+    let test = {
+        x = 10
+        y = 10
+        managedOffices = []
+        departments = [Product 16; Marketing; Product 22; Product 30]
         extensions = []
     }
-    
-    // let config = {
-    //     clearColour = Some Color.Black
-    //     fpsFont = None
-    //     assetsToLoad = [
-    //         Texture ("tile", "tile.png")
-    //         Texture ("office", "office.png")
-    //     ]
-    //     resolution = Windowed (800, 800)
-    // }
 
-    // let advanceModel runState _ = 
-    //     if wasJustPressed Keys.Escape runState then None else Some ()
+    let tiles = productTiles test 0
+    printfn "%i" tiles.Length
     
-    // let getView _ _ = []
-
-    // runGame config advanceModel getView
     0

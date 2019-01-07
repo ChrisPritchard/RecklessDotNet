@@ -3,12 +3,13 @@ module Model
 type Corporation = {
     cash: int
     ideas: int
-    offices: Office list
+    headOffice: Office
     orders: Order list
 }
 and Office = {
     x: int
     y: int
+    managedOffices: Office list
     departments: Department list
     extensions: Extension list
 }
@@ -19,11 +20,8 @@ and Department =
     | Acquisitions
 and Extension =
     | QA
-and Order = {
-    office: Office option
-    orderType: OrderType
-} and OrderType =
-    | BuildDepartment of Department
-    | BuildExtension of Extension
-    | ResearchIdea
-    | BuildOffice of x:int * y:int * Department
+and Order =
+    | BuildDepartment of Office * Department
+    | BuildExtension of Office * Extension
+    | ResearchIdea of researchLocation:Office
+    | BuildOffice of acquisitions:Office * x:int * y:int * Department
