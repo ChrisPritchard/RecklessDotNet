@@ -13,7 +13,7 @@ let main _ =
         extensions = []
     }
 
-    updateQuality test false |> fun o -> printfn "%A" o.departments
+    updateQuality test [] |> fun o -> printfn "%A" o.departments
     
 
 

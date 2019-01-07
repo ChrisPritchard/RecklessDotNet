@@ -24,15 +24,16 @@ let rec productTiles parent office =
     
     localTiles @ List.collect (productTiles (Some office)) office.managedOffices
 
-let updateQuality office researchInUse =
-    let hasResearch = List.contains Research office.departments
+let rec updateQuality office researchOffices =
+    let hasResearch = List.contains Research office.departments && not <| List.contains office researchOffices
     let qaCount = office.extensions |> List.sumBy (fun e -> match e with QA -> 1)
     let newDepartments = 
         office.departments
         |> List.map (function
         | Product q -> 
-            let degraded = if hasResearch && not researchInUse then q else q - 10
+            let degraded = if hasResearch then q else q - 10
             let enhanced = degraded + (qaCount * 5)
             Product (max 10 enhanced)
         | d -> d)
-    { office with departments = newDepartments }
+    let newManaged = office.managedOffices |> List.map (fun o -> updateQuality o researchOffices)
+    { office with departments = newDepartments; managedOffices = newManaged }
