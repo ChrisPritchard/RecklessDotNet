@@ -13,7 +13,8 @@ let main _ =
         extensions = []
     }
 
-    let tiles = productTiles test 0
-    printfn "%i" tiles.Length
+    updateQuality test false |> fun o -> printfn "%A" o.departments
     
+
+
     0
