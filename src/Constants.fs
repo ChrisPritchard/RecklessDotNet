@@ -1,6 +1,15 @@
-module Constants
+module Reckless.Constants
 
+open GameCore.GameModel
 open Model
+
+let windowSize = 800, 600
+let tileSize = 64, 32
+
+let assets = [
+        Texture ("tile", "content/tile.png")
+        Texture ("office", "content/office.png")
+    ]
 
 let rec orderCost =
     function

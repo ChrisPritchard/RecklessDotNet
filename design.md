@@ -26,3 +26,9 @@ Needed interface:
 - inspection interface
 - end turn button: idle, hover, pressed
 - order interface
+
+Camera object?
+
+- updated in advance model, picking up left/right/up/down
+- results in an offset set of creds
+- main view (tiles, offices etc) draw relative to this set of coords
