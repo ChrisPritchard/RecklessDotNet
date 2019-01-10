@@ -25,4 +25,6 @@ let getView runState (map, (corps: Corporation list)) = [
   
     let isPressed = isMousePressed (true, false) runState
     let mx, my = runState.mouse.position 
-    yield Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow)) ]
+    yield Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
+    
+    yield Text ("font", sprintf "%i, %i" mx my, (10, 10, 100, 30), TopLeft, Color.Black) ]

@@ -8,6 +8,7 @@ let tileSize = 64, 32
 let mapSize = 10
 
 let assets = [
+        Font ("font", "./content/Xolonium")
         Texture ("tile", "content/tile.png")
         Texture ("tile-highlight", "content/tile-highlight.png")
         Texture ("office", "content/office.png")
