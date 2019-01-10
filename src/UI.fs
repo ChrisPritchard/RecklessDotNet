@@ -5,6 +5,19 @@ open GameCore.GameModel
 open GameCore.UIElements.Model
 open GameCore.UIElements.Functions
 
+// let standardColours = { background = Color.DarkBlue; border = Some (3, Color.Blue); text = Color.White }
+
+// let table destRect header rows = 
+//     Panel ({
+//         destRect = destRect
+//         background = Some standardColours.background
+//         border = standardColours.border
+//         padding = Some 10
+//         alignment = Some (AlignVertically 10)
+//     }, [ 
+//         Label {  }
+//         ])
+
 let updateUIModel runState ui =
     [
         yield Label { 
