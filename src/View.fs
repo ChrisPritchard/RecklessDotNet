@@ -4,10 +4,11 @@ open Microsoft.Xna.Framework
 open GameCore.GameModel
 open Model
 open Iso
+open UI
 
 let tw, th = Constants.tileSize
 
-let getView runState (map, (corps: Corporation list)) = 
+let getView runState (map, (corps: Corporation list), ui) = 
     [
     let mx, my = mouseTile runState |> Option.defaultValue (-1, -1)
 
@@ -30,11 +31,7 @@ let getView runState (map, (corps: Corporation list)) =
                 yield 3, Image ("office-highlight", rect, Color.White)
             ])
   
-    
-    yield 4, Text ("font", sprintf "%i, %i" mx my, (10, 10, 100, 30), TopLeft, Color.Black)
-    
-    let isPressed = isMousePressed (true, false) runState
-    let mx, my = runState.mouse.position 
-    yield 5, Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
-    
-    ] |> List.sortBy fst |> List.map snd
+    ] 
+    |> List.sortBy fst 
+    |> List.map snd 
+    |> fun l -> List.append l (getUIView runState ui)

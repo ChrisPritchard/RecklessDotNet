@@ -4,6 +4,7 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Input
 open GameCore.GameModel
 open Model
+open UI
 
 let dim = Constants.mapSize
 let map = 
@@ -30,11 +31,13 @@ let corps = [
     }
 ]
 
-let startModel = map, corps
+let ui = []
+
+let startModel = map, corps, ui
 
 let advanceModel runState model =
     if wasJustPressed Keys.Escape runState then None
     else
         match model with
         | None -> Some startModel
-        | _ -> model
+        | Some (map, corps, ui) -> Some (map, corps, updateUIModel runState ui)
