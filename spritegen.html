@@ -34,6 +34,29 @@
     ctx.stroke ()
 </script>
 
+<h2>Isometric Tile Highlight</h2>
+
+<canvas id="isometric-tile-highlight" width="256" height="128" style="background: magenta"></canvas>
+
+<script type="text/javascript">
+    var canvas = document.getElementById("isometric-tile-highlight")
+    var ctx = canvas.getContext("2d")
+
+    ctx.fillStyle = "#00000000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    ctx.strokeStyle = "white"
+    ctx.lineWidth  = 4
+
+    ctx.moveTo (0,64)
+    ctx.lineTo (128,0)
+    ctx.lineTo (256,64)
+    ctx.lineTo (128,128)
+    ctx.lineTo (0,64)
+
+    ctx.stroke ()
+</script>
+
 <h2>Office Building</h2>
 
 <canvas id="office-building" width="256" height="384" style="background: magenta"></canvas>
@@ -74,6 +97,44 @@
     ctx.lineTo (256-padding,384-64)
 
     ctx.fill ()
+    ctx.stroke ()
+    
+</script>
+
+<h2>Office Building Highlight</h2>
+
+<canvas id="office-building-highlight" width="256" height="384" style="background: magenta"></canvas>
+
+<script type="text/javascript">
+    var canvas = document.getElementById("office-building-highlight")
+    var ctx = canvas.getContext("2d")
+
+    ctx.fillStyle = "#00000000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    ctx.strokeStyle = "white"
+    ctx.lineWidth  = 4
+
+    var padding = 48
+
+    ctx.moveTo (padding,64)
+    ctx.lineTo (128,padding/2)
+    ctx.lineTo (256-padding,64)
+    ctx.lineTo (128,128-padding/2)
+    ctx.lineTo (padding,64)
+
+    ctx.moveTo (padding,384-64)
+    ctx.lineTo (128,384-padding/2)
+    ctx.lineTo (128,128-padding/2)
+    ctx.lineTo (padding,64)
+    ctx.lineTo (padding,384-64)
+
+    ctx.moveTo (256-padding,384-64)
+    ctx.lineTo (128,384-padding/2)
+    ctx.lineTo (128,128-padding/2)
+    ctx.lineTo (256-padding,64)
+    ctx.lineTo (256-padding,384-64)
+
     ctx.stroke ()
     
 </script>
