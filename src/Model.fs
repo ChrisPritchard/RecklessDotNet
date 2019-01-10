@@ -1,10 +1,13 @@
 module Model
 
+open Microsoft.Xna.Framework
+
 type Corporation = {
     cash: int
     ideas: int
     headOffice: Office
     orders: Order list
+    colour: Color
 }
 and Office = {
     x: int
