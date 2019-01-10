@@ -30,9 +30,11 @@ let getView runState (map, (corps: Corporation list)) =
                 yield 3, Image ("office-highlight", rect, Color.White)
             ])
   
+    
+    yield 4, Text ("font", sprintf "%i, %i" mx my, (10, 10, 100, 30), TopLeft, Color.Black)
+    
     let isPressed = isMousePressed (true, false) runState
     let mx, my = runState.mouse.position 
     yield 5, Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
     
-    yield 4, Text ("font", sprintf "%i, %i" mx my, (10, 10, 100, 30), TopLeft, Color.Black) 
     ] |> List.sortBy fst |> List.map snd
