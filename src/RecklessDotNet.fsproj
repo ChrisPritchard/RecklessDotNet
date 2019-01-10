@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="fsharp-gamecore" Version="0.0.4" />
+    <PackageReference Include="fsharp-gamecore" Version="0.0.5" />
+    <PackageReference Include="fsharp-gamecore-ui" Version="0.0.1" />
   </ItemGroup>
 
 </Project>
