@@ -5,10 +5,13 @@ open Model
 
 let windowSize = 800, 600
 let tileSize = 64, 32
+let mapSize = 10
 
 let assets = [
         Texture ("tile", "content/tile.png")
+        Texture ("tile-highlight", "content/tile-highlight.png")
         Texture ("office", "content/office.png")
+        Texture ("office-highlight", "content/tile-highlight.png")
     ]
 
 let rec orderCost =

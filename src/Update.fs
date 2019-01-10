@@ -5,7 +5,7 @@ open Microsoft.Xna.Framework.Input
 open GameCore.GameModel
 open Model
 
-let dim = 10
+let dim = Constants.mapSize
 let map = 
     [0..dim*dim-1] 
     |> List.fold (fun map i -> 
