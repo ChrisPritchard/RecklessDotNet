@@ -7,24 +7,32 @@ open Iso
 
 let tw, th = Constants.tileSize
 
-let getView runState (map, (corps: Corporation list)) = [
+let getView runState (map, (corps: Corporation list)) = 
+    [
+    let mx, my = mouseTile runState |> Option.defaultValue (-1, -1)
+
     yield! 
         Set.toList map 
-        |> List.map (fun (x, y) -> 
-            Image ("tile", isoRect x y tw th, Color.White))
-
-    match mouseTile runState with
-    | None -> ()
-    | Some (x, y) ->
-        yield Image ("tile-highlight", isoRect x y tw th, Color.White)
+        |> List.collect (fun (x, y) -> [
+            let rect = isoRect x y tw th
+            yield 0, Image ("tile", rect, Color.White)
+            if (x, y) = (mx, my) then
+                yield 1, Image ("tile-highlight", rect, Color.White)
+            ])
 
     yield! 
-        corps |> List.map (fun corp -> 
+        corps 
+        |> List.collect (fun corp -> [
             let o = corp.headOffice
-            Image ("office", isoRect o.x o.y tw (th*3), corp.colour))
+            let rect = isoRect o.x o.y tw (th*3)
+            yield 2, Image ("office", rect, corp.colour)
+            if (o.x, o.y) = (mx, my) then
+                yield 3, Image ("office-highlight", rect, Color.White)
+            ])
   
     let isPressed = isMousePressed (true, false) runState
     let mx, my = runState.mouse.position 
-    yield Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
+    yield 5, Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
     
-    yield Text ("font", sprintf "%i, %i" mx my, (10, 10, 100, 30), TopLeft, Color.Black) ]
+    yield 4, Text ("font", sprintf "%i, %i" mx my, (10, 10, 100, 30), TopLeft, Color.Black) 
+    ] |> List.sortBy fst |> List.map snd

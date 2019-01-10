@@ -12,7 +12,7 @@ let assets = [
         Texture ("tile", "content/tile.png")
         Texture ("tile-highlight", "content/tile-highlight.png")
         Texture ("office", "content/office.png")
-        Texture ("office-highlight", "content/tile-highlight.png")
+        Texture ("office-highlight", "content/office-highlight.png")
     ]
 
 let rec orderCost =

@@ -22,10 +22,16 @@ let isoRect x y w h =
 
 let mouseTile (runState: RunState) = 
     let mx, my = runState.mouse.position
-    let mx, my = mx - cx, my - cy
+    // offset to where the tiles have been rendered from
+    let mx, my = float (mx - cx), float (my - cy)
+    // convert tilesize to float (so ceil/floor work)
+    let ftw, fth = float tw, float th
 
-    let tx = mx/tw
-    let ty = my/th - mx*th
+    // calculate tile. this works when tiles are rendered from 
+    // left point (e.g. +x is up-right, +y is down-right)
+    let tx, ty = 
+        (floor >> int) ((-my / fth) + (mx / ftw)),
+        (ceil >> int) ((mx / ftw) + (my / fth))
 
     let map = Constants.mapSize
     if tx >= 0 && tx < map && ty >= 0 && ty < map then
