@@ -15,8 +15,8 @@ let map =
         Set.add (x, y) map) Set.empty
 
 let testOffice = {
-    x = 0
-    y = 0
+    x = 4
+    y = 4
     managedOffices = []
     departments = [Product 16; Marketing; Product 22; Product 30]
     extensions = []
