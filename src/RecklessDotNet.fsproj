@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="fsharp-gamecore" Version="0.0.5" />
-    <PackageReference Include="fsharp-gamecore-ui" Version="0.0.1" />
+    <PackageReference Include="fsharp-gamecore" Version="0.0.6" />
+    <PackageReference Include="fsharp-gamecore-ui" Version="0.0.2" />
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.4" />
     <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" />
   </ItemGroup>
