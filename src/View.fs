@@ -11,6 +11,12 @@ let tw, th = Constants.tileSize
 
 let getView runState (map, (corps: Corporation list), ui) = 
     [
+        // render map and corps
+        // render popups (office info, tile info)
+        // render ui commands (orders, end turn)
+        // render status (cash, cashflow, ideas)
+        // render mouse cursor
+
     let mx, my = mouseTile runState |> Option.defaultValue (-1, -1)
 
     let productTiles = 
