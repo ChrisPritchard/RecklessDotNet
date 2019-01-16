@@ -36,5 +36,7 @@ type GameState = {
     map: Set<int * int>
     corps: Corporation list
     productTiles: Map<int * int, (Corporation * int) list>
-    ui: ViewArtifact list
+    ui: UIModel
+} and UIModel = {
+    tilePopup: (int * int) option
 }

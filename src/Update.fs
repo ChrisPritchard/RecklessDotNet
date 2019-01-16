@@ -26,12 +26,9 @@ let updateUI runState gameState =
         gameState.ui
     else 
         match mouseTile runState with
-        | None -> []
-        | Some (mx, my) ->
-            match Map.tryFind (mx, my) gameState.productTiles with
-            | None -> []
-            | Some corpList ->
-                View.tilePopup corpList (mx, my)
+        | None -> { gameState.ui with tilePopup = None }
+        | Some (mx, my) -> 
+            { gameState.ui with tilePopup = Some (mx, my) }
 
 let advanceModel runState model =
     if wasJustPressed Keys.Escape runState then None

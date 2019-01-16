@@ -42,15 +42,16 @@ let tilePopup corpList (tx, ty) = [
         Text (font, line, (x + padding, y), fontSize, TopLeft, colour))
 ]
 
-let private renderMap productTiles (mx, my) map =
-    map
+let private renderMap (mx, my) gameState =
+    let tilePopup = gameState.ui.tilePopup |> Option.defaultValue (-1, -1)
+    gameState.map
     |> Set.toList
     |> List.collect (fun (x, y) -> [
             let rect = isoRect x y tw th
-            match Map.tryFind (x, y) productTiles with
+            match Map.tryFind (x, y) gameState.productTiles with
             | Some ((c, _)::_) -> yield 0, Image ("tile", rect, c.colour)
             | _ -> yield 0, Image ("tile", rect, Color.White)
-            if (x, y) = (mx, my) then
+            if (x, y) = (mx, my) || (x, y) = tilePopup then
                 yield 2, Image ("tile-highlight", rect, Color.White)
         ])
 
@@ -70,6 +71,17 @@ let private renderOffices (mx, my) corps =
                 yield 3, Image ("office-highlight", rect, Color.White)
         ]))
 
+let renderUI gameState = 
+    [
+        match gameState.ui.tilePopup with
+        | Some (mx, my) ->
+            match Map.tryFind (mx, my) gameState.productTiles with
+            | Some corpList ->
+                yield! tilePopup corpList (mx, my)
+            | _ -> ()
+        | _ -> ()
+    ] |> List.map (fun va -> 90, va)
+
 let private getCursor runState =
     let isPressed = isMousePressed (true, false) runState
     let mx, my = runState.mouse.position 
@@ -84,9 +96,9 @@ let getView runState gameState =
         // render mouse cursor
 
         let mousePos = mouseTile runState |> Option.defaultValue (-1, -1)
-        yield! renderMap gameState.productTiles mousePos gameState.map
+        yield! renderMap mousePos gameState
         yield! renderOffices mousePos gameState.corps
-        yield! gameState.ui |> List.map (fun va -> 90, va)
+        yield! renderUI gameState
         yield 99, getCursor runState
     ] 
     |> List.sortBy fst 
