@@ -3,21 +3,26 @@ module Reckless.View
 open Microsoft.Xna.Framework
 open GameCore.GameModel
 open Model
+open Constants
 open Iso
-open Turn
 
-let tw, th = Constants.tileSize
+let tw, th = tileSize
 
-let private findProductTiles corps =
-    corps
-    |> List.collect (fun c -> 
-            productTiles None c.headOffice
-            |> List.map (fun (x, y, q) -> (x, y), (c, q)))
-    |> List.groupBy fst
-    |> List.map (fun (pos, tiles) -> 
-        let best = tiles |> List.sortByDescending (fun (_, (_, q)) -> q) |> List.head |> snd
-        pos, best)
-    |> Map.ofList
+let lineHeight = fontSize * 4/3
+
+let textHeight lines = 
+    (lines - 1) * lineHeight + fontSize
+
+let tilePopup corpList (tx, ty) = [
+    let x, y, _, _ = isoRect tx ty tw th
+    let topCorp = List.head corpList |> fun ((c: Corporation), q) -> sprintf "%s:\t%i" c.abbreviation q
+    let rest = List.tail corpList |> List.map (fun (c, q) -> sprintf "%s:\t%i" c.abbreviation q)
+    let textHeight = List.length rest + 1
+    let textWidth = (topCorp::rest) |> List.map Seq.length |> Seq.max |> fun len -> len * 4/5
+    let width, height = textWidth + padding*2, textHeight + padding*2
+
+    yield Colour ((x, y, width, height), activeColours.background)
+]
 
 let private renderMap productTiles (mx, my) map =
     map
@@ -25,13 +30,13 @@ let private renderMap productTiles (mx, my) map =
     |> List.collect (fun (x, y) -> [
             let rect = isoRect x y tw th
             match Map.tryFind (x, y) productTiles with
-            | Some (c, _) -> yield 0, Image ("tile", rect, c.colour)
-            | None -> yield 0, Image ("tile", rect, Color.White)
+            | Some ((c, _)::_) -> yield 0, Image ("tile", rect, c.colour)
+            | _ -> yield 0, Image ("tile", rect, Color.White)
             if (x, y) = (mx, my) then
                 yield 2, Image ("tile-highlight", rect, Color.White)
         ])
 
-let rec allOffices office = [
+let rec private allOffices office = [
     yield office
     yield! List.collect allOffices office.managedOffices
 ]
@@ -47,12 +52,12 @@ let private renderOffices (mx, my) corps =
                 yield 3, Image ("office-highlight", rect, Color.White)
         ]))
 
-let getCursor runState =
+let private getCursor runState =
     let isPressed = isMousePressed (true, false) runState
     let mx, my = runState.mouse.position 
     Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
 
-let getView runState (map, (corps: Corporation list), ui) = 
+let getView runState gameState = 
     [
         // render map and corps
         // render popups (office info, tile info)
@@ -61,9 +66,9 @@ let getView runState (map, (corps: Corporation list), ui) =
         // render mouse cursor
 
         let mousePos = mouseTile runState |> Option.defaultValue (-1, -1)
-        let productTiles = findProductTiles corps
-        yield! renderMap productTiles mousePos map
-        yield! renderOffices mousePos corps
+        yield! renderMap gameState.productTiles mousePos gameState.map
+        yield! renderOffices mousePos gameState.corps
+        yield! gameState.ui |> List.map (fun va -> 90, va)
         yield 99, getCursor runState
     ] 
     |> List.sortBy fst 

@@ -1,8 +1,11 @@
 module Reckless.Model
 
 open Microsoft.Xna.Framework
+open GameCore.GameModel
 
 type Corporation = {
+    name: string
+    abbreviation: string
     cash: int
     ideas: int
     headOffice: Office
@@ -28,3 +31,10 @@ and Order =
     | BuildExtension of Office * Extension
     | ResearchIdea of researchLocation:Office
     | BuildOffice of acquisitions:Office * x:int * y:int * Department
+
+type GameState = {
+    map: Set<int * int>
+    corps: Corporation list
+    productTiles: Map<int * int, (Corporation * int) list>
+    ui: ViewArtifact list
+}

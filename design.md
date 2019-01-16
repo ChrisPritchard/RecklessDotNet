@@ -36,3 +36,11 @@ Needed interface:
 A camera might not be necessary: original RC had a fixed view
 
 ## Mouse to tile
+
+## Tile popups
+
+1. If the mouse is pressed then:
+    - eliminate the previous popup, if open
+    - work out if a mouse tile is pressed
+    - if so, generate ui and set
+    - ui is a list, doesnt need to be a specific record

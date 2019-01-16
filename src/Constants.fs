@@ -1,11 +1,18 @@
 module Reckless.Constants
 
+open Microsoft.Xna.Framework
 open GameCore.GameModel
+open GameCore.UIElements.Common
 open Model
 
 let windowSize = 800, 600
 let tileSize = 64, 32
 let mapSize = 10
+
+let fontSize = 20
+let activeColours = { background = Color.DarkBlue; border = Some (2, Color.Blue); text = Color.White }
+let inactiveColours = { activeColours with text = Color.Gray }
+let padding = 10
 
 let assets = [
         Font ("font", "./content/Xolonium")
