@@ -8,8 +8,7 @@ open Iso
 
 let tw, th = tileSize
 
-let lineHeight = float fontSize * 1.25 |> int
-let textHeight lines = ((lines - 1) * lineHeight) + fontSize
+let lineHeight = float fontSize * 1.3 |> int
 
 let contract n (rx, ry, rw, rh) =
     rx + n, ry + n, rw - 2*n, rh - 2*n
@@ -22,15 +21,14 @@ let panel rect = [
         yield Colour (inner, activeColours.background)
     | _ ->
         yield Colour (rect, activeColours.background)
-]
-        
+]        
 
 let tilePopup corpList (tx, ty) = [
     let qualityLine (corp, quality) =
         sprintf "%s: %i" corp.abbreviation quality
 
     let lines = corpList |> List.map qualityLine
-    let textHeight = textHeight (List.length lines)
+    let textHeight = List.length lines * lineHeight
     let textWidth = float (lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
     
     let x, y, _, _ = isoRect tx ty tw th
