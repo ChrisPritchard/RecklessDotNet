@@ -18,9 +18,11 @@
 
   <!-- Processed by content pipeline on build into xnb files -->
   <ItemGroup>
-    <None Include="content/Xolonium.mgcb" />
+    <None Include="content/Content.mgcb" />
     <None Include="content/Xolonium.otf" />
     <None Include="content/Xolonium.spritefont" />
+    <None Include="content/SourceCodePro-Regular.otf" />
+    <None Include="content/SourceCodePro-Regular.spritefont" />
     <MonoGameContentReference Include="**\*.mgcb" />
   </ItemGroup>
 

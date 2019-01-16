@@ -16,7 +16,7 @@ let inactiveColours = { activeColours with text = Color.Gray }
 let padding = 10
 
 let assets = [
-        Font ("font", "./content/Xolonium")
+        Font ("font", "./content/SourceCodePro-Regular")
         Texture ("tile", "content/tile.png")
         Texture ("tile-highlight", "content/tile-highlight.png")
         Texture ("office", "content/office.png")

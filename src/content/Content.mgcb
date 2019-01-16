@@ -20,3 +20,10 @@
 /processorParam:TextureFormat=Compressed
 /build:Xolonium.spritefont
 
+#begin SourceCodePro-Regular.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:SourceCodePro-Regular.spritefont
+
