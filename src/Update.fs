@@ -21,14 +21,14 @@ let private findProductTiles corps =
         pos, ordered)
     |> Map.ofList
 
-let updateUI runState gameState =
+let mouseTile runState gameState =
     if not (isMousePressed (true, false) runState) then
-        gameState.ui
+        gameState.mouseTile
     else 
         match mouseTile runState with
-        | None -> { gameState.ui with tilePopup = None }
+        | None -> None
         | Some (mx, my) -> 
-            { gameState.ui with tilePopup = Some (mx, my) }
+            Some (mx, my)
 
 let advanceModel runState model =
     if wasJustPressed Keys.Escape runState then None
@@ -36,6 +36,8 @@ let advanceModel runState model =
         match model with
         | None -> Some (startModel ())
         | Some gameState -> 
-            let newUI = updateUI runState gameState
+            let newMouseTile = mouseTile runState gameState
             let newProductTiles = findProductTiles gameState.corps
-            Some { gameState with ui = newUI; productTiles = newProductTiles }
+            Some { gameState with 
+                    mouseTile = newMouseTile
+                    productTiles = newProductTiles }

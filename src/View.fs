@@ -42,8 +42,27 @@ let tilePopup corpList (tx, ty) = [
         Text (font, line, (x + padding, y), fontSize, TopLeft, colour))
 ]
 
+let officePopup office corp = [
+    let lines = [
+        yield sprintf "%s (%s)" corp.name corp.abbreviation
+        yield! office.departments |> List.map (sprintf "%A")
+    ]
+    let textHeight = List.length lines * lineHeight
+    let textWidth = float (lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
+    
+    let x, y, _, _ = isoRect office.x office.y tw th
+    let width, height = textWidth + padding*2, textHeight + padding*2
+    let x, y = x + tw/2 - width/2, y + th + padding/2
+
+    yield! panel (x, y, width, height)
+    yield! lines |> List.mapi (fun i line -> 
+        let colour = if i = 0 then activeColours.text else inactiveColours.text
+        let y = y + padding + (i * lineHeight)
+        Text (font, line, (x + padding, y), fontSize, TopLeft, colour))
+    ]
+
 let private renderMap (mx, my) gameState =
-    let tilePopup = gameState.ui.tilePopup |> Option.defaultValue (-1, -1)
+    let tilePopup = gameState.mouseTile |> Option.defaultValue (-1, -1)
     gameState.map
     |> Set.toList
     |> List.collect (fun (x, y) -> [
@@ -60,25 +79,40 @@ let rec private allOffices office = [
     yield! List.collect allOffices office.managedOffices
 ]
 
-let private renderOffices (mx, my) corps =
-    corps
+let private renderOffices (mx, my) gameState =
+    let tilePopup = gameState.mouseTile |> Option.defaultValue (-1, -1)
+    gameState.corps
     |> List.collect (fun corp -> 
         allOffices corp.headOffice
         |> List.collect (fun o -> [
             let rect = isoRect o.x o.y tw (th*3)
             yield 1, Image ("office", rect, corp.colour)
-            if (o.x, o.y) = (mx, my) then
+            if (o.x, o.y) = (mx, my) || (o.x, o.y) = tilePopup then
                 yield 3, Image ("office-highlight", rect, Color.White)
         ]))
 
+let findOfficePopup (mx, my) gameState = 
+    let office = 
+        gameState.corps 
+        |> List.collect (fun c -> allOffices c.headOffice |> List.map (fun o -> o, c))
+        |> List.tryFind (fun (o, _) -> o.x = mx && o.y = my)
+    office |> Option.bind (fun (o, c) ->
+        Some (officePopup o c))
+
+let findTilePopup (mx, my) gameState = 
+    match Map.tryFind (mx, my) gameState.productTiles with
+    | Some corpList ->
+        tilePopup corpList (mx, my)
+    | _ -> []
+
 let renderUI gameState = 
     [
-        match gameState.ui.tilePopup with
+        match gameState.mouseTile with
         | Some (mx, my) ->
-            match Map.tryFind (mx, my) gameState.productTiles with
-            | Some corpList ->
-                yield! tilePopup corpList (mx, my)
-            | _ -> ()
+            let popup = 
+                findOfficePopup (mx, my) gameState 
+                |> Option.defaultValue (findTilePopup (mx, my) gameState)
+            yield! popup
         | _ -> ()
     ] |> List.map (fun va -> 90, va)
 
@@ -97,7 +131,7 @@ let getView runState gameState =
 
         let mousePos = mouseTile runState |> Option.defaultValue (-1, -1)
         yield! renderMap mousePos gameState
-        yield! renderOffices mousePos gameState.corps
+        yield! renderOffices mousePos gameState
         yield! renderUI gameState
         yield 99, getCursor runState
     ] 

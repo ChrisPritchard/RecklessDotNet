@@ -60,7 +60,5 @@ let startModel () = {
     map = map
     corps = corps
     productTiles = Map.empty
-    ui = {
-        tilePopup = None
-    }
+    mouseTile = None
 }
