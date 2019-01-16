@@ -11,6 +11,20 @@ let tw, th = tileSize
 let lineHeight = float fontSize * 1.25 |> int
 let textHeight lines = ((lines - 1) * lineHeight) + fontSize
 
+let contract n (rx, ry, rw, rh) =
+    rx + n, ry + n, rw - 2*n, rh - 2*n
+
+let panel rect = [
+    match activeColours.border with
+    | Some (n, colour) ->
+        yield Colour (rect, colour)
+        let inner = contract n rect
+        yield Colour (inner, activeColours.background)
+    | _ ->
+        yield Colour (rect, activeColours.background)
+]
+        
+
 let tilePopup corpList (tx, ty) = [
     let qualityLine (corp, quality) =
         sprintf "%s: %i" corp.abbreviation quality
@@ -22,7 +36,7 @@ let tilePopup corpList (tx, ty) = [
     let x, y, _, _ = isoRect tx ty tw th
     let width, height = textWidth + padding*2, textHeight + padding*2
 
-    yield Colour ((x, y, width, height), activeColours.background)
+    yield! panel (x, y, width, height)
     yield! lines |> List.mapi (fun i line -> 
         let colour = if i = 0 then activeColours.text else inactiveColours.text
         let y = y + padding + (i * lineHeight)
