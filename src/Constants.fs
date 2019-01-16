@@ -11,8 +11,8 @@ let mapSize = 10
 
 let font = "font"
 let fontSize = 14
-let activeColours = { background = Color.DarkBlue; border = Some (2, Color.Blue); text = Color.White }
-let inactiveColours = { activeColours with text = Color.Gray }
+let activeColours = { background = Color.Gray; border = Some (2, Color.DarkGray); text = Color.White }
+let inactiveColours = { activeColours with text = Color.WhiteSmoke }
 let padding = 10
 
 let assets = [
