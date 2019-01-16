@@ -33,6 +33,7 @@ let tilePopup corpList (tx, ty) = [
     
     let x, y, _, _ = isoRect tx ty tw th
     let width, height = textWidth + padding*2, textHeight + padding*2
+    let x, y = x + tw/2 - width/2, y + th + padding/2
 
     yield! panel (x, y, width, height)
     yield! lines |> List.mapi (fun i line -> 
