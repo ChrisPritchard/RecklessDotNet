@@ -14,11 +14,27 @@ let map =
         let y = i / dim
         Set.add (x, y) map) Set.empty
 
+let subOffice = {
+    x = 8
+    y = 4
+    managedOffices = []
+    departments = [Product 16; Product 30]
+    extensions = []
+}
+
 let testOffice = {
     x = 4
     y = 4
-    managedOffices = []
+    managedOffices = [subOffice]
     departments = [Product 16; Marketing; Product 22; Product 30]
+    extensions = []
+}
+
+let testOffice2 = {
+    x = 2
+    y = 7
+    managedOffices = []
+    departments = [Product 16; Marketing; Product 30]
     extensions = []
 }
 
@@ -28,6 +44,12 @@ let corps = [
         headOffice = testOffice
         orders = []
         colour = Color.Red
+    }
+    {   cash = 0
+        ideas = 0
+        headOffice = testOffice2
+        orders = []
+        colour = Color.Blue
     }
 ]
 

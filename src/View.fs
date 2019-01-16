@@ -32,15 +32,21 @@ let private renderMap productTiles (mx, my) map =
                 yield 2, Image ("tile-highlight", rect, Color.White)
         ])
 
+let rec allOffices office = [
+    yield office
+    yield! List.collect allOffices office.managedOffices
+]
+
 let private renderOffices (mx, my) corps =
     corps
-    |> List.collect (fun corp -> [
-            let o = corp.headOffice
+    |> List.collect (fun corp -> 
+        allOffices corp.headOffice
+        |> List.collect (fun o -> [
             let rect = isoRect o.x o.y tw (th*3)
             yield 1, Image ("office", rect, corp.colour)
             if (o.x, o.y) = (mx, my) then
                 yield 3, Image ("office-highlight", rect, Color.White)
-        ])
+        ]))
 
 let getView runState (map, (corps: Corporation list), ui) = 
     [
