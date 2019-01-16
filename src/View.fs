@@ -8,20 +8,25 @@ open Iso
 
 let tw, th = tileSize
 
-let lineHeight = fontSize * 4/3
-
-let textHeight lines = 
-    (lines - 1) * lineHeight + fontSize
+let lineHeight = float fontSize * 1.25 |> int
+let textHeight lines = ((lines - 1) * lineHeight) + fontSize
 
 let tilePopup corpList (tx, ty) = [
+    let qualityLine (corp, quality) =
+        sprintf "%s: %i" corp.abbreviation quality
+
+    let lines = corpList |> List.map qualityLine
+    let textHeight = textHeight (List.length lines)
+    let textWidth = float (lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
+    
     let x, y, _, _ = isoRect tx ty tw th
-    let topCorp = List.head corpList |> fun ((c: Corporation), q) -> sprintf "%s:\t%i" c.abbreviation q
-    let rest = List.tail corpList |> List.map (fun (c, q) -> sprintf "%s:\t%i" c.abbreviation q)
-    let textHeight = List.length rest + 1
-    let textWidth = (topCorp::rest) |> List.map Seq.length |> Seq.max |> fun len -> len * 4/5
     let width, height = textWidth + padding*2, textHeight + padding*2
 
     yield Colour ((x, y, width, height), activeColours.background)
+    yield! lines |> List.mapi (fun i line -> 
+        let colour = if i = 0 then activeColours.text else inactiveColours.text
+        let y = y + padding + (i * lineHeight)
+        Text (font, line, (x + padding, y), fontSize, TopLeft, colour))
 ]
 
 let private renderMap productTiles (mx, my) map =
