@@ -4,7 +4,6 @@ open Microsoft.Xna.Framework
 open GameCore.GameModel
 open Model
 open Iso
-open UI
 open Turn
 
 let tw, th = Constants.tileSize
@@ -48,6 +47,11 @@ let private renderOffices (mx, my) corps =
                 yield 3, Image ("office-highlight", rect, Color.White)
         ]))
 
+let getCursor runState =
+    let isPressed = isMousePressed (true, false) runState
+    let mx, my = runState.mouse.position 
+    Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
+
 let getView runState (map, (corps: Corporation list), ui) = 
     [
         // render map and corps
@@ -60,7 +64,7 @@ let getView runState (map, (corps: Corporation list), ui) =
         let productTiles = findProductTiles corps
         yield! renderMap productTiles mousePos map
         yield! renderOffices mousePos corps
+        yield 99, getCursor runState
     ] 
     |> List.sortBy fst 
     |> List.map snd 
-    |> fun l -> List.append l (getUIView runState ui)

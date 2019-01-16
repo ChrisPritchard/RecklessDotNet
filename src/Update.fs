@@ -4,7 +4,6 @@ open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Input
 open GameCore.GameModel
 open Model
-open UI
 
 let dim = Constants.mapSize
 let map = 
@@ -62,4 +61,4 @@ let advanceModel runState model =
     else
         match model with
         | None -> Some startModel
-        | Some (map, corps, ui) -> Some (map, corps, updateUIModel runState ui)
+        | Some (map, corps, ui) -> Some (map, corps, ui)

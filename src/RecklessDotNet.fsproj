@@ -10,7 +10,6 @@
     <Compile Include="Constants.fs" />
     <Compile Include="Turn.fs" />
     <Compile Include="Iso.fs" />
-    <Compile Include="UI.fs" />
     <Compile Include="View.fs" />
     <Compile Include="Update.fs" />
     <Compile Include="Program.fs" />
