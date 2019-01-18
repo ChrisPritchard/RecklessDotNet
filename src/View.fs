@@ -68,9 +68,13 @@ let private renderMap (mx, my) gameState =
     |> Set.toList
     |> List.collect (fun (x, y) -> [
             let rect = isoRect x y tw th
+
             match Map.tryFind (x, y) gameState.productTiles with
-            | Some ((c, _)::_) -> yield 0, Image ("tile", rect, c.colour)
-            | _ -> yield 0, Image ("tile", rect, Color.White)
+            | Some ((corp, _)::_) -> 
+                yield 0, Image ("tile", rect, corp.colour)
+            | _ -> 
+                yield 0, Image ("tile", rect, Color.White)
+
             if (x, y) = (mx, my) || (x, y) = tilePopup then
                 yield 2, Image ("tile-highlight", rect, Color.White)
         ])
@@ -80,22 +84,28 @@ let rec private allOffices office = [
     yield! List.collect allOffices office.managedOffices
 ]
 
-let private renderOffices (mx, my) gameState =
-    let tilePopup = gameState.mouseTile |> Option.defaultValue (-1, -1)
-    gameState.corps
+let renderOffice colour mouseTile selectedTile office = 
+    [
+        let pos = office.x, office.y
+        let rect = isoRect office.x office.y tw (th*3)
+        yield 1, Image ("office", rect, colour)
+
+        if pos = mouseTile || pos = selectedTile then
+            yield 3, Image ("office-highlight", rect, Color.White)
+
+        if pos = selectedTile then
+            let tiles = localProductTiles office
+            yield! tiles |> List.map (fun (x, y) ->
+                let tileRect = isoRect x y tw th
+                2, Image ("tile-highlight", tileRect, Color.White))
+    ]
+
+let private renderOffices mouseTile gameState =
+    let selectedTile = gameState.mouseTile |> Option.defaultValue (-1, -1)
+    gameState.corps 
     |> List.collect (fun corp -> 
-        allOffices corp.headOffice
-        |> List.collect (fun o -> [
-            let rect = isoRect o.x o.y tw (th*3)
-            yield 1, Image ("office", rect, corp.colour)
-            if (o.x, o.y) = (mx, my) || (o.x, o.y) = tilePopup then
-                yield 3, Image ("office-highlight", rect, Color.White)
-            if (o.x, o.y) = tilePopup then
-                let tiles = localProductTiles o
-                yield! tiles |> List.map (fun (x, y) ->
-                    let tileRect = isoRect x y tw th
-                    2, Image ("tile-highlight", tileRect, Color.White))
-        ]))
+        allOffices corp.headOffice 
+        |> List.collect (renderOffice corp.colour mouseTile selectedTile))
 
 let findOfficePopup (mx, my) gameState = 
     let office = 
