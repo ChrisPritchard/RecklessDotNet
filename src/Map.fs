@@ -26,7 +26,7 @@ let private renderMap (mx, my) gameState =
 
 
 
-let private renderOffice colour mouseTile selectedTile office = 
+let private renderOffice colour map mouseTile selectedTile office = 
     [
         let pos = office.x, office.y
         let rect = isoRect office.x office.y tw (th*3)
@@ -37,7 +37,7 @@ let private renderOffice colour mouseTile selectedTile office =
 
         if pos = selectedTile then
             let tiles = localProductTiles office
-            yield! tiles |> List.map (fun (x, y) ->
+            yield! tiles |> List.filter (fun p -> Set.contains p map) |> List.map (fun (x, y) ->
                 let tileRect = isoRect x y tw th
                 2, Image ("tile-highlight", tileRect, Color.White))
     ]
@@ -47,7 +47,7 @@ let private renderOffices mouseTile gameState =
     gameState.corps 
     |> List.collect (fun corp -> 
         allOffices corp.headOffice 
-        |> List.collect (renderOffice corp.colour mouseTile selectedTile))
+        |> List.collect (renderOffice corp.colour gameState.map mouseTile selectedTile))
 
 let render mouseTile gameState = [
     yield! renderMap mouseTile gameState
