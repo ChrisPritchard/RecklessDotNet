@@ -41,3 +41,8 @@ let departmentCost =
     | Marketing -> 500
     | Acquisitions -> 500
     | Product _ -> 0
+
+let rec allOffices office = [
+    yield office
+    yield! List.collect allOffices office.managedOffices
+]
