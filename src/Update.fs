@@ -5,12 +5,11 @@ open GameCore.GameModel
 open Model
 open StartModel
 open Iso
-open Turn
 
 let private findProductTiles corps =
     corps
     |> List.collect (fun c -> 
-            productTiles None c.headOffice
+            allProductTiles None c.headOffice
             |> List.map (fun (x, y, q) -> (x, y), (c, q)))
     |> List.groupBy fst
     |> List.map (fun (pos, tiles) -> 
@@ -21,9 +20,9 @@ let private findProductTiles corps =
         pos, ordered)
     |> Map.ofList
 
-let mouseTile runState gameState =
+let findMouseTile runState gameState =
     if not (isMousePressed (true, false) runState) then
-        gameState.mouseTile
+        gameState.selectedTile
     else 
         match mouseTile runState with
         | None -> None
@@ -36,8 +35,6 @@ let advanceModel runState model =
         match model with
         | None -> Some (startModel ())
         | Some gameState -> 
-            let newMouseTile = mouseTile runState gameState
-            let newProductTiles = findProductTiles gameState.corps
             Some { gameState with 
-                    mouseTile = newMouseTile
-                    productTiles = newProductTiles }
+                    selectedTile = findMouseTile runState gameState
+                    productTiles = findProductTiles gameState.corps }

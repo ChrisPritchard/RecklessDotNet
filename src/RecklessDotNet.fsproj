@@ -9,10 +9,7 @@
     <Compile Include="Model.fs" />
     <Compile Include="Constants.fs" />
     <Compile Include="StartModel.fs" />
-    <Compile Include="Turn.fs" />
     <Compile Include="Iso.fs" />
-    <Compile Include="Map.fs" />
-    <Compile Include="Interface.fs" />
     <Compile Include="View.fs" />
     <Compile Include="Update.fs" />
     <Compile Include="Program.fs" />

@@ -60,5 +60,5 @@ let startModel () = {
     map = map
     corps = corps
     productTiles = Map.empty
-    mouseTile = None
+    selectedTile = None
 }
