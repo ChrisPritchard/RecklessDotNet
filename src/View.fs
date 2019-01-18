@@ -5,6 +5,7 @@ open GameCore.GameModel
 open Model
 open Constants
 open Iso
+open Turn
 
 let tw, th = tileSize
 
@@ -89,6 +90,11 @@ let private renderOffices (mx, my) gameState =
             yield 1, Image ("office", rect, corp.colour)
             if (o.x, o.y) = (mx, my) || (o.x, o.y) = tilePopup then
                 yield 3, Image ("office-highlight", rect, Color.White)
+            if (o.x, o.y) = tilePopup then
+                let tiles = localProductTiles o
+                yield! tiles |> List.map (fun (x, y) ->
+                    let tileRect = isoRect x y tw th
+                    2, Image ("tile-highlight", tileRect, Color.White))
         ]))
 
 let findOfficePopup (mx, my) gameState = 
