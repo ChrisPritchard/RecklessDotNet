@@ -36,6 +36,14 @@ let private testOffice2 = {
     extensions = []
 }
 
+let private testOffice3 = {
+    x = 8
+    y = 8
+    managedOffices = []
+    departments = [Research;Research;Research;Marketing;Product 100;Acquisitions]
+    extensions = []
+}
+
 let player = {   
     name = "Aquinas Corp"
     abbreviation = "AQU"
@@ -55,6 +63,15 @@ let private others = [
         headOffice = testOffice
         orders = []
         colour = Color.Purple
+    }
+    {   
+        name = "Jade Systems"
+        abbreviation = "JAS"
+        cash = 0
+        ideas = 0
+        headOffice = testOffice3
+        orders = []
+        colour = Color.Green
     }
 ]
 

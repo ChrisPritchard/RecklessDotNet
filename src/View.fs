@@ -62,7 +62,7 @@ let private panel rect = [
         yield Colour (rect, activeColours.background)
 ]        
 
-let private tilePopup corpList (tx, ty) = [
+let private tilePopup corpList = [
     let qualityLine (corp, quality) =
         sprintf "%s: %i" corp.abbreviation quality
 
@@ -70,9 +70,7 @@ let private tilePopup corpList (tx, ty) = [
     let textHeight = List.length lines * lineHeight
     let textWidth = float (lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
     
-    //let x, y, _, _ = isoRect tx ty tw th
     let width, height = textWidth + padding*2, textHeight + padding*2
-    //let x, y = x + tw/2 - width/2, y + th + padding/2
     let x, y = 10, 10
 
     yield! panel (x, y, width, height)
@@ -90,9 +88,7 @@ let private officePopup office corp = [
     let textHeight = List.length lines * lineHeight
     let textWidth = float (lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
     
-    //let x, y, _, _ = isoRect office.x office.y tw th
     let width, height = textWidth + padding*2, textHeight + padding*2
-    //let x, y = x + tw/2 - width/2, y + th + padding/2
     let x, y = 10, 10
 
     yield! panel (x, y, width, height)
@@ -112,8 +108,7 @@ let private findOfficePopup (mx, my) gameState =
 
 let private findTilePopup (mx, my) gameState = 
     match Map.tryFind (mx, my) gameState.productTiles with
-    | Some corpList ->
-        tilePopup corpList (mx, my)
+    | Some corpList -> tilePopup corpList
     | _ -> []
 
 let renderUI gameState = 
