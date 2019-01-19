@@ -6,8 +6,7 @@ open Constants
 open Model
 open Iso
 
-let private renderMarket currentMouseTile gameState =
-    let selectedTile = gameState.selectedTile |> Option.defaultValue (-1, -1)
+let private renderMarket gameState =
     gameState.market
     |> Set.toList
     |> List.collect (fun (x, y) -> [
@@ -15,37 +14,33 @@ let private renderMarket currentMouseTile gameState =
 
         match Map.tryFind (x, y) gameState.productTiles with
         | Some ((corp, _)::_) -> 
-            yield 0, Image ("tile", rect, corp.colour)
+            yield Image ("tile", rect, corp.colour)
         | _ -> 
-            yield 0, Image ("tile", rect, Color.White)
-
-        if (x, y) = selectedTile || (x, y) = currentMouseTile then
-            yield 2, Image ("tile-highlight", rect, Color.White)
+            yield Image ("tile", rect, Color.White)
     ])
 
-let private renderOffice colour currentMouseTile gameState office = 
-    [
-        let pos = office.x, office.y
+let private renderOffices gameState =
+    allCorps gameState
+    |> List.collect (fun corp -> allOffices corp.headOffice |> List.map (fun o -> corp, o))
+    |> List.sortBy (fun (_, office) -> office.y, office.x)
+    |> List.map (fun (corp, office) -> 
         let rect = isoRect office.x office.y tw (th*3)
-        yield 1, Image ("office", rect, colour)
-        
-        let selectedTile = gameState.selectedTile |> Option.defaultValue (-1, -1)    
+        Image ("office", rect, corp.colour))
 
-        if pos = selectedTile || pos = currentMouseTile then
-            yield 3, Image ("office-highlight", rect, Color.White)
+let private renderHighlight gameState (x, y) = [
+        yield Image ("tile-highlight", isoRect x y tw th, Color.White)
 
-        if pos = selectedTile then
+        let allOffices = allCorps gameState |> List.collect (fun corp -> allOffices corp.headOffice)
+        match List.tryFind (fun office -> (office.x, office.y) = (x, y)) allOffices with
+        | None -> ()
+        | Some office ->
+            let rect = isoRect office.x office.y tw (th*3)
+            yield Image ("office-highlight", rect, Color.White)
+
             let tiles = productTiles office
             yield! tiles |> List.filter (fun p -> Set.contains p gameState.market) |> List.map (fun (x, y) ->
-                let tileRect = isoRect x y tw th
-                2, Image ("tile-highlight", tileRect, Color.White))
+                Image ("tile-highlight", isoRect x y tw th, Color.White))
     ]
-
-let private renderOffices currentMouseTile gameState =
-    allCorps gameState
-    |> List.collect (fun corp -> 
-        allOffices corp.headOffice 
-        |> List.collect (renderOffice corp.colour currentMouseTile gameState))
 
 let private lineHeight = float fontSize * 1.3 |> int
 
@@ -120,10 +115,9 @@ let private playerStats gameState =
         yield! lines |> List.mapi (fun i line -> 
             let y = y + padding + (i * lineHeight)
             Text (font, line, (x + padding, y), fontSize, TopLeft, activeColours.text))
-    ]
-    
+    ]    
 
-let renderUI gameState = 
+let private renderInterface gameState = 
     [
         yield! playerStats gameState
 
@@ -134,26 +128,25 @@ let renderUI gameState =
                 |> Option.defaultValue (findTilePopup (mx, my) gameState)
             yield! popup
         | _ -> ()
-    ] |> List.map (fun va -> 90, va)
+    ]
 
-let private getCursor runState =
+let private renderCursor runState =
     let isPressed = isMousePressed (true, false) runState
     let mx, my = runState.mouse.position 
     Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
 
 let getView runState gameState = 
     [
-        // render map and corps
-        // render popups (office info, tile info)
-        // render ui commands (orders, end turn)
-        // render status (cash, cashflow, ideas)
-        // render mouse cursor
+        yield! renderMarket gameState
+        yield! renderOffices gameState
+
+        if gameState.selectedTile <> None then
+            yield! renderHighlight gameState (Option.get gameState.selectedTile)
 
         let mousePos = mouseTile runState
-        yield! renderMarket mousePos gameState
-        yield! renderOffices mousePos gameState
-        yield! renderUI gameState
-        yield 99, getCursor runState
-    ] 
-    |> List.sortBy fst 
-    |> List.map snd 
+        if gameState.market.Contains mousePos then
+            yield! renderHighlight gameState mousePos
+
+        yield! renderInterface gameState
+        yield renderCursor runState
+    ]
