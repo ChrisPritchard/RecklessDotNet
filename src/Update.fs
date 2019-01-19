@@ -1,4 +1,4 @@
-module Reckless.Update
+module Update
 
 open Microsoft.Xna.Framework.Input
 open GameCore.GameModel

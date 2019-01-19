@@ -1,5 +1,4 @@
-﻿module Reckless.Program
-
+﻿
 open GameCore.GameRunner
 
 [<EntryPoint>]

@@ -1,4 +1,4 @@
-module Reckless.Constants
+module Constants
 
 open Microsoft.Xna.Framework
 open GameCore.GameModel

@@ -1,4 +1,4 @@
-module Reckless.Model
+module Model
 
 open Microsoft.Xna.Framework
 

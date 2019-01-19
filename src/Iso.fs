@@ -1,8 +1,7 @@
-module Reckless.Iso
+module Iso
 
 open GameCore.GameModel
 open Constants
-open Reckless
 
 let private tw, th = tileSize
 let private rx, ry = windowSize
