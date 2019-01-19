@@ -7,20 +7,6 @@ open Model
 open StartModel
 open Iso
 
-let private findProductTiles gameState =
-    allCorps gameState
-    |> List.collect (fun c -> 
-            allProductTiles None c.headOffice
-            |> List.map (fun (x, y, q) -> (x, y), (c, q)))
-    |> List.groupBy fst
-    |> List.map (fun (pos, tiles) -> 
-        let ordered = 
-            tiles 
-            |> List.sortByDescending (fun (_, (_, q)) -> q) 
-            |> List.map snd
-        pos, ordered)
-    |> Map.ofList
-
 let findMouseTile runState gameState =
     if not (isMousePressed (true, false) runState) then
         gameState.selectedTile
@@ -41,5 +27,4 @@ let advanceModel runState model =
         | Some gameState -> 
             Some { gameState with 
                     selectedTile = findMouseTile runState gameState
-                    productTiles = findProductTiles gameState
                     buttons = updateButtonStates runState gameState.buttons }

@@ -55,21 +55,21 @@ let private findOfficePopup (mx, my) gameState =
     office |> Option.bind (fun (o, c) ->
         Some (officePopup o c))
 
-let private findTilePopup (mx, my) gameState = 
-    match Map.tryFind (mx, my) gameState.productTiles with
+let private findTilePopup (mx, my) productTiles = 
+    match Map.tryFind (mx, my) productTiles with
     | Some corpList -> tilePopup corpList
     | _ -> []
 
 let private playerStats gameState =
     let stats = [
-        "Cash", gameState.player.cash
-        "Income", 0
-        "Expenses", 0
-        "Change", 0
-        "Ideas", gameState.player.ideas
-        "Orders Remaining", 0
+        "Cash", "$", gameState.player.cash
+        "Income", "$", 0
+        "Expenses", "$", 0
+        "Change", "$", 0
+        "Ideas", "", gameState.player.ideas
+        "Orders Remaining", "", 0
     ]
-    let lines = stats |> List.map (fun (label, value) -> sprintf "%s: %i" label value)
+    let lines = stats |> List.map (fun o -> o |||> sprintf "%s: %s%i")
 
     let x, y, width, height = 10, winh - 140, 200, 130
 
@@ -80,7 +80,7 @@ let private playerStats gameState =
             Text (font, line, (x + padding, y), fontSize, TopLeft, activeColours.text))
     ]
 
-let renderInterface gameState = 
+let renderInterface productTiles gameState = 
     [
         yield! playerStats gameState
 
@@ -88,7 +88,7 @@ let renderInterface gameState =
         | Some (mx, my) ->
             let popup = 
                 findOfficePopup (mx, my) gameState 
-                |> Option.defaultValue (findTilePopup (mx, my) gameState)
+                |> Option.defaultValue (findTilePopup (mx, my) productTiles)
             yield! popup
         | _ -> ()
 

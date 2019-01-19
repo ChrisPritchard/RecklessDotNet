@@ -36,7 +36,6 @@ type GameState = {
     market: Set<int * int>
     player: Corporation
     others: Corporation list
-    productTiles: Map<int * int, (Corporation * int) list>
     selectedTile: (int * int) option
     buttons: GameButtons
 } and GameButtons = {
@@ -48,30 +47,47 @@ let rec allOffices office = [
     yield! List.collect allOffices office.managedOffices
 ]
 
-let productTiles office = 
+let allCorps gameState =
+    gameState.player::gameState.others
+
+let officeProductTiles office = 
     let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)
     [-products..products] |> List.collect (fun x ->
     [-products..products] |> List.map (fun y -> x, y))
     |> List.filter (fun (x, y) -> abs x + abs y <= products)
     |> List.map (fun (x, y) -> office.x + x, office.y + y)
 
-let rec allProductTiles parent office = 
-    let quality, localMarketing = 
-        ((0, 0), office.departments) 
-        ||> List.fold (fun (q, m) -> 
-            function
-            | Product v -> q + v, m
-            | Marketing -> q, m + 1
-            | _ -> q, m)
-    let parentMarketing = 
-        match parent with 
-        | Some o -> o.departments |> List.sumBy (function Marketing -> 1 | _ -> 0) 
-        | _ -> 0
-    let quality = quality * pown 2 (localMarketing + parentMarketing)
-    [
-        yield! productTiles office |> List.map (fun (x, y) -> x, y, quality)
-        yield! List.collect (allProductTiles (Some office)) office.managedOffices
-    ]
+let private corpProductTiles corp = 
+    let rec gatherer parent office = 
+        let quality, localMarketing = 
+            ((0, 0), office.departments) 
+            ||> List.fold (fun (q, m) -> 
+                function
+                | Product v -> q + v, m
+                | Marketing -> q, m + 1
+                | _ -> q, m)
+        let parentMarketing = 
+            match parent with 
+            | Some o -> o.departments |> List.sumBy (function Marketing -> 1 | _ -> 0) 
+            | _ -> 0
+        let quality = quality * pown 2 (localMarketing + parentMarketing)
+        [
+            yield! officeProductTiles office |> List.map (fun (x, y) -> x, y, quality)
+            yield! List.collect (gatherer (Some office)) office.managedOffices
+        ]
+    gatherer None corp.headOffice
+
+let gameProductTiles gameState =
+    allCorps gameState
+    |> List.collect (fun c -> corpProductTiles c |> List.map (fun (x, y, q) -> (x, y), (c, q)))
+    |> List.groupBy fst
+    |> List.map (fun (pos, tiles) -> 
+        let ordered = 
+            tiles 
+            |> List.sortByDescending (fun (_, (_, q)) -> q) 
+            |> List.map snd
+        pos, ordered)
+    |> Map.ofList
 
 let rec updateQuality office researchOffices =
     let hasResearch = List.contains Research office.departments && not <| List.contains office researchOffices
@@ -86,6 +102,3 @@ let rec updateQuality office researchOffices =
         | d -> d)
     let newManaged = office.managedOffices |> List.map (fun o -> updateQuality o researchOffices)
     { office with departments = newDepartments; managedOffices = newManaged }
-
-let allCorps gameState =
-    gameState.player::gameState.others

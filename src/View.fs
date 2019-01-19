@@ -5,15 +5,14 @@ open GameCore.GameModel
 open Constants
 open Model
 open Iso
-open Interface
 
-let private renderMarket gameState =
+let private renderMarket productTiles gameState =
     gameState.market
     |> Set.toList
     |> List.collect (fun (x, y) -> [
         let rect = isoRect x y tw th
 
-        match Map.tryFind (x, y) gameState.productTiles with
+        match Map.tryFind (x, y) productTiles with
         | Some ((corp, _)::_) -> 
             yield Image ("tile", rect, corp.colour)
         | _ -> 
@@ -38,7 +37,7 @@ let private renderHighlight gameState (x, y) = [
             let rect = isoRect office.x office.y tw (th*3)
             yield Image ("office-highlight", rect, Color.White)
 
-            let tiles = productTiles office
+            let tiles = officeProductTiles office
             yield! tiles |> List.filter (fun p -> Set.contains p gameState.market) |> List.map (fun (x, y) ->
                 Image ("tile-highlight", isoRect x y tw th, Color.White))
     ]
@@ -49,19 +48,19 @@ let private renderCursor runState =
     Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
 
 let getView runState gameState = 
+    let productTiles = gameProductTiles gameState
+    let mousePos = mouseTile runState
     [
-        yield! renderMarket gameState
+        yield! renderMarket productTiles gameState
         yield! renderOffices gameState
 
         if gameState.selectedTile <> None then
             yield! renderHighlight gameState (Option.get gameState.selectedTile)
 
-        let mousePos = mouseTile runState
         if gameState.market.Contains mousePos then
             yield! renderHighlight gameState mousePos
 
-        // interface.fs
-        yield! renderInterface gameState
+        yield! Interface.renderInterface productTiles gameState
 
         yield renderCursor runState
     ]
