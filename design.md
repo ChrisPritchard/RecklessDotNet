@@ -44,3 +44,8 @@ A camera might not be necessary: original RC had a fixed view
     - work out if a mouse tile is pressed
     - if so, generate ui and set
     - ui is a list, doesnt need to be a specific record
+
+## Multiple building sizes
+
+Will require two more sets of two, for offices with 2 or less, 4 or less and 6 or less departments
+At this point, probably a good idea to combine sprites into a single image
