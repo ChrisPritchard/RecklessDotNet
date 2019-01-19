@@ -6,9 +6,9 @@ open Constants
 open Model
 open Iso
 
-let private renderMap currentMouseTile gameState =
+let private renderMarket currentMouseTile gameState =
     let selectedTile = gameState.selectedTile |> Option.defaultValue (-1, -1)
-    gameState.map
+    gameState.market
     |> Set.toList
     |> List.collect (fun (x, y) -> [
         let rect = isoRect x y tw th
@@ -36,13 +36,12 @@ let private renderOffice colour currentMouseTile gameState office =
 
         if pos = selectedTile then
             let tiles = productTiles office
-            yield! tiles |> List.filter (fun p -> Set.contains p gameState.map) |> List.map (fun (x, y) ->
+            yield! tiles |> List.filter (fun p -> Set.contains p gameState.market) |> List.map (fun (x, y) ->
                 let tileRect = isoRect x y tw th
                 2, Image ("tile-highlight", tileRect, Color.White))
     ]
 
 let private renderOffices currentMouseTile gameState =
-    let selectedTile = gameState.selectedTile |> Option.defaultValue (-1, -1)
     gameState.corps 
     |> List.collect (fun corp -> 
         allOffices corp.headOffice 
@@ -141,8 +140,8 @@ let getView runState gameState =
         // render status (cash, cashflow, ideas)
         // render mouse cursor
 
-        let mousePos = mouseTile runState |> Option.defaultValue (-1, -1)
-        yield! renderMap mousePos gameState
+        let mousePos = mouseTile runState
+        yield! renderMarket mousePos gameState
         yield! renderOffices mousePos gameState
         yield! renderUI gameState
         yield 99, getCursor runState

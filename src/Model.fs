@@ -33,7 +33,7 @@ and Order =
     | BuildOffice of acquisitions:Office * x:int * y:int * Department
 
 type GameState = {
-    map: Set<int * int>
+    market: Set<int * int>
     corps: Corporation list
     productTiles: Map<int * int, (Corporation * int) list>
     selectedTile: (int * int) option

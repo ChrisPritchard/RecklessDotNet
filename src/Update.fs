@@ -24,10 +24,9 @@ let findMouseTile runState gameState =
     if not (isMousePressed (true, false) runState) then
         gameState.selectedTile
     else 
-        match mouseTile runState with
-        | None -> None
-        | Some (mx, my) -> 
-            Some (mx, my)
+        let tile = mouseTile runState
+        if Set.contains tile gameState.market 
+        then Some tile else None
 
 let advanceModel runState model =
     if wasJustPressed Keys.Escape runState then None

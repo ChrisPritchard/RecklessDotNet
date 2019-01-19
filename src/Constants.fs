@@ -7,7 +7,8 @@ open Model
 
 let windowSize = 800, 600
 let tileSize = 64, 32
-let mapSize = 10
+let tw, th = tileSize
+let maxMapSize = 10
 
 let font = "font"
 let fontSize = 14
