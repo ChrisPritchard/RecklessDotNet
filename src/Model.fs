@@ -1,7 +1,6 @@
 module Reckless.Model
 
 open Microsoft.Xna.Framework
-open GameCore.GameModel
 
 type Corporation = {
     name: string

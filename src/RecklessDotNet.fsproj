@@ -24,10 +24,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="content/tile.png" />
-    <None Include="content/tile-highlight.png" />
-    <None Include="content/office.png" />
-    <None Include="content/office-highlight.png" />
+    <None Include="content/tile.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="content/tile-highlight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="content/office.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="content/office-highlight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
