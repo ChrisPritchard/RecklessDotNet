@@ -60,43 +60,34 @@ let private panel rect = [
         yield Colour (inner, activeColours.background)
     | _ ->
         yield Colour (rect, activeColours.background)
-]        
-
-let private tilePopup corpList = [
-    let qualityLine (corp, quality) =
-        sprintf "%s: %i" corp.abbreviation quality
-
-    let lines = corpList |> List.map qualityLine
-    let textHeight = List.length lines * lineHeight
-    let textWidth = float (lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
-    
-    let width, height = textWidth + padding*2, textHeight + padding*2
-    let x, y = 10, 10
-
-    yield! panel (x, y, width, height)
-    yield! lines |> List.mapi (fun i line -> 
-        let colour = if i = 0 then activeColours.text else inactiveColours.text
-        let y = y + padding + (i * lineHeight)
-        Text (font, line, (x + padding, y), fontSize, TopLeft, colour))
 ]
 
-let private officePopup office corp = [
-    let lines = [
-        yield sprintf "%s (%s)" corp.name corp.abbreviation
-        yield! office.departments |> List.map (sprintf "%A")
-    ]
-    let textHeight = List.length lines * lineHeight
-    let textWidth = float (lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
+let popup heading lines =
+    let textHeight = List.length lines * lineHeight + (float lineHeight * 1.2 |> int)
+    let textWidth = float (heading::lines |> List.map Seq.length |> Seq.max) * (float fontSize) * 0.8 |> int
     
     let width, height = textWidth + padding*2, textHeight + padding*2
     let x, y = 10, 10
 
-    yield! panel (x, y, width, height)
-    yield! lines |> List.mapi (fun i line -> 
-        let colour = if i = 0 then activeColours.text else inactiveColours.text
-        let y = y + padding + (i * lineHeight)
-        Text (font, line, (x + padding, y), fontSize, TopLeft, colour))
+    [ 
+        yield! panel (x, y, width, height)
+        yield! heading::lines |> List.mapi (fun i line -> 
+            let fontSize = if i = 0 then float fontSize * 1.2 |> int else fontSize
+            let y = y + padding + (i * lineHeight)
+            Text (font, line, (x + padding, y), fontSize, TopLeft, activeColours.text))
     ]
+
+let private tilePopup corpList =
+    let qualityLine (corp, quality) =
+        sprintf "%s: %i" corp.abbreviation quality
+    let head = List.head corpList |> qualityLine
+    let rest = match corpList with | _::rest -> rest |> List.map qualityLine | _ -> []
+    popup head rest
+
+let private officePopup office corp =
+    let corpName = sprintf "%s (%s)" corp.name corp.abbreviation
+    let departments = office.departments |> List.map (sprintf "%A")
+    popup corpName departments
 
 let private findOfficePopup (mx, my) gameState = 
     let office = 
