@@ -68,7 +68,7 @@ let player = {
     ideas = 0
     headOffice = testOffice2
     orders = []
-    colour = Color.Yellow
+    colour = Yellow
 }
 
 let private others = [
@@ -79,7 +79,7 @@ let private others = [
         ideas = 0
         headOffice = testOffice
         orders = []
-        colour = Color.Purple
+        colour = Purple
     }
     {   
         name = "Jade Systems"
@@ -88,7 +88,7 @@ let private others = [
         ideas = 0
         headOffice = testOffice3
         orders = []
-        colour = Color.Green
+        colour = Green
     }
 ]
 

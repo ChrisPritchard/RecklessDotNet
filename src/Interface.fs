@@ -60,12 +60,14 @@ let private findTilePopup (mx, my) productTiles =
     | Some corpList -> tilePopup corpList
     | _ -> []
 
-let private playerStats gameState =
+let private playerStats productTiles gameState =
+    let expenses = Map.find gameState.player (expensesByCorp departmentCost gameState)
+    let income = Map.find gameState.player (incomeByCorp productTiles productIncome)
     let stats = [
         "Cash", "$", gameState.player.cash
-        "Income", "$", 0
-        "Expenses", "$", 0
-        "Change", "$", 0
+        "Income", "$", income
+        "Expenses", "$", expenses
+        "Change", (if income > expenses then "$+" else "$"), income - expenses
         "Ideas", "", gameState.player.ideas
         "Orders Remaining", "", 0
     ]
@@ -82,7 +84,7 @@ let private playerStats gameState =
 
 let renderInterface productTiles gameState = 
     [
-        yield! playerStats gameState
+        yield! playerStats productTiles gameState
 
         match gameState.selectedTile with
         | Some (mx, my) ->

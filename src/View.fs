@@ -6,6 +6,14 @@ open Constants
 open Model
 open Iso
 
+let xna = function
+    | Red -> Color.Red
+    | Orange -> Color.Orange
+    | Yellow -> Color.Yellow 
+    | Green -> Color.Green 
+    | Blue -> Color.Blue 
+    | Purple -> Color.Purple
+
 let private renderMarket productTiles gameState =
     gameState.market
     |> Set.toList
@@ -14,7 +22,7 @@ let private renderMarket productTiles gameState =
 
         match Map.tryFind (x, y) productTiles with
         | Some ((corp, _)::_) -> 
-            yield Image ("tile", rect, corp.colour)
+            yield Image ("tile", rect, xna corp.colour)
         | _ -> 
             yield Image ("tile", rect, Color.White)
     ])
@@ -25,7 +33,7 @@ let private renderOffices gameState =
     |> List.sortBy (fun (_, office) -> office.y, -office.x)
     |> List.map (fun (corp, office) -> 
         let rect = isoRect office.x office.y tw (th*3)
-        Image ("office", rect, corp.colour))
+        Image ("office", rect, xna corp.colour))
 
 let private renderHighlight gameState (x, y) = [
         yield Image ("tile-highlight", isoRect x y tw th, Color.White)

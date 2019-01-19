@@ -10,7 +10,7 @@ type Corporation = {
     ideas: int
     headOffice: Office
     orders: Order list
-    colour: Color
+    colour: Colour
 }
 and Office = {
     x: int
@@ -31,6 +31,8 @@ and Order =
     | BuildExtension of Office * Extension
     | ResearchIdea of researchLocation:Office
     | BuildOffice of acquisitions:Office * x:int * y:int * Department
+and Colour = 
+    | Red | Orange | Yellow | Green | Blue | Purple
 
 type GameState = {
     market: Set<int * int>
@@ -87,6 +89,23 @@ let gameProductTiles gameState =
             |> List.sortByDescending (fun (_, (_, q)) -> q) 
             |> List.map snd
         pos, ordered)
+    |> Map.ofList
+
+let incomeByCorp productTiles productIncome =
+    productTiles 
+    |> Map.toList
+    |> List.map (snd >> List.head >> fst)
+    |> List.countBy id
+    |> List.map (fun (c, n) -> c, n * productIncome)
+    |> Map.ofList
+
+let expensesByCorp (costs: Department -> int) gameState = 
+    allCorps gameState
+    |> List.map (fun c ->
+        c,
+        allOffices c.headOffice
+        |> List.sumBy (fun o -> 
+            o.departments |> List.sumBy costs))
     |> Map.ofList
 
 let rec updateQuality office researchOffices =

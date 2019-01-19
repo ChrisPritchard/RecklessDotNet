@@ -3,8 +3,8 @@ module Constants
 open Microsoft.Xna.Framework
 open GameCore.GameModel
 open GameCore.UIElements.Common
-open Model
 open GameCore.UIElements.Button
+open Model
 
 let windowSize = 800, 600
 let winw, winh = windowSize
@@ -36,6 +36,8 @@ let assets = [
         Texture ("office", "content/office.png")
         Texture ("office-highlight", "content/office-highlight.png")
     ]
+
+let productIncome = 100
 
 let rec orderCost =
     function
