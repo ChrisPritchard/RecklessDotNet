@@ -6,8 +6,8 @@ open Model
 open StartModel
 open Iso
 
-let private findProductTiles corps =
-    corps
+let private findProductTiles gameState =
+    allCorps gameState
     |> List.collect (fun c -> 
             allProductTiles None c.headOffice
             |> List.map (fun (x, y, q) -> (x, y), (c, q)))
@@ -36,4 +36,4 @@ let advanceModel runState model =
         | Some gameState -> 
             Some { gameState with 
                     selectedTile = findMouseTile runState gameState
-                    productTiles = findProductTiles gameState.corps }
+                    productTiles = findProductTiles gameState }

@@ -36,7 +36,17 @@ let private testOffice2 = {
     extensions = []
 }
 
-let private corps = [
+let player = {   
+    name = "Aquinas Corp"
+    abbreviation = "AQU"
+    cash = 0
+    ideas = 0
+    headOffice = testOffice2
+    orders = []
+    colour = Color.Yellow
+}
+
+let private others = [
     {   
         name = "Evil Corp"
         abbreviation = "EVL"
@@ -46,20 +56,12 @@ let private corps = [
         orders = []
         colour = Color.Purple
     }
-    {   
-        name = "Aquinas Corp"
-        abbreviation = "AQU"
-        cash = 0
-        ideas = 0
-        headOffice = testOffice2
-        orders = []
-        colour = Color.Yellow
-    }
 ]
 
 let startModel () = {
     market = startMarket
-    corps = corps
+    player = player
+    others = others
     productTiles = Map.empty
     selectedTile = None
 }

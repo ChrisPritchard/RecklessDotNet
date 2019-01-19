@@ -34,7 +34,8 @@ and Order =
 
 type GameState = {
     market: Set<int * int>
-    corps: Corporation list
+    player: Corporation
+    others: Corporation list
     productTiles: Map<int * int, (Corporation * int) list>
     selectedTile: (int * int) option
 }
@@ -82,3 +83,6 @@ let rec updateQuality office researchOffices =
         | d -> d)
     let newManaged = office.managedOffices |> List.map (fun o -> updateQuality o researchOffices)
     { office with departments = newDepartments; managedOffices = newManaged }
+
+let allCorps gameState =
+    gameState.player::gameState.others

@@ -42,7 +42,7 @@ let private renderOffice colour currentMouseTile gameState office =
     ]
 
 let private renderOffices currentMouseTile gameState =
-    gameState.corps 
+    allCorps gameState
     |> List.collect (fun corp -> 
         allOffices corp.headOffice 
         |> List.collect (renderOffice corp.colour currentMouseTile gameState))
@@ -104,7 +104,7 @@ let private officePopup office corp = [
 
 let private findOfficePopup (mx, my) gameState = 
     let office = 
-        gameState.corps 
+        allCorps gameState
         |> List.collect (fun c -> allOffices c.headOffice |> List.map (fun o -> o, c))
         |> List.tryFind (fun (o, _) -> o.x = mx && o.y = my)
     office |> Option.bind (fun (o, c) ->
