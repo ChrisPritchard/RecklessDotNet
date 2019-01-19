@@ -2,6 +2,7 @@ module StartModel
 
 open Microsoft.Xna.Framework
 open Model
+open Constants
 
 let private dim = Constants.maxMapSize
 
@@ -97,4 +98,11 @@ let startModel () = {
     others = others
     productTiles = Map.empty
     selectedTile = None
+    buttons = {
+        endTurn = { 
+            defaultButton with
+                destRect = winw - 130, winh - 50, 120, 40
+                text = ["End Turn"]
+        }
+    }
 }

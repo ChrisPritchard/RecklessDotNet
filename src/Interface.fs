@@ -3,6 +3,7 @@
 open GameCore.GameModel
 open Model
 open Constants
+open GameCore.UIElements.Button
 
 let private lineHeight = float fontSize * 1.3 |> int
 
@@ -77,7 +78,7 @@ let private playerStats gameState =
         yield! lines |> List.mapi (fun i line -> 
             let y = y + padding + (i * lineHeight)
             Text (font, line, (x + padding, y), fontSize, TopLeft, activeColours.text))
-    ]    
+    ]
 
 let renderInterface gameState = 
     [
@@ -90,4 +91,6 @@ let renderInterface gameState =
                 |> Option.defaultValue (findTilePopup (mx, my) gameState)
             yield! popup
         | _ -> ()
+
+        yield! getButtonView gameState.buttons.endTurn
     ]
