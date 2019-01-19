@@ -102,8 +102,31 @@ let private findTilePopup (mx, my) gameState =
     | Some corpList -> tilePopup corpList
     | _ -> []
 
+let private playerStats gameState =
+    let stats = [
+        "Cash", gameState.player.cash
+        "Income", 0
+        "Expenses", 0
+        "Change", 0
+        "Ideas", gameState.player.ideas
+        "Orders Remaining", 0
+    ]
+    let lines = stats |> List.map (fun (label, value) -> sprintf "%s: %i" label value)
+
+    let x, y, width, height = 10, winh - 140, 200, 130
+
+    [ 
+        yield! panel (x, y, width, height)
+        yield! lines |> List.mapi (fun i line -> 
+            let y = y + padding + (i * lineHeight)
+            Text (font, line, (x + padding, y), fontSize, TopLeft, activeColours.text))
+    ]
+    
+
 let renderUI gameState = 
     [
+        yield! playerStats gameState
+
         match gameState.selectedTile with
         | Some (mx, my) ->
             let popup = 

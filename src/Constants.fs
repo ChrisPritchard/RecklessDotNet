@@ -6,6 +6,7 @@ open GameCore.UIElements.Common
 open Model
 
 let windowSize = 800, 600
+let winw, winh = windowSize
 let tileSize = 64, 32
 let tw, th = tileSize
 let maxMapSize = 10
