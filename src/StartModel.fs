@@ -36,10 +36,26 @@ let private testOffice2 = {
     extensions = []
 }
 
+let private testOffice5 = {
+    x = 9
+    y = 7
+    managedOffices = []
+    departments = [Research;Research;Research;Marketing;Product 100;Acquisitions]
+    extensions = []
+}
+
+let private testOffice4 = {
+    x = 9
+    y = 8
+    managedOffices = [testOffice5]
+    departments = [Research;Research;Research;Marketing;Product 100;Acquisitions]
+    extensions = []
+}
+
 let private testOffice3 = {
     x = 8
     y = 8
-    managedOffices = []
+    managedOffices = [testOffice4]
     departments = [Research;Research;Research;Marketing;Product 100;Acquisitions]
     extensions = []
 }

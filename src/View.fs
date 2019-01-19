@@ -23,7 +23,7 @@ let private renderMarket gameState =
 let private renderOffices gameState =
     allCorps gameState
     |> List.collect (fun corp -> allOffices corp.headOffice |> List.map (fun o -> corp, o))
-    |> List.sortBy (fun (_, office) -> office.y, office.x)
+    |> List.sortBy (fun (_, office) -> office.y, -office.x)
     |> List.map (fun (corp, office) -> 
         let rect = isoRect office.x office.y tw (th*3)
         Image ("office", rect, corp.colour))
@@ -60,6 +60,8 @@ let getView runState gameState =
         if gameState.market.Contains mousePos then
             yield! renderHighlight gameState mousePos
 
+        // interface.fs
         yield! renderInterface gameState
+
         yield renderCursor runState
     ]

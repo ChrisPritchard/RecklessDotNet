@@ -7,7 +7,7 @@ let private tw, th = tileSize
 let private rx, ry = windowSize
 let private cx, cy = (rx - (tw * Constants.maxMapSize)) / 2 + (tw/2), ry / 2 + (th/2)
 
-let iso x y = 
+let private iso x y = 
     cx + (x * tw/2 + y*tw/2), cy + (y*th/2 - x*th/2)
 
 let private bottomCentre x y w h =
