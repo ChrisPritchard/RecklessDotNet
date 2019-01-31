@@ -95,19 +95,21 @@ let getInterface (gameState: GameState) =
             uimodel
         )
 
-        let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar
+        let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar ||| ImGuiWindowFlags.NoInputs
         let title = sprintf "%s (%s)" gameState.player.name gameState.player.abbreviation
         yield window title (Some (10, winh - 145)) (Some (220, 135)) statsFlags [
-            yield text (sprintf "Cash                $%i" gameState.player.cash)
-            yield text (sprintf "Income              $%i" gameState.player.cash)
-            yield text (sprintf "Expenses            $%i" gameState.player.cash)
-            yield text (sprintf "  Change            $%i" gameState.player.cash)
-            yield text (sprintf "Product Ideas        %i" gameState.player.ideas)
-            yield text (sprintf "Orders Remaining     %i" (2 - gameState.player.orders.Length))
+            text (sprintf "Cash                $%i" gameState.player.cash)
+            text (sprintf "Income              $%i" gameState.player.cash)
+            text (sprintf "Expenses            $%i" gameState.player.cash)
+            text (sprintf "  Change            $%i" gameState.player.cash)
+            text (sprintf "Product Ideas        %i" gameState.player.ideas)
+            text (sprintf "Orders Remaining     %i" (2 - gameState.player.orders.Length))
         ]
 
-        let endTurnFlags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoBackground
-        yield window "" (Some (winw - 100, winh - 50)) None endTurnFlags [
-            button "END TURN" (fun uimodel state -> { uimodel with endTurn = state })
+        let endTurnFlags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoBackground ||| ImGuiWindowFlags.AlwaysAutoResize
+        yield window "" (Some (winw - 110, winh - 60)) None endTurnFlags [
+            (fun uimodel _ -> 
+                let res = ImGui.Button ("END TURN", new System.Numerics.Vector2 (90.f, 40.f))
+                { uimodel with endTurn = res })
         ]
     ]
