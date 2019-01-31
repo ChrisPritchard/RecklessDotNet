@@ -1,8 +1,11 @@
 ﻿module Interface
 
+open GameCore.ImGui.Wrappers
+open ImGuiNET
+
 //open GameCore.GameModel
 //open Model
-//open Constants
+open Constants
     
 //let private tilePopup corpList =
 //    let qualityLine (corp, quality) =
@@ -65,3 +68,22 @@
 
 //        yield! getButtonView gameState.buttons.endTurn
 //    ]
+
+type UIModel = {
+    endTurn: bool
+}
+
+let flags = { noResize = true; noCollapse = true; noMove = true; noTitleBar = true; autoResize = false }
+let config = { title = None; size = None; pos = None; flags = flags }
+
+let getInterface _ =
+    { endTurn = false },
+    [
+        yield (fun uimodel _ ->
+            ImGui.StyleColorsLight ()
+            uimodel
+        )
+        yield window { config with pos = Some (winw - 100, winh - 50) } [
+            button "END TURN" (fun uimodel state -> { uimodel with endTurn = state })
+        ]
+    ]
