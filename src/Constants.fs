@@ -1,9 +1,6 @@
 module Constants
 
-open Microsoft.Xna.Framework
 open GameCore.GameModel
-open GameCore.UIElements.Common
-open GameCore.UIElements.Button
 open Model
 
 let windowSize = 800, 600
@@ -12,25 +9,7 @@ let tileSize = 64, 32
 let tw, th = tileSize
 let maxMapSize = 10
 
-let font = "font"
-let fontSize = 14
-let activeColours = { background = Color.Gray; border = Some (2, Color.DarkGray); text = Color.White }
-let inactiveColours = { activeColours with text = Color.WhiteSmoke }
-let padding = 10
-
-let defaultButton : Button = {
-    destRect = 0, 0, 0, 0
-    text = [""]
-    fontAsset = font
-    fontSize = fontSize
-    idleColours = activeColours
-    hoverColours = Some { activeColours with background = Color.LightGray }
-    pressedColours = Some { activeColours with background = Color.Black }
-    state = []
-}
-
 let assets = [
-        Font ("font", "./content/SourceCodePro-Regular")
         Texture ("tile", "content/tile.png")
         Texture ("tile-highlight", "content/tile-highlight.png")
         Texture ("office", "content/office.png")

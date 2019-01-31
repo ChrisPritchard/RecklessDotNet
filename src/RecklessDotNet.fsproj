@@ -16,14 +16,6 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
-  <!-- Processed by content pipeline on build into xnb files -->
-  <ItemGroup>
-    <None Include="content/Content.mgcb" />
-    <None Include="content/SourceCodePro-Regular.otf" />
-    <None Include="content/SourceCodePro-Regular.spritefont" />
-    <MonoGameContentReference Include="**\*.mgcb" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Include="content/tile.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -40,10 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="fsharp-gamecore" Version="0.0.6" />
-    <PackageReference Include="fsharp-gamecore-ui" Version="0.0.2" />
-    <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.4" />
-    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" />
+    <PackageReference Include="fsharp-gamecore-imgui" Version="0.0.2" />
   </ItemGroup>
 
 </Project>

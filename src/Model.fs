@@ -1,8 +1,5 @@
 module Model
 
-open Microsoft.Xna.Framework
-open GameCore.UIElements.Button
-
 type Corporation = {
     name: string
     abbreviation: string
@@ -39,9 +36,6 @@ type GameState = {
     player: Corporation
     others: Corporation list
     selectedTile: (int * int) option
-    buttons: GameButtons
-} and GameButtons = {
-    endTurn: Button
 }
 
 let rec allOffices office = [

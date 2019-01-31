@@ -67,8 +67,4 @@ let getView runState gameState =
 
         if gameState.market.Contains mousePos then
             yield! renderHighlight gameState mousePos
-
-        yield! Interface.renderInterface productTiles gameState
-
-        yield renderCursor runState
     ]

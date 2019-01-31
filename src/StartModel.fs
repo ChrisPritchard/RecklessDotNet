@@ -97,11 +97,4 @@ let startModel () = {
     player = player
     others = others
     selectedTile = None
-    buttons = {
-        endTurn = { 
-            defaultButton with
-                destRect = winw - 130, winh - 50, 120, 40
-                text = ["End Turn"]
-        }
-    }
 }
