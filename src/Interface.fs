@@ -1,10 +1,8 @@
 ﻿module Interface
 
-open GameCore.ImGui.Wrappers
 open ImGuiNET
-
-//open GameCore.GameModel
-//open Model
+open GameCore.ImGui.Wrappers
+open Model
 open Constants
     
 //let private tilePopup corpList =
@@ -73,17 +71,43 @@ type UIModel = {
     endTurn: bool
 }
 
-let flags = { noResize = true; noCollapse = true; noMove = true; noTitleBar = true; autoResize = false }
-let config = { title = None; size = None; pos = None; flags = flags }
+let flags = 
+    ImGuiWindowFlags.NoResize ||| ImGuiWindowFlags.NoMove ||| ImGuiWindowFlags.NoCollapse
 
-let getInterface _ =
+let window label pos size (flags: ImGuiWindowFlags) children =
+    fun model textures ->
+        match pos with 
+            | None -> () 
+            | Some (x, y) -> ImGui.SetNextWindowPos (new System.Numerics.Vector2 (float32 x, float32 y))
+        match size with
+            | None -> ()
+            | Some (w, h) -> ImGui.SetNextWindowSize (new System.Numerics.Vector2 (float32 w, float32 h))
+        ImGui.Begin (label, flags) |> ignore
+        let next = (model, children) ||> List.fold (fun last child -> child last textures)
+        ImGui.End ()
+        next
+
+let getInterface (gameState: GameState) =
     { endTurn = false },
     [
         yield (fun uimodel _ ->
             ImGui.StyleColorsLight ()
             uimodel
         )
-        yield window { config with pos = Some (winw - 100, winh - 50) } [
+
+        let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar
+        let title = sprintf "%s (%s)" gameState.player.name gameState.player.abbreviation
+        yield window title (Some (10, winh - 145)) (Some (220, 135)) statsFlags [
+            yield text (sprintf "Cash                $%i" gameState.player.cash)
+            yield text (sprintf "Income              $%i" gameState.player.cash)
+            yield text (sprintf "Expenses            $%i" gameState.player.cash)
+            yield text (sprintf "  Change            $%i" gameState.player.cash)
+            yield text (sprintf "Product Ideas        %i" gameState.player.ideas)
+            yield text (sprintf "Orders Remaining     %i" (2 - gameState.player.orders.Length))
+        ]
+
+        let endTurnFlags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoBackground
+        yield window "" (Some (winw - 100, winh - 50)) None endTurnFlags [
             button "END TURN" (fun uimodel state -> { uimodel with endTurn = state })
         ]
     ]
