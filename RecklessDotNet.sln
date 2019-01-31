@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RecklessDotNet", "src\RecklessDotNet.fsproj", "{E14E4DC4-700D-4E06-BF0A-685114E3251E}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "RecklessDotNet", "src\RecklessDotNet.fsproj", "{E14E4DC4-700D-4E06-BF0A-685114E3251E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5DB0034E-8476-4D68-9A65-D47F64834B59}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		FONT LICENSE.txt = FONT LICENSE.txt
+		README.md = README.md
+		spritegen.html = spritegen.html
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,9 +21,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E14E4DC4-700D-4E06-BF0A-685114E3251E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,5 +35,11 @@ Global
 		{E14E4DC4-700D-4E06-BF0A-685114E3251E}.Release|x64.Build.0 = Release|Any CPU
 		{E14E4DC4-700D-4E06-BF0A-685114E3251E}.Release|x86.ActiveCfg = Release|Any CPU
 		{E14E4DC4-700D-4E06-BF0A-685114E3251E}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3113F5DF-0F30-4A04-A138-FD650EF26DAB}
 	EndGlobalSection
 EndGlobal
