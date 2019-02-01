@@ -50,11 +50,6 @@ let private renderHighlight gameState (x, y) = [
                 Image ("tile-highlight", isoRect x y tw th, Color.White))
     ]
 
-let private renderCursor runState =
-    let isPressed = isMousePressed (true, false) runState
-    let mx, my = runState.mouse.position 
-    Colour ((mx, my, 5, 5), (if isPressed then Color.Red else Color.Yellow))
-
 let getView runState gameState = 
     let productTiles = gameProductTiles gameState
     let mousePos = mouseTile runState

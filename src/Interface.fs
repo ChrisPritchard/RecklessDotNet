@@ -30,28 +30,6 @@ open Constants
 //    | Some corpList -> tilePopup corpList
 //    | _ -> []
 
-//let private playerStats productTiles gameState =
-//    let expenses = Map.find gameState.player (expensesByCorp departmentCost gameState)
-//    let income = Map.find gameState.player (incomeByCorp productTiles productIncome)
-//    let stats = [
-//        "Cash", "$", gameState.player.cash
-//        "Income", "$", income
-//        "Expenses", "$", expenses
-//        "Change", (if income > expenses then "$+" else "$"), income - expenses
-//        "Ideas", "", gameState.player.ideas
-//        "Orders Remaining", "", 0
-//    ]
-//    let lines = stats |> List.map (fun o -> o |||> sprintf "%s: %s%i")
-
-//    let x, y, width, height = 10, winh - 140, 200, 130
-
-//    [ 
-//        yield! panel (x, y, width, height)
-//        yield! lines |> List.mapi (fun i line -> 
-//            let y = y + padding + (i * lineHeight)
-//            Text (font, line, (x + padding, y), fontSize, TopLeft, activeColours.text))
-//    ]
-
 //let renderInterface productTiles gameState = 
 //    [
 //        yield! playerStats productTiles gameState
@@ -87,6 +65,22 @@ let window label pos size (flags: ImGuiWindowFlags) children =
         ImGui.End ()
         next
 
+let playerStats gameState = 
+    let productTiles = gameProductTiles gameState
+    let income = Map.find gameState.player (incomeByCorp productTiles productIncome)
+    let expenses = Map.find gameState.player (expensesByCorp departmentCost gameState)
+
+    let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar ||| ImGuiWindowFlags.NoInputs
+    let title = sprintf "%s (%s)" gameState.player.name gameState.player.abbreviation
+    window title (Some (10, winh - 145)) (Some (220, 135)) statsFlags [
+        text (sprintf "Cash                $%i" gameState.player.cash)
+        text (sprintf "Income              $%i" income)
+        text (sprintf "Expenses            $%i" expenses)
+        text (sprintf "  Change            $%s%i" (if income > expenses then "+" else "") (income - expenses))
+        text (sprintf "Product Ideas        %i" gameState.player.ideas)
+        text (sprintf "Orders Remaining     %i" (2 - gameState.player.orders.Length))
+    ]
+
 let getInterface (gameState: GameState) =
     { endTurn = false },
     [
@@ -95,16 +89,7 @@ let getInterface (gameState: GameState) =
             uimodel
         )
 
-        let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar ||| ImGuiWindowFlags.NoInputs
-        let title = sprintf "%s (%s)" gameState.player.name gameState.player.abbreviation
-        yield window title (Some (10, winh - 145)) (Some (220, 135)) statsFlags [
-            text (sprintf "Cash                $%i" gameState.player.cash)
-            text (sprintf "Income              $%i" gameState.player.cash)
-            text (sprintf "Expenses            $%i" gameState.player.cash)
-            text (sprintf "  Change            $%i" gameState.player.cash)
-            text (sprintf "Product Ideas        %i" gameState.player.ideas)
-            text (sprintf "Orders Remaining     %i" (2 - gameState.player.orders.Length))
-        ]
+        yield playerStats gameState
 
         let endTurnFlags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoBackground ||| ImGuiWindowFlags.AlwaysAutoResize
         yield window "" (Some (winw - 110, winh - 60)) None endTurnFlags [
