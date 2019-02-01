@@ -1,5 +1,6 @@
 ﻿module Interface
 
+open System.Numerics
 open ImGuiNET
 open GameCore.ImGui.Wrappers
 open Model
@@ -56,10 +57,10 @@ let window label pos size (flags: ImGuiWindowFlags) children =
     fun model textures ->
         match pos with 
             | None -> () 
-            | Some (x, y) -> ImGui.SetNextWindowPos (new System.Numerics.Vector2 (float32 x, float32 y))
+            | Some (x, y) -> ImGui.SetNextWindowPos (new Vector2 (float32 x, float32 y))
         match size with
             | None -> ()
-            | Some (w, h) -> ImGui.SetNextWindowSize (new System.Numerics.Vector2 (float32 w, float32 h))
+            | Some (w, h) -> ImGui.SetNextWindowSize (new Vector2 (float32 w, float32 h))
         ImGui.Begin (label, flags) |> ignore
         let next = (model, children) ||> List.fold (fun last child -> child last textures)
         ImGui.End ()
@@ -94,7 +95,7 @@ let getInterface (gameState: GameState) =
         let endTurnFlags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoBackground ||| ImGuiWindowFlags.AlwaysAutoResize
         yield window "" (Some (winw - 110, winh - 60)) None endTurnFlags [
             (fun uimodel _ -> 
-                let res = ImGui.Button ("END TURN", new System.Numerics.Vector2 (90.f, 40.f))
+                let res = ImGui.Button ("END TURN", new Vector2 (90.f, 40.f))
                 { uimodel with endTurn = res })
         ]
     ]
