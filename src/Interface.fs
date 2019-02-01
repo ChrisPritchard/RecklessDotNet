@@ -13,14 +13,10 @@ type UIModel = {
 let flags = 
     ImGuiWindowFlags.NoResize ||| ImGuiWindowFlags.NoMove ||| ImGuiWindowFlags.NoCollapse
 
-let window label pos size (flags: ImGuiWindowFlags) children =
+let window label (x, y) (w, h) (flags: ImGuiWindowFlags) children =
     fun model textures ->
-        match pos with 
-            | None -> () 
-            | Some (x, y) -> ImGui.SetNextWindowPos (new Vector2 (float32 x, float32 y))
-        match size with
-            | None -> ()
-            | Some (w, h) -> ImGui.SetNextWindowSize (new Vector2 (float32 w, float32 h))
+        ImGui.SetNextWindowPos (new Vector2 (float32 x, float32 y))
+        ImGui.SetNextWindowSize (new Vector2 (float32 w, float32 h))
         ImGui.Begin (label, flags) |> ignore
         let next = (model, children) ||> List.fold (fun last child -> child last textures)
         ImGui.End ()
@@ -32,7 +28,7 @@ let playerStats productTiles gameState =
 
     let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar ||| ImGuiWindowFlags.NoInputs
     let title = sprintf "%s (%s)" gameState.player.name gameState.player.abbreviation
-    window title (Some (10, winh - 145)) (Some (220, 135)) statsFlags [
+    window title (10, winh - 145) (220, 135) statsFlags [
         text (sprintf "Cash                $%i" gameState.player.cash)
         text (sprintf "Income              $%i" income)
         text (sprintf "Expenses            $%i" expenses)
@@ -54,7 +50,7 @@ let showPopup (mx, my) productTiles gameState =
     |> function
     | Some (office, corp) ->
         let corpName = sprintf "%s (%s)" corp.name corp.abbreviation
-        window corpName (Some (10, 10)) (Some (150, 150)) popupFlags [
+        window corpName (10, 10) (150, 150) popupFlags [
             yield! List.map (fun d -> text (sprintf "%A" d)) office.departments
         ]
     | None -> 
@@ -62,7 +58,7 @@ let showPopup (mx, my) productTiles gameState =
         | Some corpList -> 
             let qualityLine (corp, quality) =
                 sprintf "%s: %i" corp.abbreviation quality
-            window "" (Some (10, 10)) None (popupFlags ||| ImGuiWindowFlags.NoTitleBar) [
+            window "" (10, 10) (100, 150) (popupFlags ||| ImGuiWindowFlags.NoTitleBar) [
                 yield! List.map (fun c -> text (qualityLine c)) corpList
             ]
         | _ -> fun m _ -> m
@@ -81,8 +77,12 @@ let getInterface (gameState: GameState) =
         | Some point -> yield showPopup point productTiles gameState
         | None -> ()
 
-        let endTurnFlags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoBackground ||| ImGuiWindowFlags.AlwaysAutoResize
-        yield window "" (Some (winw - 110, winh - 60)) None endTurnFlags [
+        let endTurnFlags = 
+            flags ||| ImGuiWindowFlags.NoTitleBar 
+            ||| ImGuiWindowFlags.NoBackground 
+            ||| ImGuiWindowFlags.AlwaysAutoResize
+            ||| ImGuiWindowFlags.NoScrollbar
+        yield window "" (winw - 110, winh - 60) (110, 60) endTurnFlags [
             (fun uimodel _ -> 
                 let res = ImGui.Button ("END TURN", new Vector2 (90.f, 40.f))
                 { uimodel with endTurn = res })
