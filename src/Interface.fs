@@ -63,6 +63,18 @@ let showPopup (mx, my) productTiles gameState =
             ]
         | _ -> fun m _ -> m
 
+let endTurnButton: UIModel -> GameState -> UIModel = 
+    let endTurnFlags = 
+        flags ||| ImGuiWindowFlags.NoTitleBar 
+        ||| ImGuiWindowFlags.NoBackground 
+        ||| ImGuiWindowFlags.AlwaysAutoResize
+        ||| ImGuiWindowFlags.NoScrollbar
+    window "" (winw - 110, winh - 60) (110, 60) endTurnFlags [
+        (fun uimodel _ -> 
+            let res = ImGui.Button ("END TURN", new Vector2 (90.f, 40.f))
+            { uimodel with endTurn = res })
+    ]
+
 let getInterface (gameState: GameState) =
     { endTurn = false },
     [
@@ -72,19 +84,12 @@ let getInterface (gameState: GameState) =
         )
         
         let productTiles = gameProductTiles gameState
+
         yield playerStats productTiles gameState
+
         match gameState.selectedTile with
         | Some point -> yield showPopup point productTiles gameState
         | None -> ()
 
-        let endTurnFlags = 
-            flags ||| ImGuiWindowFlags.NoTitleBar 
-            ||| ImGuiWindowFlags.NoBackground 
-            ||| ImGuiWindowFlags.AlwaysAutoResize
-            ||| ImGuiWindowFlags.NoScrollbar
-        yield window "" (winw - 110, winh - 60) (110, 60) endTurnFlags [
-            (fun uimodel _ -> 
-                let res = ImGui.Button ("END TURN", new Vector2 (90.f, 40.f))
-                { uimodel with endTurn = res })
-        ]
+        yield endTurnButton
     ]
