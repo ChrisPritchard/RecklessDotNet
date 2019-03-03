@@ -38,13 +38,9 @@ type GameState = {
     selectedTile: (int * int) option
 }
 
-let rec allOffices office = [
-    yield office
-    yield! List.collect allOffices office.managedOffices
-]
+let rec allOffices office = office::List.collect allOffices office.managedOffices
 
-let allCorps gameState =
-    gameState.player::gameState.others
+let allCorps gameState = gameState.player::gameState.others
 
 let officeProductTiles office = 
     let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)

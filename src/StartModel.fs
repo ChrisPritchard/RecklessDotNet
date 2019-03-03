@@ -1,8 +1,6 @@
 module StartModel
 
-open Microsoft.Xna.Framework
 open Model
-open Constants
 
 let private dim = Constants.maxMapSize
 
@@ -21,6 +19,14 @@ let private subOffice = {
     extensions = []
 }
 
+let private subOffice2 = {
+    x = 1
+    y = 3
+    managedOffices = []
+    departments = [Product 16; Product 30]
+    extensions = []
+}
+
 let private testOffice = {
     x = 4
     y = 4
@@ -32,7 +38,7 @@ let private testOffice = {
 let private testOffice2 = {
     x = 2
     y = 7
-    managedOffices = []
+    managedOffices = [subOffice2]
     departments = [Product 16; Marketing; Product 30]
     extensions = []
 }

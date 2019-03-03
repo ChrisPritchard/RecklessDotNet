@@ -51,17 +51,15 @@ let showPopup (mx, my) productTiles gameState =
     |> function
     | Some (office, corp) ->
         let corpName = sprintf "%s (%s)" corp.name corp.abbreviation
-        window corpName (10, 10) (150, 150) popupFlags [
-            yield! List.map (fun d -> text (sprintf "%A" d)) office.departments
-        ]
+        let departments = List.map (fun d -> text (sprintf "%A" d)) office.departments
+        window corpName (10, 10) (150, 150) popupFlags departments
     | None -> 
         match Map.tryFind (mx, my) productTiles with
         | Some corpList -> 
             let qualityLine (corp, quality) =
                 sprintf "%s: %i" corp.abbreviation quality
-            window "" (10, 10) (100, 150) (popupFlags ||| ImGuiWindowFlags.NoTitleBar) [
-                yield! List.map (fun c -> text (qualityLine c)) corpList
-            ]
+            let corps = List.map (fun c -> text (qualityLine c)) corpList
+            window "" (10, 10) (100, 150) (popupFlags ||| ImGuiWindowFlags.NoTitleBar) corps
         | _ -> fun m _ -> m
 
 let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel = 
