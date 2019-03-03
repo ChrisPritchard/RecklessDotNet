@@ -5,6 +5,7 @@ open ImGuiNET
 open GameCore.ImGui.Wrappers
 open Model
 open Constants
+open System
     
 type UIModel = {
     endTurn: bool
@@ -63,7 +64,7 @@ let showPopup (mx, my) productTiles gameState =
             ]
         | _ -> fun m _ -> m
 
-let endTurnButton: UIModel -> GameState -> UIModel = 
+let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel = 
     let endTurnFlags = 
         flags ||| ImGuiWindowFlags.NoTitleBar 
         ||| ImGuiWindowFlags.NoBackground 
