@@ -27,9 +27,8 @@ let playerStats productTiles gameState =
     let income = Map.find gameState.player (incomeByCorp productTiles productIncome)
     let expenses = Map.find gameState.player (expensesByCorp departmentCost gameState)
 
-    let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar ||| ImGuiWindowFlags.NoInputs
-    let title = sprintf "%s (%s)" gameState.player.name gameState.player.abbreviation
-    window title (10, winh - 145) (220, 135) statsFlags [
+    let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar ||| ImGuiWindowFlags.NoInputs ||| ImGuiWindowFlags.NoTitleBar
+    window "player-info" (10, winh - 145) (220, 135) statsFlags [
         text (sprintf "Cash                $%i" gameState.player.cash)
         text (sprintf "Income              $%i" income)
         text (sprintf "Expenses            $%i" expenses)
@@ -59,7 +58,7 @@ let showPopup (mx, my) productTiles gameState =
             let qualityLine (corp, quality) =
                 sprintf "%s: %i" corp.abbreviation quality
             let corps = List.map (fun c -> text (qualityLine c)) corpList
-            window "" (10, 10) (100, 150) (popupFlags ||| ImGuiWindowFlags.NoTitleBar) corps
+            window "tile-info" (10, 10) (100, 150) (popupFlags ||| ImGuiWindowFlags.NoTitleBar) corps
         | _ -> fun m _ -> m
 
 let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel = 
@@ -68,7 +67,7 @@ let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel =
         ||| ImGuiWindowFlags.NoBackground 
         ||| ImGuiWindowFlags.AlwaysAutoResize
         ||| ImGuiWindowFlags.NoScrollbar
-    window "" (winw - 110, winh - 60) (110, 60) endTurnFlags [
+    window "end-turn" (winw - 110, winh - 60) (110, 60) endTurnFlags [
         (fun uimodel _ -> 
             let res = ImGui.Button ("END TURN", new Vector2 (90.f, 40.f))
             { uimodel with endTurn = res })
