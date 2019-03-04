@@ -36,7 +36,11 @@ type GameState = {
     player: Corporation
     others: Corporation list
     selectedTile: (int * int) option
-}
+    phase: TurnPhase
+} and TurnPhase =
+    | Orders
+    | TurnEnding of startTime:float
+    | TurnStarting of startTime:float
 
 let rec allOffices office = office::List.collect allOffices office.managedOffices
 

@@ -9,6 +9,8 @@ let tileSize = 64, 32
 let tw, th = tileSize
 let maxMapSize = 10
 
+let turnTransitionTime = 500.
+
 let assets = [
         Texture ("tile", "content/tile.png")
         Texture ("tile-highlight", "content/tile-highlight.png")

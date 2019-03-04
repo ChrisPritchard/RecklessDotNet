@@ -62,4 +62,13 @@ let getView runState gameState =
 
         if gameState.market.Contains mousePos then
             yield! renderHighlight gameState mousePos
+
+        match gameState.phase with
+        | TurnEnding startTime ->
+            let amount = (runState.elapsed - startTime) / turnTransitionTime
+            yield Colour ((0, 0, winw, winh), new Color(0.f, 0.f, 0.f, float32 amount))
+        | TurnStarting startTime ->
+            let amount = (runState.elapsed - startTime) / turnTransitionTime
+            yield Colour ((0, 0, winw, winh), new Color(0.f, 0.f, 0.f, 1.f - float32 amount))
+        | _ -> ()
     ]

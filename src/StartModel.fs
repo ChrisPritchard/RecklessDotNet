@@ -103,4 +103,5 @@ let startModel () = {
     player = player
     others = others
     selectedTile = None
+    phase = Orders
 }
