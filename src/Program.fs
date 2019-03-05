@@ -1,6 +1,7 @@
-﻿open GameCore.GameModel
-open GameCore.ImGui.GameRunner
+﻿
 open Microsoft.Xna.Framework
+open GameCore.GameModel
+open GameCore.ImGui.GameRunner
 
 [<EntryPoint>]
 let main _ =

@@ -1,16 +1,12 @@
 ﻿module Interface
 
+open System
 open System.Numerics
 open ImGuiNET
 open GameCore.ImGui.Wrappers
 open Model
 open Constants
-open System
-    
-type UIModel = {
-    endTurn: bool
-    confirmOrders: bool
-}
+open Helpers
 
 let startUIModel = {
     endTurn = false

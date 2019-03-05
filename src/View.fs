@@ -2,8 +2,9 @@ module View
 
 open Microsoft.Xna.Framework
 open GameCore.GameModel
-open Constants
 open Model
+open Constants
+open Helpers
 open Iso
 
 let xna = function
