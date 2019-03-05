@@ -16,20 +16,22 @@ let findMouseTile runState gameState =
         if Set.contains tile gameState.market 
         then Some tile else None
 
-let applyIncome productTiles gameState corp = 
-    let income = Map.find corp (incomeByCorp productTiles productIncome)
-    let expenses = Map.find corp (expensesByCorp departmentCost gameState)
-    { corp with cash = corp.cash + income - expenses }
-
 let advanceTurn gameState = 
     let productTiles = gameProductTiles gameState
-    // TODO update qualities
-    let newPlayer = applyIncome productTiles gameState gameState.player 
-    let newOthers = gameState.others |> List.map (applyIncome productTiles gameState)
+    let incomeByCorp = incomeByCorp productTiles productIncome
+    let expensesByCorp = expensesByCorp departmentCost gameState
+
+    let updateCorp corp = 
+        {
+            corp with
+                cash = corp.cash + Map.find corp incomeByCorp - Map.find corp expensesByCorp
+                headOffice = updateQuality corp.headOffice []
+        }
+
     { 
         gameState with 
-            player = newPlayer 
-            others = newOthers
+            player = updateCorp gameState.player
+            others = gameState.others |> List.map updateCorp
     }
 
 let advanceModel runState (uiModel: UIModel) model =
