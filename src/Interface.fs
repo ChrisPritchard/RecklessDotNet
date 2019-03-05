@@ -75,19 +75,22 @@ let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel =
 
 let getInterface (gameState: GameState) =
     { endTurn = false },
-    [
-        yield (fun uimodel _ ->
-            ImGui.StyleColorsLight ()
-            uimodel
-        )
+    match gameState.phase with
+    | Orders ->
+        [
+            yield (fun uimodel _ ->
+                ImGui.StyleColorsLight ()
+                uimodel
+            )
         
-        let productTiles = gameProductTiles gameState
+            let productTiles = gameProductTiles gameState
 
-        yield playerStats productTiles gameState
+            yield playerStats productTiles gameState
 
-        match gameState.selectedTile with
-        | Some point -> yield showPopup point productTiles gameState
-        | None -> ()
+            match gameState.selectedTile with
+            | Some point -> yield showPopup point productTiles gameState
+            | None -> ()
 
-        yield endTurnButton
-    ]
+            yield endTurnButton
+        ]
+    | _ -> []
