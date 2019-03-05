@@ -93,13 +93,12 @@ let incomeByCorp productTiles productIncome =
     |> List.map (fun (c, n) -> c, n * productIncome)
     |> Map.ofList
 
-let expensesByCorp (costs: Department -> int) gameState = 
+let expensesForCorp (costs: Department -> int) corp = 
+    allOffices corp.headOffice |> List.sumBy (fun o -> o.departments |> List.sumBy costs)
+
+let expensesByCorp costs gameState = 
     allCorps gameState
-    |> List.map (fun c ->
-        c,
-        allOffices c.headOffice
-        |> List.sumBy (fun o -> 
-            o.departments |> List.sumBy costs))
+    |> List.map (fun c -> c, expensesForCorp costs c)
     |> Map.ofList
 
 let rec updateQuality office researchOffices =

@@ -25,7 +25,7 @@ let window label (x, y) (w, h) (flags: ImGuiWindowFlags) children =
 
 let playerStats productTiles gameState = 
     let income = Map.find gameState.player (incomeByCorp productTiles productIncome)
-    let expenses = Map.find gameState.player (expensesByCorp departmentCost gameState)
+    let expenses = expensesForCorp departmentCost gameState.player
 
     let statsFlags = flags ||| ImGuiWindowFlags.NoScrollbar ||| ImGuiWindowFlags.NoInputs ||| ImGuiWindowFlags.NoTitleBar
     window "player-info" (10, winh - 145) (220, 135) statsFlags [
