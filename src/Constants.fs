@@ -19,6 +19,7 @@ let assets = [
     ]
 
 let productIncome = 100
+let ordersPerTurn = 2
 
 let rec orderCost =
     function

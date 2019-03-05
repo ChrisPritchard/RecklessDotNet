@@ -39,6 +39,7 @@ type GameState = {
     phase: TurnPhase
 } and TurnPhase =
     | Orders
+    | ConfirmEndTurn
     | TurnEnding of startTime:float
     | TurnStarting of startTime:float
 
@@ -100,17 +101,3 @@ let expensesByCorp costs gameState =
     allCorps gameState
     |> List.map (fun c -> c, expensesForCorp costs c)
     |> Map.ofList
-
-let rec updateQuality office researchOffices =
-    let hasResearch = List.contains Research office.departments && not <| List.contains office researchOffices
-    let qaCount = office.extensions |> List.sumBy (fun e -> match e with QA -> 1)
-    let newDepartments = 
-        office.departments
-        |> List.map (function
-        | Product q -> 
-            let degraded = if hasResearch then q else q - 10
-            let enhanced = degraded + (qaCount * 5)
-            Product (max 10 enhanced)
-        | d -> d)
-    let newManaged = office.managedOffices |> List.map (fun o -> updateQuality o researchOffices)
-    { office with departments = newDepartments; managedOffices = newManaged }

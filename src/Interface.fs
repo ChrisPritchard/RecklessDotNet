@@ -9,6 +9,12 @@ open System
     
 type UIModel = {
     endTurn: bool
+    confirmOrders: bool
+}
+
+let startUIModel = {
+    endTurn = false
+    confirmOrders = false
 }
 
 let flags = 
@@ -73,8 +79,14 @@ let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel =
             { uimodel with endTurn = res })
     ]
 
+let turnOrders _ =
+    let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
+    window "confirm-orders" (30, 30) (winw - 60, winh - 60) flags [
+        
+    ]
+
 let getInterface (gameState: GameState) =
-    { endTurn = false },
+    startUIModel,
     match gameState.phase with
     | Orders ->
         [
@@ -93,4 +105,6 @@ let getInterface (gameState: GameState) =
 
             yield endTurnButton
         ]
+    | ConfirmEndTurn ->
+        [turnOrders gameState]
     | _ -> []
