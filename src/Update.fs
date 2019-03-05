@@ -22,17 +22,13 @@ let advanceTurn gameState =
     let expensesByCorp = expensesByCorp departmentCost gameState
 
     let updateCorp corp = 
-        {
-            corp with
+        { corp with
                 cash = corp.cash + Map.find corp incomeByCorp - Map.find corp expensesByCorp
-                headOffice = updateQuality corp.headOffice []
-        }
+                headOffice = updateQuality corp.headOffice [] }
 
-    { 
-        gameState with 
+    { gameState with 
             player = updateCorp gameState.player
-            others = gameState.others |> List.map updateCorp
-    }
+            others = gameState.others |> List.map updateCorp }
 
 let advanceModel runState (uiModel: UIModel) model =
     if wasJustPressed Keys.Escape runState then None
