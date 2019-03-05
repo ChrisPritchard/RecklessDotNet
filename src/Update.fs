@@ -16,6 +16,22 @@ let findMouseTile runState gameState =
         if Set.contains tile gameState.market 
         then Some tile else None
 
+let applyIncome productTiles gameState corp = 
+    let income = Map.find corp (incomeByCorp productTiles productIncome)
+    let expenses = Map.find corp (expensesByCorp departmentCost gameState)
+    { corp with cash = corp.cash + income - expenses }
+
+let advanceTurn gameState = 
+    let productTiles = gameProductTiles gameState
+    // TODO update qualities
+    let newPlayer = applyIncome productTiles gameState gameState.player 
+    let newOthers = gameState.others |> List.map (applyIncome productTiles gameState)
+    { 
+        gameState with 
+            player = newPlayer 
+            others = newOthers
+    }
+
 let advanceModel runState (uiModel: UIModel) model =
     if wasJustPressed Keys.Escape runState then None
     else
@@ -26,7 +42,7 @@ let advanceModel runState (uiModel: UIModel) model =
             | Orders when uiModel.endTurn -> 
                 Some { gameState with phase = TurnEnding runState.elapsed }
             | TurnEnding startTime when runState.elapsed - startTime >= turnTransitionTime ->
-                // TODO: advanceTurn
+                let gameState = advanceTurn gameState
                 Some { gameState with phase = TurnStarting runState.elapsed }
             | TurnStarting startTime when runState.elapsed - startTime >= turnTransitionTime ->
                 Some { gameState with phase = Orders }
