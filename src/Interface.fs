@@ -8,11 +8,6 @@ open Model
 open Constants
 open Helpers
 
-let startUIModel = {
-    endTurn = false
-    confirmOrders = false
-}
-
 let flags = 
     ImGuiWindowFlags.NoResize ||| ImGuiWindowFlags.NoMove ||| ImGuiWindowFlags.NoCollapse
 
@@ -77,9 +72,20 @@ let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel =
 
 let turnOrders _ =
     let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
-    window "confirm-orders" (30, 30) (winw - 60, winh - 60) flags [
-        
+    window "confirm-orders" (100, 100) (winw - 200, winh - 200) flags [
+        (fun uimodel _ -> 
+            let res = ImGui.Button ("Accept", new Vector2 (90.f, 40.f))
+            { uimodel with confirmOrders = res })
+        (fun uimodel _ -> 
+            let res = ImGui.Button ("Cancel", new Vector2 (90.f, 40.f))
+            { uimodel with cancelEndTurn = res })
     ]
+
+let startUIModel = {
+    endTurn = false
+    confirmOrders = false
+    cancelEndTurn = false
+}
 
 let getInterface (gameState: GameState) =
     startUIModel,

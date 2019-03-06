@@ -54,6 +54,8 @@ let advanceModel runState (uiModel: UIModel) model =
             match gameState.phase with
             | Orders when uiModel.endTurn -> 
                 Some { gameState with phase = ConfirmEndTurn }
+            | ConfirmEndTurn when uiModel.cancelEndTurn ->
+                Some { gameState with phase = Orders }
             | ConfirmEndTurn when uiModel.confirmOrders ->
                 Some { gameState with phase = TurnEnding runState.elapsed }
             | TurnEnding startTime when runState.elapsed - startTime >= turnTransitionTime ->

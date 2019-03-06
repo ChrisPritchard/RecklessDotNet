@@ -46,4 +46,5 @@ type GameState = {
 type UIModel = {
     endTurn: bool
     confirmOrders: bool
+    cancelEndTurn: bool
 }
