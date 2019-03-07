@@ -7,7 +7,6 @@ open Constants
 open StartModel
 open Helpers
 open Iso
-open Interface
 
 let findMouseTile runState gameState =
     if not (isMousePressed (true, false) runState) then

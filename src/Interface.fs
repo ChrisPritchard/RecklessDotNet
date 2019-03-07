@@ -72,7 +72,8 @@ let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel =
 
 let turnOrders _ =
     let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
-    window "confirm-orders" (100, 100) (winw - 200, winh - 200) flags [
+    let margin = 200
+    window "confirm-orders" (margin, margin) (winw - margin*2, winh - margin*2) flags [
         (fun uimodel _ -> 
             let res = ImGui.Button ("Accept", new Vector2 (90.f, 40.f))
             { uimodel with confirmOrders = res })
