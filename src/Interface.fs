@@ -70,16 +70,35 @@ let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel =
             { uimodel with endTurn = res })
     ]
 
-let turnOrders _ =
+let turnOrders gameState =
     let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
     let margin = 200
     window "confirm-orders" (margin, margin) (winw - margin*2, winh - margin*2) flags [
-        (fun uimodel _ -> 
-            let res = ImGui.Button ("Accept", new Vector2 (90.f, 40.f))
-            { uimodel with confirmOrders = res })
-        (fun uimodel _ -> 
-            let res = ImGui.Button ("Cancel", new Vector2 (90.f, 40.f))
-            { uimodel with cancelEndTurn = res })
+
+        let orderCount = List.length gameState.player.orders
+        if orderCount <> ordersPerTurn then
+            yield text (sprintf "Are you sure? You still have %i orders remaining" (ordersPerTurn - orderCount))
+        
+        if orderCount > 0 then
+            yield text "Current Orders:"
+
+            for order in gameState.player.orders do
+                yield text (sprintf "%A" order)
+
+        yield 
+            fun uimodel _ -> 
+                let res = ImGui.Button ("Accept", new Vector2 (90.f, 40.f))
+                { uimodel with confirmOrders = res }
+        
+        yield 
+            fun uimodel _ ->
+                ImGui.SameLine ()
+                uimodel
+
+        yield 
+            fun uimodel _ -> 
+                let res = ImGui.Button ("Cancel", new Vector2 (90.f, 40.f))
+                { uimodel with cancelEndTurn = res }
     ]
 
 let startUIModel = {
