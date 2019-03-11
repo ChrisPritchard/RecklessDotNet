@@ -38,7 +38,7 @@ type GameState = {
     selectedTile: (int * int) option
     phase: TurnPhase
 } and TurnPhase =
-    | Orders
+    | Orders of showOptions:bool
     | ConfirmEndTurn
     | TurnEnding of startTime:float
     | TurnStarting of startTime:float

@@ -103,6 +103,9 @@ let turnOrders gameState =
                 { uimodel with cancelEndTurn = res }
     ]
 
+let orderOptions gameState = 
+    []
+
 let startUIModel = {
     endTurn = false
     confirmOrders = false
@@ -112,7 +115,7 @@ let startUIModel = {
 let getInterface (gameState: GameState) =
     startUIModel,
     match gameState.phase with
-    | Orders ->
+    | Orders showOptions ->
         [
             yield (fun uimodel _ ->
                 ImGui.StyleColorsLight ()
@@ -128,6 +131,9 @@ let getInterface (gameState: GameState) =
             | None -> ()
 
             yield endTurnButton
+
+            if showOptions then
+                yield! orderOptions gameState
         ]
     | ConfirmEndTurn ->
         [turnOrders gameState]

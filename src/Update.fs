@@ -51,10 +51,10 @@ let advanceModel runState (uiModel: UIModel) model =
         | None -> Some (startModel ())
         | Some gameState -> 
             match gameState.phase with
-            | Orders when uiModel.endTurn -> 
+            | Orders _ when uiModel.endTurn -> 
                 Some { gameState with phase = ConfirmEndTurn }
             | ConfirmEndTurn when uiModel.cancelEndTurn ->
-                Some { gameState with phase = Orders }
+                Some { gameState with phase = Orders false }
             | ConfirmEndTurn when uiModel.confirmOrders ->
                 Some { gameState with phase = TurnEnding runState.elapsed }
             | ConfirmEndTurn -> 
@@ -63,6 +63,6 @@ let advanceModel runState (uiModel: UIModel) model =
                 let gameState = advanceTurn gameState
                 Some { gameState with phase = TurnStarting runState.elapsed }
             | TurnStarting startTime when runState.elapsed - startTime >= turnTransitionTime ->
-                Some { gameState with phase = Orders }
+                Some { gameState with phase = Orders false }
             | _ ->
                 Some { gameState with selectedTile = findMouseTile runState gameState }
