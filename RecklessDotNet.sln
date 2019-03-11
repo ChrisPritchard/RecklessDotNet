@@ -8,7 +8,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5DB0034E-8476-4D68-9A65-D47F64834B59}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		FONT LICENSE.txt = FONT LICENSE.txt
 		README.md = README.md
 		spritegen.html = spritegen.html
 	EndProjectSection
