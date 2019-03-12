@@ -51,6 +51,8 @@ let advanceModel runState (uiModel: UIModel) model =
         | None -> Some (startModel ())
         | Some gameState -> 
             match gameState.phase with
+            | Orders false when uiModel.showOrders ->
+                Some { gameState with phase = Orders true }
             | Orders _ when uiModel.endTurn -> 
                 Some { gameState with phase = ConfirmEndTurn }
             | ConfirmEndTurn when uiModel.cancelEndTurn ->

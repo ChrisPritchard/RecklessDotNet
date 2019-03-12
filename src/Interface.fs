@@ -70,6 +70,18 @@ let endTurnButton: UIModel -> (string -> IntPtr) -> UIModel =
             { uimodel with endTurn = res })
     ]
 
+let showOrderOptionsButton: UIModel -> (string -> IntPtr) -> UIModel = 
+    let endTurnFlags = 
+        flags ||| ImGuiWindowFlags.NoTitleBar 
+        ||| ImGuiWindowFlags.NoBackground 
+        ||| ImGuiWindowFlags.AlwaysAutoResize
+        ||| ImGuiWindowFlags.NoScrollbar
+    window "show-order-options" (240, winh - 60) (110, 60) endTurnFlags [
+        (fun uimodel _ -> 
+            let res = ImGui.Button ("ORDERS", new Vector2 (90.f, 40.f))
+            { uimodel with showOrders = res })
+    ]
+
 let turnOrders gameState =
     let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
     let width, height  = 400, 100
@@ -104,9 +116,13 @@ let turnOrders gameState =
     ]
 
 let orderOptions gameState = 
-    []
+    let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
+    let width, height  = 600, 200
+    window "select-order" ((winw - width)/2, winh - height - 20) (width, height) flags [
+    ]
 
 let startUIModel = {
+    showOrders = false
     endTurn = false
     confirmOrders = false
     cancelEndTurn = false
@@ -133,7 +149,9 @@ let getInterface (gameState: GameState) =
             yield endTurnButton
 
             if showOptions then
-                yield! orderOptions gameState
+                yield orderOptions gameState
+            else
+                yield showOrderOptionsButton
         ]
     | ConfirmEndTurn ->
         [turnOrders gameState]

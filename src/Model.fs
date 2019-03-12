@@ -44,6 +44,7 @@ type GameState = {
     | TurnStarting of startTime:float
     
 type UIModel = {
+    showOrders: bool
     endTurn: bool
     confirmOrders: bool
     cancelEndTurn: bool
