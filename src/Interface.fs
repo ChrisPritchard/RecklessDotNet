@@ -82,6 +82,15 @@ let showOrderOptionsButton: UIModel -> (string -> IntPtr) -> UIModel =
             { uimodel with showOrders = res })
     ]
 
+let orderOptions gameState = 
+    let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
+    let width, height  = 500, 200
+    window "select-order" ((winw - width)/2, winh - height - 20) (width, height) flags [
+        for column in List.chunkBySize 3 orders do
+            for order in column do
+                yield button order (fun s _ -> s)
+    ]
+
 let turnOrders gameState =
     let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
     let width, height  = 400, 100
@@ -113,12 +122,6 @@ let turnOrders gameState =
             fun uimodel _ -> 
                 let res = ImGui.Button ("Cancel", new Vector2 (90.f, 40.f))
                 { uimodel with cancelEndTurn = res }
-    ]
-
-let orderOptions gameState = 
-    let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
-    let width, height  = 600, 200
-    window "select-order" ((winw - width)/2, winh - height - 20) (width, height) flags [
     ]
 
 let startUIModel = {

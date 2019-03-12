@@ -42,6 +42,18 @@ type GameState = {
     | ConfirmEndTurn
     | TurnEnding of startTime:float
     | TurnStarting of startTime:float
+
+let orders = [
+    "Research Idea"
+    "New Department"
+    "New Office"
+    "Research Idea"
+    "New Department"
+    "New Office"
+    "Research Idea"
+    "New Department"
+    "New Office"
+]
     
 type UIModel = {
     showOrders: bool
