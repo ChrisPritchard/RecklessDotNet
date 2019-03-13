@@ -85,11 +85,16 @@ let showOrderOptionsButton: UIModel -> (string -> IntPtr) -> UIModel =
 let orderOptions gameState = 
     let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
     let width, height  = 500, 200
-    window "select-order" ((winw - width)/2, winh - height - 20) (width, height) flags [
-        for column in List.chunkBySize 3 orders do
-            for order in column do
-                yield button order (fun s _ -> s)
-    ]
+    let orderButtons = 
+        orders 
+        |> List.chunkBySize 3 
+        |> List.mapi (fun i column ->
+            fun uimodel res ->
+                ImGui.SetCursorPosY (0.f)
+                (uimodel, column) ||> List.fold (fun model order ->
+                    ImGui.SetCursorPosX (float32 i * 100.f)
+                    button order (fun s _ -> s) model res))
+    window "select-order" ((winw - width)/2, winh - height - 20) (width, height) flags orderButtons
 
 let turnOrders gameState =
     let flags = flags ||| ImGuiWindowFlags.NoTitleBar ||| ImGuiWindowFlags.NoScrollbar
