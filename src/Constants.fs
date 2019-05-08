@@ -1,22 +1,13 @@
 module Constants
 
-open GameCore.GameModel
-open Model
+open SharedModel
 
 let windowSize = 800, 600
 let winw, winh = windowSize
-let tileSize = 64, 32
-let tw, th = tileSize
+let tileWidth, tileHeight = 64, 32
 let maxMapSize = 10
 
 let turnTransitionTime = 500.
-
-let assets = [
-        Texture ("tile", "content/tile.png")
-        Texture ("tile-highlight", "content/tile-highlight.png")
-        Texture ("office", "content/office.png")
-        Texture ("office-highlight", "content/office-highlight.png")
-    ]
 
 let productIncome = 100
 let ordersPerTurn = 2

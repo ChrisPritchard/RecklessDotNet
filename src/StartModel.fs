@@ -1,10 +1,11 @@
 module StartModel
 
-open Model
+open Xelmish.Model
+open SharedModel
 
 let private dim = Constants.maxMapSize
 
-let private startMarket = 
+let startMarket = 
     [0..dim*dim-1] 
     |> List.fold (fun map i -> 
         let x = i % dim
@@ -47,7 +48,7 @@ let private testOffice5 = {
     x = 9
     y = 7
     managedOffices = []
-    departments = [Research;Research;Research;Marketing;Product 100;Acquisitions]
+    departments = [Research; Research; Research; Marketing; Product 100; Acquisitions]
     extensions = []
 }
 
@@ -55,7 +56,7 @@ let private testOffice4 = {
     x = 9
     y = 8
     managedOffices = [testOffice5]
-    departments = [Research;Research;Research;Marketing;Product 100;Acquisitions]
+    departments = [Research; Research; Research; Marketing; Product 100; Acquisitions]
     extensions = []
 }
 
@@ -63,7 +64,7 @@ let private testOffice3 = {
     x = 8
     y = 8
     managedOffices = [testOffice4]
-    departments = [Research;Research;Research;Marketing;Product 100;Acquisitions]
+    departments = [Research; Research; Research; Marketing; Product 100; Acquisitions]
     extensions = []
 }
 
@@ -74,10 +75,10 @@ let player = {
     ideas = 0
     headOffice = testOffice2
     orders = []
-    colour = Yellow
+    colour = Colour.Yellow
 }
 
-let private others = [
+let others = [
     {   
         name = "Evil Corp"
         abbreviation = "EVL"
@@ -85,7 +86,7 @@ let private others = [
         ideas = 0
         headOffice = testOffice
         orders = []
-        colour = Purple
+        colour = Colour.Purple
     }
     {   
         name = "Jade Systems"
@@ -94,14 +95,6 @@ let private others = [
         ideas = 0
         headOffice = testOffice3
         orders = []
-        colour = Green
+        colour = Colour.Green
     }
 ]
-
-let startModel () = {
-    market = startMarket
-    player = player
-    others = others
-    selectedTile = None
-    phase = Orders false
-}

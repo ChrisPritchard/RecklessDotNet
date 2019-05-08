@@ -1,10 +1,8 @@
 ﻿module Helpers
 
-open Model
+open SharedModel
 
 let rec allOffices office = office::List.collect allOffices office.managedOffices
-
-let allCorps gameState = gameState.player::gameState.others
 
 let officeProductTiles office = 
     let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)
@@ -13,7 +11,7 @@ let officeProductTiles office =
     |> List.filter (fun (x, y) -> abs x + abs y <= products)
     |> List.map (fun (x, y) -> office.x + x, office.y + y)
 
-let private corpProductTiles corp = 
+let corpProductTiles corp = 
     let rec gatherer parent office = 
         let quality, localMarketing = 
             ((0, 0), office.departments) 
@@ -33,18 +31,6 @@ let private corpProductTiles corp =
         ]
     gatherer None corp.headOffice
 
-let gameProductTiles gameState =
-    allCorps gameState
-    |> List.collect (fun c -> corpProductTiles c |> List.map (fun (x, y, q) -> (x, y), (c, q)))
-    |> List.groupBy fst
-    |> List.map (fun (pos, tiles) -> 
-        let ordered = 
-            tiles 
-            |> List.sortByDescending (fun (_, (_, q)) -> q) 
-            |> List.map snd
-        pos, ordered)
-    |> Map.ofList
-
 let incomeByCorp productTiles productIncome =
     productTiles 
     |> Map.toList
@@ -55,8 +41,3 @@ let incomeByCorp productTiles productIncome =
 
 let expensesForCorp (costs: Department -> int) corp = 
     allOffices corp.headOffice |> List.sumBy (fun o -> o.departments |> List.sumBy costs)
-
-let expensesByCorp costs gameState = 
-    allCorps gameState
-    |> List.map (fun c -> c, expensesForCorp costs c)
-    |> Map.ofList

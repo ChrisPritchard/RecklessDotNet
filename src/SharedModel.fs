@@ -1,4 +1,6 @@
-module Model
+﻿module SharedModel
+
+open Xelmish.Model
 
 type Corporation = {
     name: string
@@ -28,23 +30,3 @@ and Order =
     | BuildExtension of Office * Extension
     | ResearchIdea of researchLocation:Office
     | BuildOffice of acquisitions:Office * x:int * y:int * Department
-and Colour = 
-    | Red | Orange | Yellow | Green | Blue | Purple
-
-type GameState = {
-    market: Set<int * int>
-    player: Corporation
-    others: Corporation list
-    selectedTile: (int * int) option
-    phase: TurnPhase
-} and TurnPhase =
-    | Orders of showOptions:bool
-    | ConfirmEndTurn
-    | TurnEnding of startTime:float
-    | TurnStarting of startTime:float
-    
-type UIModel = {
-    endTurn: bool
-    confirmOrders: bool
-    cancelEndTurn: bool
-}
