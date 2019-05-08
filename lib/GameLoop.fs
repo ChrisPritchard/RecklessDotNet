@@ -29,7 +29,7 @@ type GameLoop (config: GameConfig) as this =
 
     // these two collections are set by the Elmish setState call
     let mutable updatable: (Inputs -> Unit) list = []
-    let mutable drawable: (LoadedAssets -> SpriteBatch -> Unit) list = []
+    let mutable drawable: (LoadedAssets -> Inputs -> SpriteBatch -> Unit) list = []
 
     do 
         // presently Xelmish only supports windowed - fullscreen will come eventually (tm)
@@ -48,15 +48,17 @@ type GameLoop (config: GameConfig) as this =
     /// and assigned internally here for update and drawing
     member __.View
         with set value = 
+            let rec splitter updatableAcc drawableAcc =
+                function
+                | [] -> updatableAcc, drawableAcc
+                | (OnUpdate f)::rest -> splitter (f::updatableAcc) drawableAcc rest
+                | (OnDraw f)::rest -> splitter updatableAcc (f::drawableAcc) rest
+                | (ViewableList set)::rest -> 
+                    let updatableAcc, drawableAcc = splitter updatableAcc drawableAcc (List.rev set)
+                    splitter updatableAcc drawableAcc rest
+
             // we split the viewables by their DU type to be more efficient during draw/update
-            let newUpdatables, newDrawables =
-                (([], []), Seq.rev value)
-                ||> Seq.fold (fun (updatable, drawable) -> 
-                    function
-                    | OnUpdate f -> 
-                        f::updatable, drawable
-                    | OnDraw f ->
-                        updatable, f::drawable)
+            let newUpdatables, newDrawables = splitter [] [] (List.rev value)
             updatable <- newUpdatables
             drawable <- newDrawables
 
@@ -123,5 +125,5 @@ type GameLoop (config: GameConfig) as this =
         Option.iter this.GraphicsDevice.Clear config.clearColour
 
         spriteBatch.Begin (SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp)
-        for drawFunc in drawable do drawFunc assets spriteBatch
+        for drawFunc in drawable do drawFunc assets inputs spriteBatch
         spriteBatch.End ()
