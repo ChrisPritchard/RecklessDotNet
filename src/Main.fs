@@ -92,8 +92,10 @@ let view model dispatch =
 
         yield OnDraw (fun assets inputs spritebatch ->
             let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
-            let toReturn = if model.market.Contains mouseTile then renderHighlight model mouseTile else []
-            toReturn 
-            |> List.choose (function OnDraw f -> Some f | _ -> None)
-            |> List.iter (fun f -> f assets inputs spritebatch))
+            if model.market.Contains mouseTile then 
+                renderHighlight model mouseTile
+                |> List.choose (function OnDraw f -> Some f | _ -> None)
+                |> List.iter (fun f -> f assets inputs spritebatch))
+
+        yield onkeydown Keys.Escape exit
     ]

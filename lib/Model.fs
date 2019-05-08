@@ -80,7 +80,6 @@ type LoadedAssets = {
 type Viewable = 
     | OnDraw of (LoadedAssets -> Inputs -> SpriteBatch -> unit)
     | OnUpdate of (Inputs -> unit)
-    | ViewableList of Viewable list
 
 /// If a game throws this exception, the gameloop will catch it and quit.
 type QuitGame() =

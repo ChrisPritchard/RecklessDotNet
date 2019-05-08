@@ -50,17 +50,13 @@ type GameLoop (config: GameConfig) as this =
         with set value = 
             let rec splitter updatableAcc drawableAcc =
                 function
-                | [] -> updatableAcc, drawableAcc
+                | [] -> 
+                    updatable <- updatableAcc
+                    drawable <- drawableAcc
                 | (OnUpdate f)::rest -> splitter (f::updatableAcc) drawableAcc rest
                 | (OnDraw f)::rest -> splitter updatableAcc (f::drawableAcc) rest
-                | (ViewableList set)::rest -> 
-                    let updatableAcc, drawableAcc = splitter updatableAcc drawableAcc (List.rev set)
-                    splitter updatableAcc drawableAcc rest
-
             // we split the viewables by their DU type to be more efficient during draw/update
-            let newUpdatables, newDrawables = splitter [] [] (List.rev value)
-            updatable <- newUpdatables
-            drawable <- newDrawables
+            splitter [] [] (List.rev value)
 
     override __.LoadContent () = 
         spriteBatch <- new SpriteBatch (graphics.GraphicsDevice)
