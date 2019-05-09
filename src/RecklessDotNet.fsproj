@@ -5,6 +5,13 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
+
+  <ItemGroup>
+    <Content Include="content\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="SharedModel.fs" />
     <Compile Include="Constants.fs" />
@@ -18,23 +25,22 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
+  <ItemGroup />
+
+  <!-- Processed by content pipeline on build into xnb files -->
   <ItemGroup>
-    <None Include="content/tile.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="content/tile-highlight.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="content/office.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="content/office-highlight.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <MonoGameContentReference Include="**\*.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="bin\**" />
+    <MonoGameContentReference Remove="bin\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\lib\Xelmish.fsproj" />
+    <!-- Required to trigger the content build -->
+    <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.4" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" />
   </ItemGroup>
 
 </Project>

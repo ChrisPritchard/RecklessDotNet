@@ -28,6 +28,7 @@ let main _ =
         FileTexture ("tile-highlight", "content/tile-highlight.png")
         FileTexture ("office", "content/office.png")
         FileTexture ("office-highlight", "content/office-highlight.png")
+        PipelineFont ("defaultFont", "content/SourceCodePro")
     ]
 
     Program.mkProgram init update view
