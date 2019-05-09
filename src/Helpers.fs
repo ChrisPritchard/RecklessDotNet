@@ -31,13 +31,13 @@ let corpProductTiles corp =
         ]
     gatherer None corp.headOffice
 
-let incomeByCorp productTiles productIncome =
-    productTiles 
-    |> Map.toList
-    |> List.map (snd >> List.head >> fst)
-    |> List.countBy id
-    |> List.map (fun (c, n) -> c, n * productIncome)
-    |> Map.ofList
+//let incomeByCorp productTiles productIncome =
+//    productTiles 
+//    |> Map.toList
+//    |> List.map (snd >> List.head >> fst)
+//    |> List.countBy id
+//    |> List.map (fun (c, n) -> c, n * productIncome)
+//    |> Map.ofList
 
-let expensesForCorp (costs: Department -> int) corp = 
-    allOffices corp.headOffice |> List.sumBy (fun o -> o.departments |> List.sumBy costs)
+//let expensesForCorp (costs: Department -> int) corp = 
+//    allOffices corp.headOffice |> List.sumBy (fun o -> o.departments |> List.sumBy costs)
