@@ -87,6 +87,11 @@ let view model dispatch =
         yield! renderMarket productTiles model
         yield! renderOffices model
 
+        match model.selectedTile with
+        | None -> ()
+        | Some tile ->
+            yield! renderHighlight model tile
+
         yield OnDraw (fun assets inputs spritebatch ->
             let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
             if model.market.Contains mouseTile then 
