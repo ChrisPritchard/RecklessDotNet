@@ -42,15 +42,6 @@ let playQueuedSound (soundQueue: KeyQueue) =
         if soundQueue.Count > 0 then 
             let nextSound = soundQueue.Dequeue ()
             ignore (loadedAssets.sounds.[nextSound].Play ()))
-    
-let onhover event (width, height) (x, y) =
-    OnDraw (fun _ inputs _ -> 
-        if (inputs.mouseState.X, inputs.mouseState.Y) 
-            ||> isInside x y width height then event ())
-
-let onhoverpoint check event =
-    OnDraw (fun _ inputs _ -> 
-        if check inputs.mouseState.X inputs.mouseState.Y then event ())
 
 /// Run the given event function on every call to Update by the game loop (approx 60 times a second)
 let onupdate event = 

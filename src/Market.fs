@@ -88,16 +88,13 @@ let view model dispatch =
         yield! renderOffices model
 
         match model.selectedTile with
-        | None -> ()
-        | Some tile ->
-            yield! renderHighlight model tile
+        | None -> () | Some tile -> yield! renderHighlight model tile
 
         yield OnDraw (fun assets inputs spritebatch ->
             let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
             if model.market.Contains mouseTile then 
                 let posText = text "defaultFont" 18. Colour.Black (0., 0.) (sprintf "%A" mouseTile) (10, 10)
                 let highlight = renderHighlight model mouseTile
-
                 (posText::highlight)
                 |> List.choose (function OnDraw f -> Some f | _ -> None)
                 |> List.iter (fun f -> f assets inputs spritebatch))
