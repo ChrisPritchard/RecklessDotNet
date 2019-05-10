@@ -18,8 +18,6 @@
     <Compile Include="StartModel.fs" />
     <Compile Include="Helpers.fs" />
     <Compile Include="Iso.fs" />
-    <Compile Include="Interface.fs" />
-    <Compile Include="View.fs" />
     <Compile Include="Update.fs" />
     <Compile Include="Market.fs" />
     <Compile Include="Main.fs" />
