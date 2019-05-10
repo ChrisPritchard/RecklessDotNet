@@ -25,9 +25,3 @@ and Department =
     | Marketing
     | Research
     | Admin of Executive option
-
-type Market = {
-    market: Set<int * int>
-    player: Corporation
-    others: Corporation list
-}

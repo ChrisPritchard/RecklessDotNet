@@ -17,7 +17,6 @@ let private subOffice = {
     y = 4
     managedOffices = []
     departments = [Product 16; Product 30]
-    extensions = []
 }
 
 let private subOffice2 = {
@@ -25,7 +24,6 @@ let private subOffice2 = {
     y = 3
     managedOffices = []
     departments = [Product 16; Product 30]
-    extensions = []
 }
 
 let private testOffice = {
@@ -33,7 +31,6 @@ let private testOffice = {
     y = 4
     managedOffices = [subOffice]
     departments = [Product 16; Marketing; Product 22; Product 30]
-    extensions = []
 }
 
 let private testOffice2 = {
@@ -41,23 +38,20 @@ let private testOffice2 = {
     y = 7
     managedOffices = [subOffice2]
     departments = [Product 16; Marketing; Product 30]
-    extensions = []
 }
 
 let private testOffice5 = {
     x = 9
     y = 7
     managedOffices = []
-    departments = [Research; Research; Research; Marketing; Product 100; Acquisitions]
-    extensions = []
+    departments = [Research; Research; Research; Marketing; Product 100]
 }
 
 let private testOffice4 = {
     x = 9
     y = 8
     managedOffices = [testOffice5]
-    departments = [Research; Research; Research; Marketing; Product 100; Acquisitions]
-    extensions = []
+    departments = [Research; Research; Research; Marketing; Product 100]
 }
 
 let private testOffice3 = {
@@ -65,7 +59,6 @@ let private testOffice3 = {
     y = 8
     managedOffices = [testOffice4]
     departments = [Research; Research; Research; Marketing; Product 100; Acquisitions]
-    extensions = []
 }
 
 let player = {   
@@ -74,7 +67,6 @@ let player = {
     cash = 5000
     ideas = 0
     headOffice = testOffice2
-    orders = []
     colour = Colour.Yellow
 }
 
@@ -85,7 +77,6 @@ let others = [
         cash = 5000
         ideas = 0
         headOffice = testOffice
-        orders = []
         colour = Colour.Purple
     }
     {   
@@ -94,7 +85,6 @@ let others = [
         cash = 5000
         ideas = 0
         headOffice = testOffice3
-        orders = []
         colour = Colour.Green
     }
 ]

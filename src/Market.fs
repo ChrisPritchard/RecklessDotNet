@@ -21,7 +21,6 @@ let init () =
         player = StartModel.player
         others = StartModel.others
         selectedTile = None
-        //phase = Orders false
     }
 
 type Message = SelectTile of x:int * y:int
