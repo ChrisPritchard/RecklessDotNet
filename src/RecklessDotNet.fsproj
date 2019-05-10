@@ -13,9 +13,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Include="SharedModel.fs" />
     <Compile Include="Constants.fs" />
-    <Compile Include="StartModel.fs" />
     <Compile Include="Helpers.fs" />
     <Compile Include="Iso.fs" />
     <Compile Include="Market.fs" />

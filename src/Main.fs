@@ -2,7 +2,8 @@
 
 open Elmish
 
-type Model = { market: Market.Model }
+type Model = 
+    {   market: Market.Model    }
 
 let init () = { market = Market.init () }
 
