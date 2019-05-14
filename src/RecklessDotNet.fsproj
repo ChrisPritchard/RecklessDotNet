@@ -14,9 +14,7 @@
   
   <ItemGroup>
     <Compile Include="Constants.fs" />
-    <Compile Include="Helpers.fs" />
     <Compile Include="Iso.fs" />
-    <Compile Include="Market.fs" />
     <Compile Include="Main.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -1,7 +1,5 @@
 module Constants
 
-open SharedModel
-
 let windowSize = 800, 600
 let winw, winh = windowSize
 let tileWidth, tileHeight = 64, 32
@@ -24,9 +22,9 @@ let ordersPerTurn = 2
 //        7500 + 
 //        orderCost (BuildDepartment (Unchecked.defaultof<Office>, dep))
 
-let departmentCost = 
-    function
-    | Research -> 500
-    | Marketing -> 500
-    | Admin _ -> 500
-    | Product _ -> 0
+//let departmentCost = 
+//    function
+//    | Research -> 500
+//    | Marketing -> 500
+//    | Admin _ -> 500
+//    | Product _ -> 0
