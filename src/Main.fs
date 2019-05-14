@@ -35,6 +35,11 @@ type Market = {
     player: Corporation
     others: Corporation list
 }
+with 
+    member x.allCorps = x.player::x.others    
+    member x.allOffices =
+        let rec allOffices office = office::List.collect allOffices office.managedOffices
+        x.allCorps |> List.collect (fun corp -> allOffices corp.headOffice |> List.map (fun o -> o, corp))
 
 type Model = {
     market: Market
@@ -68,9 +73,6 @@ let init () =
 type Message = 
     | SelectTile of int * int
     | DeselectTile
-
-
-let rec allOffices office = office::List.collect allOffices office.managedOffices
 
 let officeProductTiles office = 
     let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)
@@ -109,10 +111,8 @@ let private renderMarket productTiles model =
             | Some ((corp, _)::_) -> corp.colour | _ -> Colour.White
         image "tile" colour (w, h) (x, y))
 
-let allCorps gameState = gameState.player::gameState.others
-
-let gameProductTiles gameState =
-    allCorps gameState
+let gameProductTiles (market: Market) =
+    market.allCorps
     |> List.collect (fun c -> corpProductTiles c |> List.map (fun (x, y, q) -> (x, y), (c, q)))
     |> List.groupBy fst
     |> List.map (fun (pos, tiles) -> 
@@ -123,28 +123,26 @@ let gameProductTiles gameState =
         pos, ordered)
     |> Map.ofList
 
-let private renderOffices gameState =
-    allCorps gameState
-    |> List.collect (fun corp -> allOffices corp.headOffice |> List.map (fun o -> corp, o))
-    |> List.sortBy (fun (_, office) -> office.y, -office.x)
-    |> List.map (fun (corp, office) -> 
+let private renderOffices (market: Market) =
+    market.allOffices
+    |> List.sortBy (fun (office, _) -> office.y, -office.x)
+    |> List.map (fun (office, corp) -> 
         let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
         image "office" corp.colour (w, h) (x, y))
 
-let private renderHighlight model (mx, my) = [
+let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
         yield image "tile-highlight" Colour.White (w, h) (x, y)
 
-        let allOffices = allCorps model |> List.collect (fun corp -> allOffices corp.headOffice)
-        match List.tryFind (fun office -> (office.x, office.y) = (mx, my)) allOffices with
+        match market.allOffices |> List.tryFind (fun (office, _) -> (office.x, office.y) = (mx, my)) with
         | None -> ()
-        | Some office ->
+        | Some (office, _) ->
             let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
 
             let tiles = officeProductTiles office
             yield! tiles 
-                |> List.filter (fun p -> Set.contains p model.tiles) 
+                |> List.filter (fun p -> Set.contains p market.tiles) 
                 |> List.map (fun (tx, ty) ->
                     let (x, y, w, h) = isoRect tx ty tileWidth tileHeight
                     image "tile-highlight" Colour.White (w, h) (x, y))
@@ -157,7 +155,12 @@ let view model dispatch =
         yield! renderOffices model.market
 
         match model.selectedTile with
-        | None -> () | Some tile -> yield! renderHighlight model.market tile
+        | None -> () 
+        | Some tile -> 
+            yield! renderHighlight model.market tile
+            // get tile or office at location (DU info?)
+            // render DU in window
+            yield colour Colour.LightGray (250, 150) (10, 10)
 
         yield OnDraw (fun assets inputs spritebatch ->
             let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
