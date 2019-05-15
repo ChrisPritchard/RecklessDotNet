@@ -64,7 +64,15 @@ with
         |> List.collect (fun corp -> 
             allOffices None corp.headOffice 
             |> List.map (fun (office, quality) -> office, quality, corp))
-        
+    member market.productTiles = 
+        market.allOffices
+        |> List.collect (fun (office, quality, corp) ->
+            office.productTiles |> List.map (fun tile -> tile, (corp, quality)))
+        |> List.groupBy fst
+        |> List.map (fun (tile, list) -> 
+            tile, List.map snd list |> List.sortByDescending snd)
+        |> Map.ofList
+
     //member x.atTile (x, y) =
     //    match List.tryFind (fun (office, _) -> office.x = x && office.y = y) x.allOffices with
     //    | Some office -> Office office
