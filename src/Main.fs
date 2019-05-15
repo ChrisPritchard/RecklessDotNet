@@ -127,11 +127,11 @@ let private renderMarket productTiles model =
     model.tiles
     |> Set.toList
     |> List.map (fun (x, y) -> 
-        let (x, y, w, h) = isoRect x y tileWidth tileHeight
+        let (tx, ty, tw, th) = isoRect x y tileWidth tileHeight
         let colour = 
             match Map.tryFind (x, y) productTiles with 
             | Some ((corp, _)::_) -> corp.colour | _ -> Colour.White
-        image "tile" colour (w, h) (x, y))
+        image "tile" colour (tw, th) (tx, ty))
 
 let gameProductTiles (market: Market) =
     market.allCorps
