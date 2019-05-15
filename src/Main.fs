@@ -25,12 +25,13 @@ and Office = {
     departments: Department list
 }
 with
-    member office.productTiles = 
+    member office.productTiles market = 
         let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)
         [-products..products] |> List.collect (fun x ->
         [-products..products] |> List.map (fun y -> x, y))
         |> List.filter (fun (x, y) -> abs x + abs y <= products)
         |> List.map (fun (x, y) -> office.x + x, office.y + y)
+        |> List.filter (fun p -> Set.contains p market.tiles)
     member office.productQuality parentOffice =
         let quality, localMarketing = 
             ((0, 0), office.departments) 
@@ -49,8 +50,7 @@ and Department =
     | Marketing
     | Research
     | Admin of Executive option
-
-type Market = {
+and Market = {
     tiles: Set<int * int>
     player: Corporation
     others: Corporation list
@@ -67,16 +67,20 @@ with
     member market.productTiles = 
         market.allOffices
         |> List.collect (fun (office, quality, corp) ->
-            office.productTiles |> List.map (fun tile -> tile, (corp, quality)))
+            office.productTiles market |> List.map (fun tile -> tile, (corp, quality)))
         |> List.groupBy fst
         |> List.map (fun (tile, list) -> 
             tile, List.map snd list |> List.sortByDescending snd)
         |> Map.ofList
-
-    //member x.atTile (x, y) =
-    //    match List.tryFind (fun (office, _) -> office.x = x && office.y = y) x.allOffices with
-    //    | Some office -> Office office
-    //    | None -> Tile 
+    member market.atTile (x, y) =
+        match List.tryFind (fun (office, _, _) -> office.x = x && office.y = y) market.allOffices with
+        | Some (office, quality, corp) -> OfficeInfo (office, quality, corp)
+        | None ->
+            let info = Map.tryFind (x, y) market.productTiles |> Option.defaultValue []
+            TileInfo info
+and Info =
+    | OfficeInfo of office:Office * quality:int * corp:Corporation
+    | TileInfo of (Corporation * int) list
 
 type Model = {
     market: Market
@@ -111,26 +115,6 @@ type Message =
     | SelectTile of int * int
     | DeselectTile
 
-let corpProductTiles corp = 
-    let rec gatherer parent office = 
-        let quality, localMarketing = 
-            ((0, 0), office.departments) 
-            ||> List.fold (fun (q, m) -> 
-                function
-                | Product v -> q + v, m
-                | Marketing -> q, m + 1
-                | _ -> q, m)
-        let parentMarketing = 
-            match parent with 
-            | Some o -> o.departments |> List.sumBy (function Marketing -> 1 | _ -> 0) 
-            | _ -> 0
-        let quality = quality * pown 2 (localMarketing + parentMarketing)
-        [
-            yield! office.productTiles |> List.map (fun (x, y) -> x, y, quality)
-            yield! List.collect (gatherer (Some office)) office.managedOffices
-        ]
-    gatherer None corp.headOffice
-
 let private renderMarket market =
     market.tiles
     |> Set.toList
@@ -151,16 +135,15 @@ let private renderOffices (market: Market) =
 let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
         yield image "tile-highlight" Colour.White (w, h) (x, y)
-        match market.allOffices |> List.tryFind (fun (office, _, _) -> (office.x, office.y) = (mx, my)) with
-        | None -> ()
-        | Some (office, _, _) ->
+        match market.atTile (mx, my) with
+        | OfficeInfo (office, _, _) ->
             let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
-            yield! office.productTiles 
-                |> List.filter (fun p -> Set.contains p market.tiles) 
+            yield! office.productTiles market
                 |> List.map (fun (tx, ty) ->
                     let (x, y, w, h) = isoRect tx ty tileWidth tileHeight
                     image "tile-highlight" Colour.White (w, h) (x, y))
+        | _ -> ()            
     ]
 
 let view model dispatch =
