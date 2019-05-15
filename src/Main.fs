@@ -74,12 +74,14 @@ with
             tile, List.map snd list |> List.sortByDescending snd)
         |> Map.ofList
     member market.atTile p =
-        match market.allOffices |> List.tryFind (fun (office, _, _, _) -> office.pos = p) with
-        | Some (office, tiles, quality, corp) -> 
-            OfficeInfo (office, tiles, quality, corp)
-        | None ->
-            let info = Map.tryFind p market.productTiles |> Option.defaultValue []
-            TileInfo info
+        if not (Set.contains p market.tiles) then None
+        else
+            match market.allOffices |> List.tryFind (fun (office, _, _, _) -> office.pos = p) with
+            | Some (office, tiles, quality, corp) -> 
+                Some (OfficeInfo (office, tiles, quality, corp))
+            | None ->
+                let info = Map.tryFind p market.productTiles |> Option.defaultValue []
+                Some (TileInfo info)
 and Info =
     | OfficeInfo of office:Office * tiles: (int * int) list * quality:int * corp:Corporation
     | TileInfo of (Corporation * int) list
@@ -138,7 +140,7 @@ let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
         yield image "tile-highlight" Colour.White (w, h) (x, y)
         match market.atTile (mx, my) with
-        | OfficeInfo (office, tiles, _, _) ->
+        | Some (OfficeInfo (office, tiles, _, _)) ->
             let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
             yield! tiles
@@ -157,9 +159,20 @@ let view model dispatch =
         | None -> () 
         | Some tile -> 
             yield! renderHighlight model.market tile
-            // get tile or office at location (DU info?)
-            // render DU in window
-            yield colour Colour.LightGray (250, 150) (10, 10)
+            match model.market.atTile tile with
+            | Some (OfficeInfo (office, _, _, corp)) ->
+                yield colour Colour.LightGray (250, 150) (10, 10)
+                // Office of Aquinas Corp
+                // departments:
+                //   product of quality 100
+                //   marketing
+            | Some (TileInfo owners) ->
+                yield colour Colour.LightGray (250, 150) (10, 10)
+                // Market tile
+                // products being sold here:
+                //   aquinas corp (dominant): 100
+                //   evil corp: 90
+            | _ -> ()
 
         yield OnDraw (fun assets inputs spritebatch ->
             let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
