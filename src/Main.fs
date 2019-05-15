@@ -25,6 +25,7 @@ and Office = {
     departments: Department list
 }
 with
+    member office.pos = (office.x, office.y)
     member office.productTiles market = 
         let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)
         [-products..products] |> List.collect (fun x ->
@@ -63,23 +64,24 @@ with
         market.allCorps 
         |> List.collect (fun corp -> 
             allOffices None corp.headOffice 
-            |> List.map (fun (office, quality) -> office, quality, corp))
+            |> List.map (fun (office, quality) -> office, office.productTiles market, quality, corp))
     member market.productTiles = 
         market.allOffices
-        |> List.collect (fun (office, quality, corp) ->
-            office.productTiles market |> List.map (fun tile -> tile, (corp, quality)))
+        |> List.collect (fun (_, tiles, quality, corp) ->
+            tiles |> List.map (fun tile -> tile, (corp, quality)))
         |> List.groupBy fst
         |> List.map (fun (tile, list) -> 
             tile, List.map snd list |> List.sortByDescending snd)
         |> Map.ofList
-    member market.atTile (x, y) =
-        match List.tryFind (fun (office, _, _) -> office.x = x && office.y = y) market.allOffices with
-        | Some (office, quality, corp) -> OfficeInfo (office, quality, corp)
+    member market.atTile p =
+        match market.allOffices |> List.tryFind (fun (office, _, _, _) -> office.pos = p) with
+        | Some (office, tiles, quality, corp) -> 
+            OfficeInfo (office, tiles, quality, corp)
         | None ->
-            let info = Map.tryFind (x, y) market.productTiles |> Option.defaultValue []
+            let info = Map.tryFind p market.productTiles |> Option.defaultValue []
             TileInfo info
 and Info =
-    | OfficeInfo of office:Office * quality:int * corp:Corporation
+    | OfficeInfo of office:Office * tiles: (int * int) list * quality:int * corp:Corporation
     | TileInfo of (Corporation * int) list
 
 type Model = {
@@ -127,8 +129,8 @@ let private renderMarket market =
 
 let private renderOffices (market: Market) =
     market.allOffices
-    |> List.sortBy (fun (office, _, _) -> office.y, -office.x)
-    |> List.map (fun (office, _, corp) -> 
+    |> List.sortBy (fun (office, _, _, _) -> office.y, -office.x)
+    |> List.map (fun (office, _, _, corp) -> 
         let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
         image "office" corp.colour (w, h) (x, y))
 
@@ -136,10 +138,10 @@ let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
         yield image "tile-highlight" Colour.White (w, h) (x, y)
         match market.atTile (mx, my) with
-        | OfficeInfo (office, _, _) ->
+        | OfficeInfo (office, tiles, _, _) ->
             let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
-            yield! office.productTiles market
+            yield! tiles
                 |> List.map (fun (tx, ty) ->
                     let (x, y, w, h) = isoRect tx ty tileWidth tileHeight
                     image "tile-highlight" Colour.White (w, h) (x, y))
