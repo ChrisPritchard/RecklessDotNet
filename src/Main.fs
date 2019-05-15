@@ -24,6 +24,26 @@ and Office = {
     managedOffices: Office list
     departments: Department list
 }
+with
+    member office.productTiles = 
+        let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)
+        [-products..products] |> List.collect (fun x ->
+        [-products..products] |> List.map (fun y -> x, y))
+        |> List.filter (fun (x, y) -> abs x + abs y <= products)
+        |> List.map (fun (x, y) -> office.x + x, office.y + y)
+    member office.productQuality parentOffice =
+        let quality, localMarketing = 
+            ((0, 0), office.departments) 
+            ||> List.fold (fun (q, m) -> 
+                function
+                | Product v -> q + v, m
+                | Marketing -> q, m + 1
+                | _ -> q, m)
+        let parentMarketing = 
+            match parentOffice with 
+            | Some o -> o.departments |> List.sumBy (function Marketing -> 1 | _ -> 0) 
+            | _ -> 0
+        quality * pown 2 (localMarketing + parentMarketing)
 and Department =
     | Product of quality: int 
     | Marketing
@@ -36,10 +56,15 @@ type Market = {
     others: Corporation list
 }
 with 
-    member x.allCorps = x.player::x.others    
-    member x.allOffices =
+    member market.allCorps = market.player::market.others    
+    member market.allOffices =
         let rec allOffices office = office::List.collect allOffices office.managedOffices
-        x.allCorps |> List.collect (fun corp -> allOffices corp.headOffice |> List.map (fun o -> o, corp))
+        market.allCorps |> List.collect (fun corp -> allOffices corp.headOffice |> List.map (fun o -> o, corp))
+        
+    //member x.atTile (x, y) =
+    //    match List.tryFind (fun (office, _) -> office.x = x && office.y = y) x.allOffices with
+    //    | Some office -> Office office
+    //    | None -> Tile 
 
 type Model = {
     market: Market
@@ -74,13 +99,6 @@ type Message =
     | SelectTile of int * int
     | DeselectTile
 
-let officeProductTiles office = 
-    let products = office.departments |> List.sumBy (function Product _ -> 1 | _ -> 0)
-    [-products..products] |> List.collect (fun x ->
-    [-products..products] |> List.map (fun y -> x, y))
-    |> List.filter (fun (x, y) -> abs x + abs y <= products)
-    |> List.map (fun (x, y) -> office.x + x, office.y + y)
-
 let corpProductTiles corp = 
     let rec gatherer parent office = 
         let quality, localMarketing = 
@@ -96,7 +114,7 @@ let corpProductTiles corp =
             | _ -> 0
         let quality = quality * pown 2 (localMarketing + parentMarketing)
         [
-            yield! officeProductTiles office |> List.map (fun (x, y) -> x, y, quality)
+            yield! office.productTiles |> List.map (fun (x, y) -> x, y, quality)
             yield! List.collect (gatherer (Some office)) office.managedOffices
         ]
     gatherer None corp.headOffice
@@ -140,8 +158,7 @@ let private renderHighlight (market: Market) (mx, my) = [
             let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
 
-            let tiles = officeProductTiles office
-            yield! tiles 
+            yield! office.productTiles 
                 |> List.filter (fun p -> Set.contains p market.tiles) 
                 |> List.map (fun (tx, ty) ->
                     let (x, y, w, h) = isoRect tx ty tileWidth tileHeight
