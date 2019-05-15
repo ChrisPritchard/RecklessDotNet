@@ -131,27 +131,15 @@ let corpProductTiles corp =
         ]
     gatherer None corp.headOffice
 
-let private renderMarket productTiles model =
-    model.tiles
+let private renderMarket market =
+    market.tiles
     |> Set.toList
     |> List.map (fun (x, y) -> 
         let (tx, ty, tw, th) = isoRect x y tileWidth tileHeight
         let colour = 
-            match Map.tryFind (x, y) productTiles with 
+            match Map.tryFind (x, y) market.productTiles with 
             | Some ((corp, _)::_) -> corp.colour | _ -> Colour.White
         image "tile" colour (tw, th) (tx, ty))
-
-let gameProductTiles (market: Market) =
-    market.allCorps
-    |> List.collect (fun c -> corpProductTiles c |> List.map (fun (x, y, q) -> (x, y), (c, q)))
-    |> List.groupBy fst
-    |> List.map (fun (pos, tiles) -> 
-        let ordered = 
-            tiles 
-            |> List.sortByDescending (fun (_, (_, q)) -> q) 
-            |> List.map snd
-        pos, ordered)
-    |> Map.ofList
 
 let private renderOffices (market: Market) =
     market.allOffices
@@ -163,13 +151,11 @@ let private renderOffices (market: Market) =
 let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
         yield image "tile-highlight" Colour.White (w, h) (x, y)
-
         match market.allOffices |> List.tryFind (fun (office, _, _) -> (office.x, office.y) = (mx, my)) with
         | None -> ()
         | Some (office, _, _) ->
             let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
-
             yield! office.productTiles 
                 |> List.filter (fun p -> Set.contains p market.tiles) 
                 |> List.map (fun (tx, ty) ->
@@ -179,8 +165,7 @@ let private renderHighlight (market: Market) (mx, my) = [
 
 let view model dispatch =
     [
-        let productTiles = gameProductTiles model.market
-        yield! renderMarket productTiles model.market
+        yield! renderMarket model.market
         yield! renderOffices model.market
 
         match model.selectedTile with
