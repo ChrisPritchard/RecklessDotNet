@@ -58,8 +58,12 @@ type Market = {
 with 
     member market.allCorps = market.player::market.others    
     member market.allOffices =
-        let rec allOffices office = office::List.collect allOffices office.managedOffices
-        market.allCorps |> List.collect (fun corp -> allOffices corp.headOffice |> List.map (fun o -> o, corp))
+        let rec allOffices parent (office: Office) = 
+            (office, office.productQuality parent)::(List.collect (allOffices (Some office)) office.managedOffices)
+        market.allCorps 
+        |> List.collect (fun corp -> 
+            allOffices None corp.headOffice 
+            |> List.map (fun (office, quality) -> office, quality, corp))
         
     //member x.atTile (x, y) =
     //    match List.tryFind (fun (office, _) -> office.x = x && office.y = y) x.allOffices with
@@ -143,8 +147,8 @@ let gameProductTiles (market: Market) =
 
 let private renderOffices (market: Market) =
     market.allOffices
-    |> List.sortBy (fun (office, _) -> office.y, -office.x)
-    |> List.map (fun (office, corp) -> 
+    |> List.sortBy (fun (office, _, _) -> office.y, -office.x)
+    |> List.map (fun (office, _, corp) -> 
         let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
         image "office" corp.colour (w, h) (x, y))
 
@@ -152,9 +156,9 @@ let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
         yield image "tile-highlight" Colour.White (w, h) (x, y)
 
-        match market.allOffices |> List.tryFind (fun (office, _) -> (office.x, office.y) = (mx, my)) with
+        match market.allOffices |> List.tryFind (fun (office, _, _) -> (office.x, office.y) = (mx, my)) with
         | None -> ()
-        | Some (office, _) ->
+        | Some (office, _, _) ->
             let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
 
