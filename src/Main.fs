@@ -152,6 +152,40 @@ let private renderHighlight (market: Market) (mx, my) = [
 
 let text = text "defaultFont"
 
+let officeInfoWindowFor office corp =
+    [   yield setSmoothSampling ()
+        yield colour Colour.LightGray (300, 60 + office.departments.Length * 20) (10, 10)
+        let heading = sprintf "Office of %s (%s)" corp.name corp.abbreviation
+        yield text 18. Colour.Black (0., 0.) heading (20, 20)
+        yield text 16. Colour.Black (0., 0.) "departments:" (20, 40)
+        yield! office.departments
+            |> List.mapi (fun i dep ->
+                let label = "  " +
+                            match dep with
+                            | Product n -> sprintf "Product (quality: %i)" n
+                            | other -> string other
+                text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
+        yield setPixelSampling () ]
+    
+let tileInfoWindowFor owners =
+    [   yield setSmoothSampling ()
+        yield colour Colour.LightGray (300, 60 + List.length owners * 20) (10, 10)
+        yield text 18. Colour.Black (0., 0.) "Market tile" (20, 20)
+        match owners with
+        | [] ->
+            yield text 16. Colour.Black (0., 0.) "no corporations influence this tile" (20, 40)
+        | _ ->
+            yield text 16. Colour.Black (0., 0.) "products being sold here:" (20, 40)
+            yield! owners
+                |> List.mapi (fun i (corp, quality) ->
+                    let label = 
+                        if i = 0 then
+                            sprintf "  %s (dominant): %i quality" corp.name quality
+                        else
+                            sprintf "  %s: %i quality" corp.name quality
+                    text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
+        yield setPixelSampling () ]
+
 let view model dispatch =
     [
         yield! renderMarket model.market
@@ -161,36 +195,11 @@ let view model dispatch =
         | None -> () 
         | Some tile -> 
             yield! renderHighlight model.market tile
-            match model.market.atTile tile with
-            | Some (OfficeInfo (office, _, _, corp)) ->
-                yield colour Colour.LightGray (300, 60 + office.departments.Length * 20) (10, 10)
-                let heading = sprintf "Office of %s (%s)" corp.name corp.abbreviation
-                yield text 18. Colour.Black (0., 0.) heading (20, 20)
-                yield text 16. Colour.Black (0., 0.) "departments:" (20, 40)
-                yield! office.departments
-                    |> List.mapi (fun i dep ->
-                        let label = "  " +
-                                    match dep with
-                                    | Product n -> sprintf "Product (quality: %i)" n
-                                    | other -> string other
-                        text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
-            | Some (TileInfo owners) ->
-                yield colour Colour.LightGray (300, 60 + owners.Length * 20) (10, 10)
-                yield text 18. Colour.Black (0., 0.) "Market tile" (20, 20)
-                match owners with
-                | [] ->
-                    yield text 16. Colour.Black (0., 0.) "no corporations influence this tile" (20, 40)
-                | _ ->
-                    yield text 16. Colour.Black (0., 0.) "products being sold here:" (20, 40)
-                    yield! owners
-                        |> List.mapi (fun i (corp, quality) ->
-                            let label = 
-                                if i = 0 then
-                                    sprintf "  %s (dominant): %i quality" corp.name quality
-                                else
-                                    sprintf "  %s: %i quality" corp.name quality
-                            text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
-            | _ -> ()
+            yield! 
+                match model.market.atTile tile with
+                | Some (OfficeInfo (office, _, _, corp)) -> officeInfoWindowFor office corp
+                | Some (TileInfo owners) -> tileInfoWindowFor owners
+                | _ -> []
 
         yield OnDraw (fun assets inputs spritebatch ->
             let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)

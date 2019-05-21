@@ -29,8 +29,6 @@ type GameConfig = {
     mouseVisible: bool
     /// All assets (like images, fonts etc) that the game will use
     assetsToLoad: Loadable list
-    /// how the spriteBatch should stretch textures and fonts. controls the blended/pixellated appearance of things
-    stretchMode: StretchMode
 } 
 /// Specifies the resolution to run the game at. For now, this is set once at initiation.
 /// Also, presently fullscreen is not supported.
@@ -54,11 +52,6 @@ and Loadable =
 | FileMusic of key:string * path:string
 /// key (how it is referenced) and path (full relative path (without extension) to music source)
 | PipelineMusic of key:string * path:string
-and StretchMode =
-/// Uses ansotropic blending - will result in good text and sharp graphics, but pixel graphics might look blurred
-| Blended 
-/// Uses pixel copying, which will make pixel graphics look great but can make aliased text look off
-| PointClamp
 
 /// Current and previous state of input devices
 type Inputs = {
@@ -88,7 +81,8 @@ type Viewable =
     | OnDraw of (LoadedAssets -> Inputs -> SpriteBatch -> unit)
     | OnUpdate of (Inputs -> unit)
 
-/// If a game throws this exception, the gameloop will catch it and quit.
+/// If a game throws this exception during the update call (e.g. via an OnUpdate viewable), the gameloop will catch it and quit.
+/// Note: when referencing via Nuget or .dll, debuggers will halt on this exception. However, you can safely continue if they do.
 type QuitGame() =
     inherit System.Exception()
 
