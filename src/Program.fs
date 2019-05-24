@@ -3,22 +3,22 @@ open Elmish
 open Xelmish.Model
 open Constants
 
-type Model = Playing of Main.Model
+type Model = Playing of Main.Model.MainModel
 
-let init () = Playing (Main.init ()), Cmd.none
+let init () = Playing (Main.Init.init ()), Cmd.none
 
-type Message = PlayingMessage of Main.Message
+type Message = PlayingMessage of Main.Model.Message
 
 let update message model =
     match message, model with
     | PlayingMessage message, Playing model ->
-        let model, command = Main.update message model
+        let model, command = Main.Update.update message model
         Playing model, Cmd.map PlayingMessage command
 
 let view model dispatch =
     match model with
     | Playing model ->
-        Main.view model (PlayingMessage >> dispatch)
+        Main.View.view model (PlayingMessage >> dispatch)
 
 [<EntryPoint>]
 let main _ =

@@ -7,19 +7,20 @@
 
 
   <ItemGroup>
+    <Compile Include="Constants.fs" />
+    <Compile Include="Iso.fs" />
+    <Compile Include="main\Model.fs" />
+    <Compile Include="main\Init.fs" />
+    <Compile Include="main\Update.fs" />
+    <Compile Include="main\View.fs" />
     <Content Include="content\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Include="Constants.fs" />
-    <Compile Include="Iso.fs" />
-    <Compile Include="Main.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-
-  <ItemGroup />
 
   <!-- Processed by content pipeline on build into xnb files -->
   <ItemGroup>
