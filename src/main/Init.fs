@@ -25,4 +25,4 @@ let init () =
             colour = Colour.Yellow
         }
         others = [] }
-    { market = market; selectedTile = None }
+    { market = market; selectedTile = None; window = None }

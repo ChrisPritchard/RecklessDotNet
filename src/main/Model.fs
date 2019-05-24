@@ -87,11 +87,16 @@ and Info =
     | OfficeInfo of office:Office * tiles: (int * int) list * quality:int * corp:Corporation * exec:Executive option
     | TileInfo of (Corporation * int) list
 
+type Window = 
+    | SelectOrder of exec:Executive
+
 type MainModel = {
     market: Market
     selectedTile: (int * int) option
+    window: Window option
 }
 
 type Message = 
     | SelectTile of int * int
     | DeselectTile
+    | ShowWindow of Window

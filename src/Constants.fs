@@ -1,6 +1,6 @@
 module Constants
 
-let windowSize = 800, 600
+let windowSize = 1024, 768
 let winw, winh = windowSize
 let tileWidth, tileHeight = 64, 32
 let maxMapSize = 10
