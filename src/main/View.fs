@@ -69,7 +69,7 @@ let officeInfoWindowFor office corp (exec: Executive option) dispatch =
         | None -> ()
         | Some executive ->
             yield colour Colour.LightGray (300, 140) (320, 10)
-            yield text 16. Colour.Black (0., 0.) "managing executive:" (330, 20)
+            yield text 16. Colour.Black (0., 0.) "Managing Executive:" (330, 20)
             yield text 18. Colour.Black (0., 0.) executive.name (330, 40)
             let orderMessage = ShowWindow (SelectOrder executive)
             yield! button "Give Order" (fun () -> dispatch orderMessage) (220, 30) (360, 110)
@@ -95,6 +95,13 @@ let tileInfoWindowFor owners =
                     text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
         yield setPixelSampling () ]
 
+let renderOrderWindow executive dispatch =
+    let size = 300, 140
+    let pos = 640, 10
+    [
+        yield colour Colour.LightGray size pos
+    ]
+
 let view model dispatch =
     [
         yield! renderMarket model.market
@@ -110,19 +117,21 @@ let view model dispatch =
                 | Some (TileInfo owners) -> tileInfoWindowFor owners
                 | _ -> []
 
-        yield OnDraw (fun assets inputs spritebatch ->
-            let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
-            if model.market.tiles.Contains mouseTile then 
-                renderHighlight model.market mouseTile
-                |> List.choose (function OnDraw f -> Some f | _ -> None)
-                |> List.iter (fun f -> f assets inputs spritebatch))
+        match model.window with
+        | None ->
+            yield OnDraw (fun assets inputs spritebatch ->
+                let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
+                if model.market.tiles.Contains mouseTile then 
+                    renderHighlight model.market mouseTile
+                    |> List.choose (function OnDraw f -> Some f | _ -> None)
+                    |> List.iter (fun f -> f assets inputs spritebatch))
 
-        yield onclickpoint (fun mousePos -> 
-            let mouseTile = mouseTile mousePos
-            let message = 
-                if model.market.tiles.Contains mouseTile 
-                then SelectTile mouseTile else DeselectTile
-            dispatch message)
+            yield onclickpoint (fun mousePos -> 
+                let mouseTile = mouseTile mousePos
+                if model.market.tiles.Contains mouseTile then 
+                    dispatch (SelectTile mouseTile))
+        | Some (SelectOrder executive) ->
+            yield! renderOrderWindow executive dispatch
 
         yield onkeydown Keys.Escape exit
     ]
