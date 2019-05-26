@@ -46,7 +46,7 @@ let button s event (width, height) (x, y) =
         onclick event (width, height) (x, y)
     ]
 
-let officeInfoWindowFor office corp (exec: Executive option) dispatch =
+let officeInfoWindowFor market office corp (exec: Executive option) dispatch =
     [   yield setSmoothSampling ()
 
         // general info
@@ -71,8 +71,9 @@ let officeInfoWindowFor office corp (exec: Executive option) dispatch =
             yield colour Colour.LightGray (300, 140) (320, 10)
             yield text 16. Colour.Black (0., 0.) "Managing Executive:" (330, 20)
             yield text 18. Colour.Black (0., 0.) executive.name (330, 40)
-            let orderMessage = ShowWindow (SelectOrder executive)
-            yield! button "Give Order" (fun () -> dispatch orderMessage) (220, 30) (360, 110)
+            if corp = market.player then
+                let orderMessage = ShowWindow (SelectOrder executive)
+                yield! button "Give Order" (fun () -> dispatch orderMessage) (220, 30) (360, 110)
 
         yield setPixelSampling () ]
     
@@ -113,7 +114,7 @@ let view model dispatch =
             yield! renderHighlight model.market tile
             yield! 
                 match model.market.atTile tile with
-                | Some (OfficeInfo (office, _, _, corp, exec)) -> officeInfoWindowFor office corp exec dispatch
+                | Some (OfficeInfo (office, _, _, corp, exec)) -> officeInfoWindowFor model.market office corp exec dispatch
                 | Some (TileInfo owners) -> tileInfoWindowFor owners
                 | _ -> []
 
