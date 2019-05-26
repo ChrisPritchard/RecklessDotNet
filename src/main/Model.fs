@@ -65,40 +65,49 @@ with
         |> List.collect (fun corp -> 
             allOffices None None corp.headOffice 
             |> List.map (fun (office, quality, exec) -> 
-                office, office.productTiles market, quality, corp, exec))
+                {   office = office
+                    productTiles = office.productTiles market
+                    quality = quality
+                    corporation = corp
+                    executive = exec }))
     member market.productTiles = 
         market.allOffices
-        |> List.collect (fun (_, tiles, quality, corp, _) ->
-            tiles |> List.map (fun tile -> tile, (corp, quality)))
-        |> List.groupBy fst
-        |> List.map (fun (tile, list) -> 
+        |> Seq.collect (fun info ->
+            info.productTiles |> Seq.map (fun tile -> tile, (info.corporation, info.quality)))
+        |> Seq.groupBy fst
+        |> Seq.map (fun (tile, list) -> 
             let corps = 
-                List.map snd list 
-                |> List.sortByDescending snd
-                |> List.distinctBy fst
-            tile, corps)
-        |> Map.ofList
+                Seq.map snd list 
+                |> Seq.sortByDescending snd
+                |> Seq.distinctBy fst
+            tile, Seq.toList corps)
+        |> Map.ofSeq
     member market.atTile p =
         if not (Set.contains p market.tiles) then None
         else
-            match market.allOffices |> List.tryFind (fun (office, _, _, _, _) -> office.pos = p) with
-            | Some (office, tiles, quality, corp, exec) -> 
-                Some (OfficeInfo (office, tiles, quality, corp, exec))
+            match market.allOffices |> List.tryFind (fun info -> info.office.pos = p) with
+            | Some officeInfo -> 
+                Some (OfficeInfo officeInfo)
             | None ->
                 let info = Map.tryFind p market.productTiles |> Option.defaultValue []
                 Some (TileInfo info)
 and Info =
-    | OfficeInfo of office:Office * tiles: (int * int) list * quality:int * corp:Corporation * exec:Executive option
+    | OfficeInfo of OfficeInfo
     | TileInfo of (Corporation * int) list
+and OfficeInfo = 
+    {   office:Office
+        productTiles: (int * int) list
+        quality:int
+        corporation:Corporation
+        executive:Executive option    }
 
 type Window = 
     | SelectOrder of exec:Executive
 
-type MainModel = {
-    market: Market
-    selectedTile: (int * int) option
-    window: Window option
-}
+type MainModel = 
+    {   market: Market
+        selectedTile: (int * int) option
+        window: Window option   }
 
 type Message = 
     | SelectTile of int * int

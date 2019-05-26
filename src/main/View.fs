@@ -18,19 +18,19 @@ let private renderMarket market =
 
 let private renderOffices (market: Market) =
     market.allOffices
-    |> List.sortBy (fun (office, _, _, _, _) -> office.y, -office.x)
-    |> List.map (fun (office, _, _, corp, _) -> 
-        let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
-        image "office" corp.colour (w, h) (x, y))
+    |> List.sortBy (fun info -> info.office.y, -info.office.x)
+    |> List.map (fun info -> 
+        let (x, y, w, h) = isoRect info.office.x info.office.y tileWidth (tileHeight*3)
+        image "office" info.corporation.colour (w, h) (x, y))
 
 let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
         yield image "tile-highlight" Colour.White (w, h) (x, y)
         match market.atTile (mx, my) with
-        | Some (OfficeInfo (office, tiles, _, _, _)) ->
-            let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
+        | Some (OfficeInfo info) ->
+            let (x, y, w, h) = isoRect info.office.x info.office.y tileWidth (tileHeight*3)
             yield image "office-highlight" Colour.White (w, h) (x, y)
-            yield! tiles
+            yield! info.productTiles
                 |> List.map (fun (tx, ty) ->
                     let (x, y, w, h) = isoRect tx ty tileWidth tileHeight
                     image "tile-highlight" Colour.White (w, h) (x, y))
@@ -46,15 +46,15 @@ let button s event (width, height) (x, y) =
         onclick event (width, height) (x, y)
     ]
 
-let officeInfoWindowFor market office corp (exec: Executive option) dispatch =
+let officeInfoWindowFor market officeInfo dispatch =
     [   yield setSmoothSampling ()
 
         // general info
-        yield colour Colour.LightGray (300, 60 + office.departments.Length * 20) (10, 10)
-        let heading = sprintf "Office of %s (%s)" corp.name corp.abbreviation
+        yield colour Colour.LightGray (300, 60 + officeInfo.office.departments.Length * 20) (10, 10)
+        let heading = sprintf "Office of %s (%s)" officeInfo.corporation.name officeInfo.corporation.abbreviation
         yield text 18. Colour.Black (0., 0.) heading (20, 20)
         yield text 16. Colour.Black (0., 0.) "departments:" (20, 40)
-        yield! office.departments
+        yield! officeInfo.office.departments
             |> List.mapi (fun i dep ->
                 let label = "  " +
                             match dep with
@@ -65,13 +65,13 @@ let officeInfoWindowFor market office corp (exec: Executive option) dispatch =
                 text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
 
         // exec info
-        match exec with
+        match officeInfo.executive with
         | None -> ()
         | Some executive ->
             yield colour Colour.LightGray (300, 140) (320, 10)
             yield text 16. Colour.Black (0., 0.) "Managing Executive:" (330, 20)
             yield text 18. Colour.Black (0., 0.) executive.name (330, 40)
-            if corp = market.player then
+            if officeInfo.corporation = market.player then
                 let orderMessage = ShowWindow (SelectOrder executive)
                 yield! button "Give Order" (fun () -> dispatch orderMessage) (220, 30) (360, 110)
 
@@ -114,7 +114,7 @@ let view model dispatch =
             yield! renderHighlight model.market tile
             yield! 
                 match model.market.atTile tile with
-                | Some (OfficeInfo (office, _, _, corp, exec)) -> officeInfoWindowFor model.market office corp exec dispatch
+                | Some (OfficeInfo info) -> officeInfoWindowFor model.market info dispatch
                 | Some (TileInfo owners) -> tileInfoWindowFor owners
                 | _ -> []
 
