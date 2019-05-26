@@ -12,52 +12,52 @@ let private startMarket =
         let y = i / dim
         Set.add (x, y) map) Set.empty
 
-let private subOffice = {
+let private evilSubOffice = {
     x = 8
     y = 4
     managedOffices = []
     departments = [Product 16; Product 30]
 }
 
-let private subOffice2 = {
+let private aquinasSubOffice = {
     x = 1
     y = 3
     managedOffices = []
     departments = [Product 16; Product 30]
 }
 
-let private testOffice = {
+let private evilHeadOffice = {
     x = 4
     y = 4
-    managedOffices = [subOffice]
+    managedOffices = [evilSubOffice]
     departments = [Product 16; Marketing; Product 22; Product 30]
 }
 
 let private aquinasHeadOffice = {
     x = 2
     y = 7
-    managedOffices = [subOffice2]
+    managedOffices = [aquinasSubOffice]
     departments = [Product 16; Marketing; Product 30; Admin (Some { name = "Christopher Aquinas" })]
 }
 
-let private testOffice5 = {
+let private jadeSubSubOffice = {
     x = 9
     y = 7
     managedOffices = []
     departments = [Research;Research;Research;Marketing;Product 100]
 }
 
-let private testOffice4 = {
+let private jadeSubOffice = {
     x = 9
     y = 8
-    managedOffices = [testOffice5]
+    managedOffices = [jadeSubSubOffice]
     departments = [Research;Research;Research;Marketing;Product 100]
 }
 
-let private testOffice3 = {
+let private jadeHeadOffice = {
     x = 8
     y = 8
-    managedOffices = [testOffice4]
+    managedOffices = [jadeSubOffice]
     departments = [Research;Research;Research;Marketing;Product 100]
 }
 
@@ -76,7 +76,7 @@ let private others = [
         abbreviation = "EVL"
         cash = 5000
         ideas = 0
-        headOffice = testOffice
+        headOffice = evilHeadOffice
         colour = Colour.Purple
     }
     {   
@@ -84,7 +84,7 @@ let private others = [
         abbreviation = "JAS"
         cash = 5000
         ideas = 0
-        headOffice = testOffice3
+        headOffice = jadeHeadOffice
         colour =Colour. Green
     }
 ]
