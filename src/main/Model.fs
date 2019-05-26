@@ -72,7 +72,11 @@ with
             tiles |> List.map (fun tile -> tile, (corp, quality)))
         |> List.groupBy fst
         |> List.map (fun (tile, list) -> 
-            tile, List.map snd list |> List.sortByDescending snd)
+            let corps = 
+                List.map snd list 
+                |> List.sortByDescending snd
+                |> List.distinctBy fst
+            tile, corps)
         |> Map.ofList
     member market.atTile p =
         if not (Set.contains p market.tiles) then None
