@@ -5,7 +5,7 @@ open Constants
 let private rx, ry = windowSize
 let private centreX, centreY = (rx - (tileWidth * Constants.maxMapSize)) / 2 + (tileWidth/2), ry / 2 + (tileHeight/2)
 
-let private iso x y = 
+let iso x y = 
     centreX + (x * tileWidth/2 + y*tileWidth/2), centreY + (y*tileHeight/2 - x*tileHeight/2)
 
 let private bottomCentre x y w h =

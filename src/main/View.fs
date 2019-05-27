@@ -33,7 +33,7 @@ let findPathBetween (sourceOffice: Office) (destOffice: Office) (market: Market)
             | _ ->
                 let newHeads = paths |> List.map List.head
                 let newVisited = List.foldBack Set.add newHeads visited
-                bfs paths newVisited
+                bfs next newVisited
     let startVisited = 
         market.allOffices 
         |> List.filter (fun info -> info.office <> destOffice) 
@@ -41,15 +41,43 @@ let findPathBetween (sourceOffice: Office) (destOffice: Office) (market: Market)
         |> Set.ofList
     bfs [[sourceOffice.pos]] startVisited
 
+let rec graphicsForPath colour path soFar =
+    let sprite (sx, sy) (x, y) colour =
+        OnDraw (fun loadedAssets _ (spriteBatch: SpriteBatch) ->
+            let texture = loadedAssets.textures.["office-links"]
+            let (x, y) = iso x y
+            let destRect = rect x y (tileWidth/2) (tileHeight/2)
+            let (sx, sy) = int (sx * float texture.Width), int (sy * float texture.Height)
+            let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
+            spriteBatch.Draw (texture, destRect, sourceRect, colour))
+
+    match path with
+    | (cx, cy)::(nx, ny)::rest ->
+        if cx = nx && cy < ny then
+            let current = sprite (0.5, 0.5) (cx, cy) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+        elif cx = nx && cy > ny then
+            let current = sprite (0., 0.) (cx, cy) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+        elif cx < nx then
+            let current = sprite (0.5, 0.) (cx, cy) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+        else
+            let current = sprite (0., 0.5) (cx, cy) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+    | _ -> soFar
+            
 let private renderOfficeLinks market =
     
-
+    let test = market.player.headOffice
+    let testDest = test.managedOffices.[0]
+    let path = findPathBetween test testDest market
+    graphicsForPath market.player.colour path.Value []
     // for each corp headoffice, recursive link
         // for each sub office, link, then rerun for sub office
             // between office x and y, bfs a path
             // yield pos and link types, and colours
     // for all pos/type/colours, yield an ondraw
-    []
 
 let private renderOffices (market: Market) =
     market.allOffices
