@@ -60,16 +60,30 @@
     var canvas = document.getElementById("office-links")
     var ctx = canvas.getContext("2d")
 
-    ctx.strokeStyle = "white"
+    function draw() {
+        ctx.moveTo(64, 32)
+        ctx.lineTo(128, 64)
+
+        ctx.moveTo(192, 32)
+        ctx.lineTo(128, 64)
+
+        ctx.moveTo(192, 96)
+        ctx.lineTo(128, 64)
+
+        ctx.moveTo(64, 96)
+        ctx.lineTo(128, 64)
+
+        ctx.stroke()
+    }
+
+    ctx.strokeStyle = "black"
     ctx.lineWidth = 4
+    draw()
 
-    ctx.moveTo(0, 64)
-    ctx.lineTo(128, 0)
-    ctx.lineTo(256, 64)
-    ctx.lineTo(128, 128)
-    ctx.lineTo(0, 64)
+    ctx.strokeStyle = "white"
+    ctx.lineWidth = 2
+    draw()
 
-    ctx.stroke()
 </script>
 
 <h2>Office Building</h2>
