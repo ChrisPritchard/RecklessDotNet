@@ -55,16 +55,20 @@ let rec graphicsForPath colour path soFar =
     | (cx, cy)::(nx, ny)::rest ->
         if cx = nx && cy < ny then
             let current = sprite (0.5, 0.5) (cx, cy) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+            let next = sprite (0., 0.) (nx, ny) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
         elif cx = nx && cy > ny then
             let current = sprite (0., 0.) (cx, cy) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+            let next = sprite (0.5, 0.5) (nx, ny) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
         elif cx < nx then
             let current = sprite (0.5, 0.) (cx, cy) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+            let next = sprite (0., 0.5) (nx, ny) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
         else
             let current = sprite (0., 0.5) (cx, cy) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::soFar)
+            let next = sprite (0.5, 0.) (nx, ny) colour
+            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
     | _ -> soFar
             
 let private renderOfficeLinks market =
