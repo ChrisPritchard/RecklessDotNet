@@ -16,6 +16,41 @@ let private renderMarket market =
             | Some ((corp, _)::_) -> corp.colour | _ -> Colour.White
         image "tile" colour (tw, th) (tx, ty))
 
+let findPathBetween (sourceOffice: Office) (destOffice: Office) (market: Market) =
+    let rec bfs paths visited =
+        let next = 
+            paths
+            |> List.collect (fun path ->
+                let (x, y) = List.head path
+                [-1, 0; 1, 0; 0, -1; 0, 1]
+                |> List.map (fun (dx, dy) -> x + dx, y + dy)
+                |> List.filter (fun p -> not (Set.contains p visited))
+                |> List.map (fun p -> p::path))
+        if next = [] then None 
+        else
+            match List.tryFind (fun path -> List.head path = destOffice.pos) next with
+            | Some path -> Some path
+            | _ ->
+                let newHeads = paths |> List.map List.head
+                let newVisited = List.foldBack Set.add newHeads visited
+                bfs paths newVisited
+    let startVisited = 
+        market.allOffices 
+        |> List.filter (fun info -> info.office <> destOffice) 
+        |> List.map (fun info -> info.office.pos)
+        |> Set.ofList
+    bfs [[sourceOffice.pos]] startVisited
+
+let private renderOfficeLinks market =
+    
+
+    // for each corp headoffice, recursive link
+        // for each sub office, link, then rerun for sub office
+            // between office x and y, bfs a path
+            // yield pos and link types, and colours
+    // for all pos/type/colours, yield an ondraw
+    []
+
 let private renderOffices (market: Market) =
     market.allOffices
     |> List.sortBy (fun info -> info.office.y, -info.office.x)
@@ -106,6 +141,7 @@ let renderOrderWindow executive dispatch =
 let view model dispatch =
     [
         yield! renderMarket model.market
+        yield! renderOfficeLinks model.market
         yield! renderOffices model.market
 
         match model.selectedTile with

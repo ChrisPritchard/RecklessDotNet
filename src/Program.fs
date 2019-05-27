@@ -28,6 +28,7 @@ let main _ =
         FileTexture ("tile-highlight", "content/tile-highlight.png")
         FileTexture ("office", "content/office.png")
         FileTexture ("office-highlight", "content/office-highlight.png")
+        FileTexture ("office-links", "content/office-links.png")
         PipelineFont ("defaultFont", "content/SourceCodePro")
     ]
 
