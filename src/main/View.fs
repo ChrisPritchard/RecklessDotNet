@@ -42,15 +42,18 @@ let findPathBetween (sourceOffice: Office) (destOffice: Office) (market: Market)
     bfs [[sourceOffice.pos]] startVisited
 
 let rec graphicsForPath colour path soFar =
-    let sprite (sx, sy) (x, y) colour =
+    let sprite (px, py) (x, y) colour =
         OnDraw (fun loadedAssets _ (spriteBatch: SpriteBatch) ->
             let texture = loadedAssets.textures.["office-links"]
+
             let (tx, ty, tw, th) = isoRect x y tileWidth tileHeight
-            let destRect = rect tx ty tw th
-            //let (sx, sy) = int (sx * float texture.Width), int (sy * float texture.Height)
-            //let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
-            //spriteBatch.Draw (texture, destRect, sourceRect, colour))
-            spriteBatch.Draw (texture, destRect, colour))
+            let (otx, oty) = int (px * float tw), int (py * float th)
+            let destRect = rect (tx + otx) (ty + oty) (tw/2) (th/2)
+            
+            let (sx, sy) = int (px * float texture.Width), int (py * float texture.Height)
+            let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
+            
+            spriteBatch.Draw (texture, destRect, sourceRect, colour))
 
     match path with
     | (cx, cy)::(nx, ny)::rest ->
