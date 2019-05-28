@@ -76,16 +76,18 @@ let rec graphicsForPath colour path soFar =
     | _ -> soFar
             
 let private renderOfficeLinks market =
-    
-    let test = market.player.headOffice
-    let testDest = test.managedOffices.[0]
-    let path = findPathBetween test testDest market
-    graphicsForPath market.player.colour path.Value []
-    // for each corp headoffice, recursive link
-        // for each sub office, link, then rerun for sub office
-            // between office x and y, bfs a path
-            // yield pos and link types, and colours
-    // for all pos/type/colours, yield an ondraw
+    let rec linkOfficeAndManaged colour office = 
+        office.managedOffices
+        |> List.collect (fun subOffice ->
+            let links =
+                match findPathBetween office subOffice market with
+                | Some path -> graphicsForPath colour path []
+                | _ -> []
+            links @ linkOfficeAndManaged colour subOffice)
+
+    market.allCorps
+    |> List.collect (fun corp -> 
+        linkOfficeAndManaged Colour.White corp.headOffice)
 
 let private renderOffices (market: Market) =
     market.allOffices
