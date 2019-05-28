@@ -45,11 +45,12 @@ let rec graphicsForPath colour path soFar =
     let sprite (sx, sy) (x, y) colour =
         OnDraw (fun loadedAssets _ (spriteBatch: SpriteBatch) ->
             let texture = loadedAssets.textures.["office-links"]
-            let (x, y) = iso x y
-            let destRect = rect x y (tileWidth/2) (tileHeight/2)
-            let (sx, sy) = int (sx * float texture.Width), int (sy * float texture.Height)
-            let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
-            spriteBatch.Draw (texture, destRect, sourceRect, colour))
+            let (tx, ty, tw, th) = isoRect x y tileWidth tileHeight
+            let destRect = rect tx ty tw th
+            //let (sx, sy) = int (sx * float texture.Width), int (sy * float texture.Height)
+            //let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
+            //spriteBatch.Draw (texture, destRect, sourceRect, colour))
+            spriteBatch.Draw (texture, destRect, colour))
 
     match path with
     | (cx, cy)::(nx, ny)::rest ->
