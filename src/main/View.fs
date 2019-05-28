@@ -41,53 +41,47 @@ let findPathBetween (sourceOffice: Office) (destOffice: Office) (market: Market)
         |> Set.ofList
     bfs [[sourceOffice.pos]] startVisited
 
-let rec graphicsForPath colour path soFar =
-    let sprite (px, py) (x, y) colour =
+let rec graphicsForPath path soFar =
+    let sprite (px, py) (x, y) =
         OnDraw (fun loadedAssets _ (spriteBatch: SpriteBatch) ->
             let texture = loadedAssets.textures.["office-links"]
 
-            let (tx, ty, tw, th) = isoRect x y tileWidth tileHeight
-            let (otx, oty) = int (px * float tw), int (py * float th)
+            let tx, ty, tw, th = isoRect x y tileWidth tileHeight
+            let otx, oty = int (px * float tw), int (py * float th)
             let destRect = rect (tx + otx) (ty + oty) (tw/2) (th/2)
-            
-            let (sx, sy) = int (px * float texture.Width), int (py * float texture.Height)
+
+            let sx, sy = int (px * float texture.Width), int (py * float texture.Height)
             let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
             
-            spriteBatch.Draw (texture, destRect, sourceRect, colour))
+            spriteBatch.Draw (texture, destRect, sourceRect, Colour.White))
 
     match path with
     | (cx, cy)::(nx, ny)::rest ->
-        if cx = nx && cy < ny then
-            let current = sprite (0.5, 0.5) (cx, cy) colour
-            let next = sprite (0., 0.) (nx, ny) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
-        elif cx = nx && cy > ny then
-            let current = sprite (0., 0.) (cx, cy) colour
-            let next = sprite (0.5, 0.5) (nx, ny) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
-        elif cx < nx then
-            let current = sprite (0.5, 0.) (cx, cy) colour
-            let next = sprite (0., 0.5) (nx, ny) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
-        else
-            let current = sprite (0., 0.5) (cx, cy) colour
-            let next = sprite (0.5, 0.) (nx, ny) colour
-            graphicsForPath colour ((nx, ny)::rest) (current::next::soFar)
+        let current, next =
+            if cx = nx && cy < ny then
+                sprite (0.5, 0.5) (cx, cy), sprite (0., 0.) (nx, ny)
+            elif cx = nx && cy > ny then
+                sprite (0., 0.) (cx, cy), sprite (0.5, 0.5) (nx, ny)
+            elif cx < nx then
+                sprite (0.5, 0.) (cx, cy), sprite (0., 0.5) (nx, ny)
+            else
+                sprite (0., 0.5) (cx, cy), sprite (0.5, 0.) (nx, ny)
+        graphicsForPath ((nx, ny)::rest) (current::next::soFar)
     | _ -> soFar
             
 let private renderOfficeLinks market =
-    let rec linkOfficeAndManaged colour office = 
+    let rec linkOfficeAndManaged office = 
         office.managedOffices
         |> List.collect (fun subOffice ->
             let links =
                 match findPathBetween office subOffice market with
-                | Some path -> graphicsForPath colour path []
+                | Some path -> graphicsForPath path []
                 | _ -> []
-            links @ linkOfficeAndManaged colour subOffice)
+            links @ linkOfficeAndManaged subOffice)
 
     market.allCorps
     |> List.collect (fun corp -> 
-        linkOfficeAndManaged Colour.White corp.headOffice)
+        linkOfficeAndManaged corp.headOffice)
 
 let private renderOffices (market: Market) =
     market.allOffices
