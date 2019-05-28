@@ -57,6 +57,9 @@ let rec graphicsForPath path soFar =
 
     match path with
     | (cx, cy)::(nx, ny)::rest ->
+        let centre = 
+            let tx, ty, tw, th = isoRect cx cy tileWidth tileHeight
+            image "office-link-centre" Colour.White (tw, th) (tx, ty)
         let current, next =
             if cx = nx && cy < ny then
                 sprite (0.5, 0.5) (cx, cy), sprite (0., 0.) (nx, ny)
@@ -66,7 +69,7 @@ let rec graphicsForPath path soFar =
                 sprite (0.5, 0.) (cx, cy), sprite (0., 0.5) (nx, ny)
             else
                 sprite (0., 0.5) (cx, cy), sprite (0.5, 0.) (nx, ny)
-        graphicsForPath ((nx, ny)::rest) (current::next::soFar)
+        graphicsForPath ((nx, ny)::rest) (centre::current::next::soFar)
     | _ -> soFar
             
 let private renderOfficeLinks market =

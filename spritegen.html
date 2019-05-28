@@ -76,13 +76,37 @@
         ctx.stroke()
     }
 
+    let thickness = 10
+    let inner = 4
+
     ctx.strokeStyle = "black"
-    ctx.lineWidth = 10
+    ctx.lineWidth = thickness
     draw()
 
     ctx.strokeStyle = "white"
-    ctx.lineWidth = 4
+    ctx.lineWidth = inner
     draw()
+
+</script>
+
+<canvas id="office-link-centre" width="256" height="128" style="background: magenta"></canvas>
+
+<script type="text/javascript">
+    var canvas = document.getElementById("office-link-centre")
+    var ctx = canvas.getContext("2d")
+
+    ctx.strokeStyle = "black"
+    ctx.fillStyle = "white"
+    ctx.lineWidth = thickness - inner
+
+    ctx.moveTo(128 - thickness, 64)
+    ctx.lineTo(128, 64 - thickness/2)
+    ctx.lineTo(128 + thickness, 64)
+    ctx.lineTo(128, 64 + thickness/2)
+    ctx.lineTo(128 - thickness, 64)
+    ctx.lineTo(128, 64 - thickness/2)
+    ctx.stroke()
+    ctx.fill()
 
 </script>
 
