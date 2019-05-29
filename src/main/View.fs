@@ -94,6 +94,7 @@ let private renderOffices (market: Market) =
         [   yield image "office" info.corporation.colour (w, h) (x, y)
             if info.headOffice then
                 let (x, y, w, h) = isoRect (info.office.x+2) (info.office.y-2) tileWidth tileHeight
+                yield colour Colour.White (tileWidth/4, tileHeight/2) (x+(tileWidth/8)*3, y+tileHeight/4) // this background makes the star white
                 yield image "icon-head-office" info.corporation.colour (w, h) (x, y) ])
 
 let private renderHighlight (market: Market) (mx, my) = [
