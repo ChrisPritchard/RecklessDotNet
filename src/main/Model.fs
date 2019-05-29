@@ -69,7 +69,8 @@ with
                     productTiles = office.productTiles market
                     quality = quality
                     corporation = corp
-                    executive = exec }))
+                    executive = exec
+                    headOffice = office = corp.headOffice }))
     member market.productTiles = 
         market.allOffices
         |> Seq.collect (fun info ->
@@ -99,7 +100,8 @@ and OfficeInfo =
         productTiles: (int * int) list
         quality:int
         corporation:Corporation
-        executive:Executive option    }
+        executive:Executive option
+        headOffice: bool    }
 
 type Window = 
     | SelectOrder of exec:Executive

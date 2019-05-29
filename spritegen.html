@@ -198,16 +198,17 @@
     ctx.strokeStyle = "black"
     ctx.lineWidth = 4
 
+    ctx.beginPath()
     ctx.moveTo(96, 32)
     ctx.lineTo(160, 32)
     ctx.lineTo(160, 96)
     ctx.lineTo(96, 96)
     ctx.lineTo(96, 32)
-    ctx.stroke()
 
     let length = 16
     ctx.translate(128 - length/2, 64+length/3)
     ctx.rotate(Math.PI * 1 / 10)
+    
     ctx.moveTo(0, length)
 
     for (var i = 5; i--;) {

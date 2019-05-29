@@ -89,9 +89,12 @@ let private renderOfficeLinks market =
 let private renderOffices (market: Market) =
     market.allOffices
     |> List.sortBy (fun info -> info.office.y, -info.office.x)
-    |> List.map (fun info -> 
+    |> List.collect (fun info -> 
         let (x, y, w, h) = isoRect info.office.x info.office.y tileWidth (tileHeight*3)
-        image "office" info.corporation.colour (w, h) (x, y))
+        [   yield image "office" info.corporation.colour (w, h) (x, y)
+            if info.headOffice then
+                let (x, y, w, h) = isoRect (info.office.x+2) (info.office.y-2) tileWidth tileHeight
+                yield image "icon-head-office" info.corporation.colour (w, h) (x, y) ])
 
 let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight
@@ -110,18 +113,20 @@ let private renderHighlight (market: Market) (mx, my) = [
 let text = text "defaultFont"
 
 let button s event (width, height) (x, y) = 
-    [
-        colour Colour.Blue (width, height) (x, y)
+    [   colour Colour.Blue (width, height) (x, y)
         text 20. Colour.White (-0.5, -0.5) s (x + width/2, y+height/2)
-        onclick event (width, height) (x, y)
-    ]
+        onclick event (width, height) (x, y) ]
 
 let officeInfoWindowFor market officeInfo dispatch =
     [   yield setSmoothSampling ()
 
         // general info
         yield colour Colour.LightGray (300, 60 + officeInfo.office.departments.Length * 20) (10, 10)
-        let heading = sprintf "Office of %s (%s)" officeInfo.corporation.name officeInfo.corporation.abbreviation
+        let heading = 
+            sprintf "%sOffice of %s (%s)" 
+                (if officeInfo.headOffice then "Head " else "")
+                officeInfo.corporation.name 
+                officeInfo.corporation.abbreviation
         yield text 18. Colour.Black (0., 0.) heading (20, 20)
         yield text 16. Colour.Black (0., 0.) "departments:" (20, 40)
         yield! officeInfo.office.departments
@@ -169,9 +174,9 @@ let tileInfoWindowFor owners =
 let renderOrderWindow executive dispatch =
     let size = 300, 140
     let pos = 640, 10
-    [
-        yield colour Colour.LightGray size pos
-    ]
+    [   yield colour Colour.LightGray size pos
+        // TODO 
+        ]
 
 let view model dispatch =
     [
