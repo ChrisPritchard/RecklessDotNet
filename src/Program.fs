@@ -1,7 +1,7 @@
 ﻿
 open Elmish
 open Xelmish.Model
-open Constants
+open Common
 
 type Model = Playing of Main.Model.MainModel
 

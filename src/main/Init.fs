@@ -3,7 +3,7 @@
 open Xelmish.Model
 open Model
 
-let private dim = Constants.maxMapSize
+let private dim = Common.maxMapSize
 
 let playerExec = { name = "Christopher Aquinas" }
 let evilExec = { name = "Quinton Charlemagne" }

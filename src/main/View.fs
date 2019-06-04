@@ -2,7 +2,7 @@
 
 open Xelmish.Viewables
 open Xelmish.Model
-open Constants
+open Common
 open Iso
 open Model
 

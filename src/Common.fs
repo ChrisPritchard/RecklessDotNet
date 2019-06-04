@@ -1,4 +1,4 @@
-module Constants
+module Common
 
 let windowSize = 1024, 768
 let winw, winh = windowSize
