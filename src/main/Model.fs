@@ -110,3 +110,11 @@ type MainModel =
     {   market: Market
         selectedTile: (int * int) option
         window: Window option   }
+
+// orders TODO
+
+type Order = {
+    name: string
+}
+
+let orderOptionsFor executiveOffice = []
