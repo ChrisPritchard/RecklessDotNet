@@ -115,3 +115,4 @@ type Message =
     | SelectTile of int * int
     | DeselectTile
     | ShowWindow of Window
+    | CloseWindow

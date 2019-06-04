@@ -172,11 +172,18 @@ let tileInfoWindowFor owners =
                     text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
         yield setPixelSampling () ]
 
+let contains (x, y) (tx, ty) (tw, th) = 
+    x >= tx && x < tx + tw
+    && y >= ty && y < ty + th
+
 let renderOrderWindow executive dispatch =
     let size = 300, 140
     let pos = 640, 10
     [   yield colour Colour.LightGray size pos
         // TODO 
+        yield onclickpoint (fun mousePoint ->
+            if not (contains mousePoint pos size) then
+                dispatch CloseWindow)
         ]
 
 let view model dispatch =
