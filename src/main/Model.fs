@@ -110,9 +110,3 @@ type MainModel =
     {   market: Market
         selectedTile: (int * int) option
         window: Window option   }
-
-type Message = 
-    | SelectTile of int * int
-    | DeselectTile
-    | ShowWindow of Window
-    | CloseWindow

@@ -3,6 +3,12 @@
 open Elmish
 open Model
 
+type Message = 
+    | SelectTile of int * int
+    | DeselectTile
+    | ShowWindow of Window
+    | CloseWindow
+
 let update message model = 
     match message with
     | SelectTile (x, y) -> { model with selectedTile = Some (x, y) }, Cmd.none

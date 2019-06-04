@@ -5,6 +5,7 @@ open Xelmish.Model
 open Common
 open Iso
 open Model
+open Update
 
 let private renderMarket market =
     market.tiles
