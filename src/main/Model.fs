@@ -115,6 +115,16 @@ type MainModel =
 
 type Order = {
     name: string
-}
+    condition: Corporation -> Office -> bool
+    selector: OrderSelectorKind
+    action: OrderSelectorResult -> Market -> Market
+} and OrderSelectorKind =
+    | OwnOffice
+    | OwnOfficeAndEnemyOffice
+    | OwnOfficeAndDifferentOwnOffice
+    | None
+and OrderSelectorResult =
+    | OwnOffice of Office
+    | OwnOfficeAndEnemyOffice of Office * Office
 
 let orderOptionsFor executiveOffice = []
