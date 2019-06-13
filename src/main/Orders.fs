@@ -7,8 +7,8 @@ type Order = {
     baseCondition: Corporation -> bool
     kind: OrderKind
 } and OrderKind =
-    | OfficeTarget of ValidOffice * (Office -> Office)
-    | OfficeSourceAndTarget of ValidOffice * ValidOffice * (Office * Office -> Office)
+    | OfficeTarget of ValidOffice * (Office -> Corporation -> Office * Corporation)
+    | OfficeSourceAndTarget of ValidOffice * ValidOffice * (Office -> Office -> Corporation -> Office * Corporation)
 and ValidOffice = Office -> Market -> bool
 
 let buildProductOrder = {
@@ -18,8 +18,9 @@ let buildProductOrder = {
         let isValid office market =
             List.exists (fun (o, _, _) -> o = office) market.player.allOffices
             && office.departments.Length < 6
-        let action office =
-            { office with departments = Product 100::office.departments }
+        let action office corp =
+            { office with departments = Product 100::office.departments },
+            { corp with ideas = corp.ideas - 1 }
         OfficeTarget (isValid, action)
 }
 
