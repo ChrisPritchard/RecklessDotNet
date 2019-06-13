@@ -14,6 +14,14 @@ type Corporation = {
     headOffice: Office
     colour: Colour
 }
+with member corp.allOffices =
+        let rec allOffices parentOffice parentExec (office: Office) = 
+            let exec = 
+                office.departments 
+                |> List.tryPick (fun dep -> match dep with Admin (Some e) -> Some (Some e) | _ -> None)
+                |> Option.defaultValue parentExec
+            (office, office.productQuality parentOffice, exec)::(List.collect (allOffices (Some office) exec) office.managedOffices)
+        allOffices None None corp.headOffice
 and Office = {
     x: int
     y: int
@@ -55,15 +63,9 @@ and Market = {
 with 
     member market.allCorps = market.player::market.others    
     member market.allOffices =
-        let rec allOffices parentOffice parentExec (office: Office) = 
-            let exec = 
-                office.departments 
-                |> List.tryPick (fun dep -> match dep with Admin (Some e) -> Some (Some e) | _ -> None)
-                |> Option.defaultValue parentExec
-            (office, office.productQuality parentOffice, exec)::(List.collect (allOffices (Some office) exec) office.managedOffices)
         market.allCorps 
         |> List.collect (fun corp -> 
-            allOffices None None corp.headOffice 
+            corp.allOffices
             |> List.map (fun (office, quality, exec) -> 
                 {   office = office
                     productTiles = office.productTiles market

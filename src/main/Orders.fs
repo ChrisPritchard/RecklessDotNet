@@ -9,14 +9,15 @@ type Order = {
 } and OrderKind =
     | OfficeTarget of ValidOffice * (Office -> Office)
     | OfficeSourceAndTarget of ValidOffice * ValidOffice * (Office * Office -> Office)
-and ValidOffice = Office -> bool
+and ValidOffice = Office -> Market -> bool
 
 let buildProductOrder = {
     name = "Build Product"
     baseCondition = fun corp -> corp.ideas > 0
     kind = 
-        let isValid office =
-            office.departments.Length < 6
+        let isValid office market =
+            List.contains (fun (o, _, _) -> o = office) market.player.allOffices
+            && office.departments.Length < 6
         let action office =
             { office with departments = Product 100::office.departments }
         OfficeTarget (isValid, action)
