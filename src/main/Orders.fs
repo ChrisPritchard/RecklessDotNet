@@ -2,32 +2,39 @@
 
 open Model
 
-type Order = {
-    name: string
-    baseCondition: Corporation -> bool
-    kind: OrderKind
-} and OrderKind =
-    | OfficeTarget of ValidOffice * (Office -> Corporation -> Office * Corporation)
-    | OfficeSourceAndTarget of ValidOffice * ValidOffice * (Office -> Office -> Corporation -> Office * Corporation)
-and ValidOffice = Office -> Market -> bool
+type Order = 
+    {   name: string
+        corpCondition: Corporation -> bool
+        conditions: OrderCondition list
+        action: OrderKind -> OrderAction list }
+and OrderCondition =
+    | OwnedOffice of (Office -> bool)
+    | EnemyOffice of (Office -> bool)
+    | Tile of ((int * int) -> bool)
+and OrderKind =
+    | OwnOffice of Office
+    | OwnToOwnOffice of Office * Office
+    | OwnToEnemyOffice of Office * Corporation * Office
+    | OwnToTile of Office * (int * int)
+    | Tile of (int * int)
+and OrderAction = (Corporation * Office) -> (Corporation * Office)
+and CorpOfficeIdentifier = string * (int * int)
 
 let buildProductOrder = {
     name = "Build Product"
-    baseCondition = fun corp -> corp.ideas > 0
-    kind = 
-        let isValid office market =
-            List.exists (fun (o, _, _) -> o = office) market.player.allOffices
-            && office.departments.Length < 6
-        let action office corp =
-            { office with departments = Product 100::office.departments },
-            { corp with ideas = corp.ideas - 1 }
-        OfficeTarget (isValid, action)
-}
-
-// TODO:
-// base condition should check if order is valid in offices beneath executive, not whole corp?
-// office condition should be able to check ownership - do we need a new member on office?
-    // solved: add allOffices to corps, then pass market to valid office query
-// action needs to be thought through - group orders by office and apply enmass?
-
-let orderOptionsFor corporation executiveOffice = []
+    corpCondition = fun corp -> corp.ideas > 0
+    conditions = [
+            OwnedOffice (fun o -> o.departments.Length < 6)
+        ]
+    action =
+        function
+        | OwnOffice o ->
+            [
+                fun (corp, office) -> 
+                    if office.pos <> o.pos then corp, office
+                    else 
+                        { corp with ideas = corp.ideas - 1 }, 
+                        { office with departments = Product 100::office.departments }
+            ]
+        | _ -> failwith "invalid parameters"
+    }
