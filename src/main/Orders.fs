@@ -4,13 +4,15 @@ open Model
 
 type Order = 
     {   name: string
+        category: string
         components: OrderComponent list }
 and OrderComponent =
     | CorpTransform of condition:(Corporation -> bool) * action:(Corporation -> Corporation)
     | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
 
 let buildProductOrder = {
-    name = "Build Product"
+    name = "Build New Product"
+    category = "Corporate"
     components = [
         CorpTransform (
             (fun corp -> corp.ideas > 0), 
@@ -18,6 +20,21 @@ let buildProductOrder = {
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length < 6), 
             fun office -> { office with departments = Product 100::office.departments })
+    ]
+}
+
+let researchIdeaOrder = {
+    name = "Research Idea"
+    category = "R & D"
+    components = [
+        CorpTransform (
+            (fun corp -> corp.cash >= 1000), 
+            fun corp -> { corp with 
+                            cash = corp.cash - 1000
+                            ideas = corp.ideas + 1 })
+        OfficeTransform (
+            (fun office isOwn -> isOwn && List.contains Research office.departments), 
+            fun office -> office) // TODO: office with used = research?
     ]
 }
 
