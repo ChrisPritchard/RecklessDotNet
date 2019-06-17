@@ -5,6 +5,7 @@ open Xelmish.Model
 open Common
 open Iso
 open Model
+open Orders
 open Update
 
 let private renderMarket market =
@@ -177,13 +178,30 @@ let contains (x, y) (tx, ty) (tw, th) =
     x >= tx && x < tx + tw
     && y >= ty && y < ty + th
 
-let renderOrderWindow executive dispatch =
+// What does executive offer here? Should it be scoped by exec?
+// Execs need to be tied to orders so they gain experience...todo?
+let renderOrderWindow market _ dispatch =
+
+    // should probably list all orders with valid yes/no. Matches base game with greyed out orders
+    let validOrders = validOrdersFor market.player
+
     let size = 300, 140
-    let pos = 640, 10
-    [   yield colour Colour.LightGray size pos
-        // TODO 
+    let x, y = 640, 10
+    let buttonWidth, buttonHeight = 150, 30
+
+    [   yield colour Colour.LightGray size (x, y)
+
+        yield! 
+            validOrders 
+            |> List.mapi (fun i order -> 
+                let orderMessage = TargetOrder order
+                let buttonX = x + 10 + (buttonWidth * i)
+                let buttonY = y + 10 + ((buttonHeight + 10) * (i % 3))
+                button order.displayName (fun () -> dispatch orderMessage) (buttonWidth, buttonHeight) (buttonX, buttonY))
+            |> List.collect id
+        
         yield onclickpoint (fun mousePoint ->
-            if not (contains mousePoint pos size) then
+            if not (contains mousePoint (x, y) size) then
                 dispatch CloseWindow)
         ]
 
@@ -217,7 +235,7 @@ let view model dispatch =
                 if model.market.tiles.Contains mouseTile then 
                     dispatch (SelectTile mouseTile))
         | Some (SelectOrder executive) ->
-            yield! renderOrderWindow executive dispatch
+            yield! renderOrderWindow model.market executive dispatch
 
         yield onkeydown Keys.Escape exit
     ]

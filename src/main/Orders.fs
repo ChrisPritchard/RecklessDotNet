@@ -3,7 +3,7 @@
 open Model
 
 type Order = 
-    {   name: string
+    {   displayName: string
         category: string
         components: OrderComponent list }
 and OrderComponent =
@@ -11,7 +11,7 @@ and OrderComponent =
     | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
 
 let buildProductOrder = {
-    name = "Build New Product"
+    displayName = "Build New Product"
     category = "Corporate"
     components = [
         CorpTransform (
@@ -24,7 +24,7 @@ let buildProductOrder = {
 }
 
 let researchIdeaOrder = {
-    name = "Research Idea"
+    displayName = "Research Idea"
     category = "R & D"
     components = [
         CorpTransform (
@@ -48,3 +48,15 @@ let researchIdeaOrder = {
 // multiple orders targeting same office:
     // once one order has been applied, a post-state office is created. new orders consider these post-states, and apply to them
     // as such the post-post-state becomes the new final state if all orders applied.
+
+let allOrders = [buildProductOrder; researchIdeaOrder]
+
+let validOrdersFor corp =
+    allOrders 
+    |> List.filter (fun order ->
+        order.components 
+        |> List.forall (function
+            | CorpTransform (checkCorp, _) -> checkCorp corp
+            | OfficeTransform (checkOffice, _) -> 
+                corp.allOffices 
+                |> List.exists (fun (office, _, _) -> checkOffice office true)))

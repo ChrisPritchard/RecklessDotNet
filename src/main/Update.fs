@@ -2,12 +2,14 @@
 
 open Elmish
 open Model
+open Orders
 
 type Message = 
     | SelectTile of int * int
     | DeselectTile
     | ShowWindow of Window
     | CloseWindow
+    | TargetOrder of Order
 
 let update message model = 
     match message with
@@ -15,3 +17,4 @@ let update message model =
     | DeselectTile -> { model with selectedTile = None }, Cmd.none
     | ShowWindow window -> { model with window = Some window }, Cmd.none
     | CloseWindow -> { model with window = None }, Cmd.none
+    | TargetOrder _ -> failwith "TODO"

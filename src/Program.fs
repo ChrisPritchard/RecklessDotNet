@@ -7,7 +7,7 @@ type Model = Playing of Main.Model.MainModel
 
 let init () = Playing (Main.Init.init ()), Cmd.none
 
-type Message = PlayingMessage of Main.Model.Message
+type Message = PlayingMessage of Main.Update.Message
 
 let update message model =
     match message, model with

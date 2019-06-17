@@ -20,7 +20,7 @@ let private aquinasSubOffice = {
     x = 1
     y = 3
     managedOffices = []
-    departments = [Product 16; Product 30]
+    departments = [Product 16; Product 30; Research]
 }
 
 let private aquinasHeadOffice = {
@@ -69,7 +69,7 @@ let player = {
     name = "Aquinas Corp"
     abbreviation = "AQU"
     cash = 5000
-    ideas = 0
+    ideas = 1
     headOffice = aquinasHeadOffice
     colour = Colour.Yellow
 }
