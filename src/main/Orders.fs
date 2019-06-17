@@ -4,21 +4,14 @@ open Model
 
 type Order = 
     {   name: string
-        corpCondition: Corporation -> bool
-        conditions: OrderCondition list
-        action: OrderKind -> OrderAction list }
-and OrderCondition =
-    | OwnedOffice of (Office -> bool)
-    | EnemyOffice of (Office -> bool)
+        components: (OrderSelector * OrderTransform) list }
+and OrderSelector =
+    | OfficeSelector of (Office -> bool -> bool)
+    | CorpSelector of (Corporation -> bool -> bool)
     | Tile of ((int * int) -> bool)
-and OrderKind =
-    | OwnOffice of Office
-    | OwnToOwnOffice of Office * Office
-    | OwnToEnemyOffice of Office * Corporation * Office
-    | OwnToTile of Office * (int * int)
-    | Tile of (int * int)
-and OrderAction = (Corporation * Office) -> (Corporation * Office)
-and CorpOfficeIdentifier = string * (int * int)
+and OrderTransform =
+    | OfficeTransform of (Office -> Office)
+    | CorpTransform of (Corporation -> Corporation)
 
 // name
 // action to run with typed variables
@@ -31,19 +24,10 @@ and CorpOfficeIdentifier = string * (int * int)
 
 let buildProductOrder = {
     name = "Build Product"
-    corpCondition = fun corp -> corp.ideas > 0
-    conditions = [
-            OwnedOffice (fun o -> o.departments.Length < 6)
-        ]
-    action =
-        function
-        | OwnOffice o ->
-            [
-                fun (corp, office) -> 
-                    if office.pos <> o.pos then corp, office
-                    else 
-                        { corp with ideas = corp.ideas - 1 }, 
-                        { office with departments = Product 100::office.departments }
-            ]
-        | _ -> failwith "invalid parameters"
-    }
+    components = [
+        CorpSelector (fun corp isOwn -> isOwn && corp.ideas > 0), 
+        CorpTransform (fun corp -> { corp with ideas = corp.ideas - 1 })
+        OfficeSelector (fun office isOwn -> isOwn && office.departments.Length < 6), 
+        OfficeTransform (fun office -> { office with departments = Product 100::office.departments })
+    ]
+}
