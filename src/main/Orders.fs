@@ -48,6 +48,16 @@ let researchIdeaOrder = {
 // multiple orders targeting same office:
     // once one order has been applied, a post-state office is created. new orders consider these post-states, and apply to them
     // as such the post-post-state becomes the new final state if all orders applied.
+    
+// process by which orders are applied:
+    // user selects order
+    // the ultimate target is a set of transitions with the order name:
+        // orderName * (origCorp, newCorp) * (origOffice * newOffice) list
+    // several update messages:
+        // select order (order)
+        // select office (orderName, corp transition, completed office transitions, remaining office transitions)
+        // confirm order (as above, no remaining)
+            // this last updates the market order list for the corp, for display or cancellation
 
 let allOrders = [buildProductOrder; researchIdeaOrder]
 
