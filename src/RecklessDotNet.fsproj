@@ -10,6 +10,7 @@
     <Compile Include="Common.fs" />
     <Compile Include="Iso.fs" />
     <Compile Include="main\Model.fs" />
+    <Compile Include="main\Pathing.fs" />
     <Compile Include="main\Orders.fs" />
     <Compile Include="main\Init.fs" />
     <Compile Include="main\Update.fs" />

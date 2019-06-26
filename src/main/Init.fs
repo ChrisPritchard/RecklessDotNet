@@ -98,4 +98,4 @@ let init () =
         tiles = startMarket
         player = player
         others = others }
-    { market = market; selectedTile = None; window = None }
+    { market = market; selectedTile = player.headOffice.pos; window = None }

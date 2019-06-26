@@ -5,10 +5,11 @@ open Xelmish.Model
 open Common
 open Iso
 open Model
+open Pathing
 open Orders
 open Update
 
-let private renderMarket market =
+let private renderMarketTiles market =
     market.tiles
     |> Set.toList
     |> List.map (fun (x, y) -> 
@@ -17,62 +18,6 @@ let private renderMarket market =
             match Map.tryFind (x, y) market.productTiles with 
             | Some ((corp, _)::_) -> corp.colour | _ -> Colour.White
         image "tile" colour (tw, th) (tx, ty))
-
-let findPathBetween (sourceOffice: Office) (destOffice: Office) (market: Market) =
-    let rec bfs paths visited =
-        let next = 
-            paths
-            |> List.collect (fun path ->
-                let (x, y) = List.head path
-                [-1, 0; 1, 0; 0, -1; 0, 1]
-                |> List.map (fun (dx, dy) -> x + dx, y + dy)
-                |> List.filter (fun p -> not (Set.contains p visited))
-                |> List.map (fun p -> p::path))
-        if next = [] then None 
-        else
-            match List.tryFind (fun path -> List.head path = destOffice.pos) next with
-            | Some path -> Some path
-            | _ ->
-                let newHeads = paths |> List.map List.head
-                let newVisited = List.foldBack Set.add newHeads visited
-                bfs next newVisited
-    let startVisited = 
-        market.allOffices 
-        |> List.filter (fun info -> info.office <> destOffice) 
-        |> List.map (fun info -> info.office.pos)
-        |> Set.ofList
-    bfs [[sourceOffice.pos]] startVisited
-
-let rec graphicsForPath path soFar =
-    let sprite (px, py) (x, y) =
-        OnDraw (fun loadedAssets _ (spriteBatch: SpriteBatch) ->
-            let texture = loadedAssets.textures.["office-links"]
-
-            let tx, ty, tw, th = isoRect x y tileWidth tileHeight
-            let otx, oty = int (px * float tw), int (py * float th)
-            let destRect = rect (tx + otx) (ty + oty) (tw/2) (th/2)
-
-            let sx, sy = int (px * float texture.Width), int (py * float texture.Height)
-            let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
-            
-            spriteBatch.Draw (texture, destRect, sourceRect, Colour.White))
-
-    match path with
-    | (cx, cy)::(nx, ny)::rest ->
-        let centre = 
-            let tx, ty, tw, th = isoRect cx cy tileWidth tileHeight
-            image "office-link-centre" Colour.White (tw, th) (tx, ty)
-        let current, next =
-            if cx = nx && cy < ny then
-                sprite (0.5, 0.5) (cx, cy), sprite (0., 0.) (nx, ny)
-            elif cx = nx && cy > ny then
-                sprite (0., 0.) (cx, cy), sprite (0.5, 0.5) (nx, ny)
-            elif cx < nx then
-                sprite (0.5, 0.) (cx, cy), sprite (0., 0.5) (nx, ny)
-            else
-                sprite (0., 0.5) (cx, cy), sprite (0.5, 0.) (nx, ny)
-        graphicsForPath ((nx, ny)::rest) (centre::current::next::soFar)
-    | _ -> soFar
             
 let private renderOfficeLinks market =
     let rec linkOfficeAndManaged office = 
@@ -202,60 +147,42 @@ let renderOrderWindow market _ dispatch =
         
         yield onclickpoint (fun mousePoint ->
             if not (contains mousePoint (x, y) size) then
-                dispatch CloseWindow)
-        ]
+                dispatch CloseWindow) ]
 
-let renderMarker model = [
+let renderMarket model =
+    [   yield! renderMarketTiles model.market
+        yield! renderOfficeLinks model.market
+        yield! renderOffices model.market
+        yield! renderHighlight model.market model.selectedTile ]
 
-    yield! renderMarket model.market
-    yield! renderOfficeLinks model.market
-    yield! renderOffices model.market
-
-    match model.selectedTile with
-    | None -> () 
-    | Some tile -> 
-        yield! renderHighlight model.market tile
-
-    ]
-
-let renderUserInterface model dispatch = [
-
+let renderUserInterface model dispatch = 
     // the user interface is in one of three modes:
-    // - general info or default: shows the player's corp, their selected executive, and the selected entity's information (default to selecting the headquarters? no no-select mode?)
+    // - general info or default: shows the player's corp, their selected executive, and the selected entity's information
     // - order screen, giving order options
     // - order select screen, giving instructions on what to select (also shows the currently selected entity)
+    [   match model.market.atTile model.selectedTile with
+        | Some (OfficeInfo info) -> yield! officeInfoWindowFor model.market info dispatch
+        | Some (TileInfo owners) -> yield! tileInfoWindowFor owners
+        | _ -> ()
 
-    match model.selectedTile with
-    | None -> ()
-    | Some tile ->
-        yield! 
-            match model.market.atTile tile with
-            | Some (OfficeInfo info) -> officeInfoWindowFor model.market info dispatch
-            | Some (TileInfo owners) -> tileInfoWindowFor owners
-            | _ -> []
+        match model.window with
+        | None ->
+            yield OnDraw (fun assets inputs spritebatch ->
+                let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
+                if model.market.tiles.Contains mouseTile then 
+                    renderHighlight model.market mouseTile
+                    |> List.choose (function OnDraw f -> Some f | _ -> None)
+                    |> List.iter (fun f -> f assets inputs spritebatch))
 
-    match model.window with
-    | None ->
-        yield OnDraw (fun assets inputs spritebatch ->
-            let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
-            if model.market.tiles.Contains mouseTile then 
-                renderHighlight model.market mouseTile
-                |> List.choose (function OnDraw f -> Some f | _ -> None)
-                |> List.iter (fun f -> f assets inputs spritebatch))
-
-        yield onclickpoint (fun mousePos -> 
-            let mouseTile = mouseTile mousePos
-            if model.market.tiles.Contains mouseTile then 
-                dispatch (SelectTile mouseTile))
-    | Some (SelectOrder executive) ->
-        yield! renderOrderWindow model.market executive dispatch
-    
-    ]
+            yield onclickpoint (fun mousePos -> 
+                let mouseTile = mouseTile mousePos
+                if model.market.tiles.Contains mouseTile then 
+                    dispatch (SelectTile mouseTile))
+        | Some (SelectOrder executive) ->
+            yield! renderOrderWindow model.market executive dispatch ]
 
 let view model dispatch =
-    [
-        yield! renderMarket model.market
+    [   yield! renderMarket model
         yield! renderUserInterface model dispatch
         
-        yield onkeydown Keys.Escape exit
-    ]
+        yield onkeydown Keys.Escape exit ]

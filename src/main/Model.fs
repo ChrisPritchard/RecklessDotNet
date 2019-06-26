@@ -110,5 +110,5 @@ type Window =
 
 type MainModel = 
     {   market: Market
-        selectedTile: (int * int) option
+        selectedTile: (int * int)
         window: Window option   }
