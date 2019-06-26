@@ -220,6 +220,11 @@ let renderMarker model = [
 
 let renderUserInterface model dispatch = [
 
+    // the user interface is in one of three modes:
+    // - general info or default: shows the player's corp, their selected executive, and the selected entity's information (default to selecting the headquarters? no no-select mode?)
+    // - order screen, giving order options
+    // - order select screen, giving instructions on what to select (also shows the currently selected entity)
+
     match model.selectedTile with
     | None -> ()
     | Some tile ->
