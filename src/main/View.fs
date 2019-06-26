@@ -205,37 +205,52 @@ let renderOrderWindow market _ dispatch =
                 dispatch CloseWindow)
         ]
 
+let renderMarker model = [
+
+    yield! renderMarket model.market
+    yield! renderOfficeLinks model.market
+    yield! renderOffices model.market
+
+    match model.selectedTile with
+    | None -> () 
+    | Some tile -> 
+        yield! renderHighlight model.market tile
+
+    ]
+
+let renderUserInterface model dispatch = [
+
+    match model.selectedTile with
+    | None -> ()
+    | Some tile ->
+        yield! 
+            match model.market.atTile tile with
+            | Some (OfficeInfo info) -> officeInfoWindowFor model.market info dispatch
+            | Some (TileInfo owners) -> tileInfoWindowFor owners
+            | _ -> []
+
+    match model.window with
+    | None ->
+        yield OnDraw (fun assets inputs spritebatch ->
+            let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
+            if model.market.tiles.Contains mouseTile then 
+                renderHighlight model.market mouseTile
+                |> List.choose (function OnDraw f -> Some f | _ -> None)
+                |> List.iter (fun f -> f assets inputs spritebatch))
+
+        yield onclickpoint (fun mousePos -> 
+            let mouseTile = mouseTile mousePos
+            if model.market.tiles.Contains mouseTile then 
+                dispatch (SelectTile mouseTile))
+    | Some (SelectOrder executive) ->
+        yield! renderOrderWindow model.market executive dispatch
+    
+    ]
+
 let view model dispatch =
     [
         yield! renderMarket model.market
-        yield! renderOfficeLinks model.market
-        yield! renderOffices model.market
-
-        match model.selectedTile with
-        | None -> () 
-        | Some tile -> 
-            yield! renderHighlight model.market tile
-            yield! 
-                match model.market.atTile tile with
-                | Some (OfficeInfo info) -> officeInfoWindowFor model.market info dispatch
-                | Some (TileInfo owners) -> tileInfoWindowFor owners
-                | _ -> []
-
-        match model.window with
-        | None ->
-            yield OnDraw (fun assets inputs spritebatch ->
-                let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
-                if model.market.tiles.Contains mouseTile then 
-                    renderHighlight model.market mouseTile
-                    |> List.choose (function OnDraw f -> Some f | _ -> None)
-                    |> List.iter (fun f -> f assets inputs spritebatch))
-
-            yield onclickpoint (fun mousePos -> 
-                let mouseTile = mouseTile mousePos
-                if model.market.tiles.Contains mouseTile then 
-                    dispatch (SelectTile mouseTile))
-        | Some (SelectOrder executive) ->
-            yield! renderOrderWindow model.market executive dispatch
-
+        yield! renderUserInterface model dispatch
+        
         yield onkeydown Keys.Escape exit
     ]
