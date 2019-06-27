@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Common.fs" />
     <Compile Include="Iso.fs" />
+    <Compile Include="Layout.fs" />
     <Compile Include="main\Model.fs" />
     <Compile Include="main\Pathing.fs" />
     <Compile Include="main\Orders.fs" />
