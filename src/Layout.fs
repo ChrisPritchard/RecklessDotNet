@@ -1,31 +1,30 @@
 ﻿module Layout
 
 let divide (left, top) (totalWidth, totalHeight) (rows: float list) (cols: float list) =
+    let folder (results, remainder) segment = 
+        if remainder = 0 then results, remainder
+        elif remainder < segment then remainder::results, 0
+        else segment::results, remainder - segment
+    
+    let rowHeights = 
+        Seq.map (fun rowDef -> int (rowDef * float totalHeight)) rows
+        |> Seq.fold folder ([], totalHeight) 
+        |> fun (res, rem) -> if rem <> 0 then rem::res else res
+
+    let colWidths = 
+        Seq.map (fun colDef -> int (colDef * float totalWidth)) rows
+        |> Seq.fold folder ([], totalWidth) 
+        |> fun (res, rem) -> if rem <> 0 then rem::res else res 
+        |> Seq.toList
+
     [
         let mutable rowTop = top
-        let mutable heightRemainder = totalHeight
-
-        for rowDefinition in rows do
-            if heightRemainder <= 0 then ()
-            else
-                let height = 
-                    let target = int (float totalHeight * rowDefinition)
-                    if target > heightRemainder then heightRemainder else target
-                heightRemainder <- heightRemainder - height
-
-                let mutable colLeft = left
-                let mutable widthRemainder = totalWidth
-
-                for colDefinition in cols do
-                    if widthRemainder <= 0 then ()
-                    else
-                        let width = 
-                            let target = int (float totalWidth * colDefinition)
-                            if target > widthRemainder then widthRemainder else target
-                        widthRemainder <- widthRemainder - width
-
-                        yield (colLeft, rowTop, width, height)
-                        colLeft <- colLeft + width
-
-                rowTop <- rowTop + height
+        for height in rowHeights do
+            let mutable colLeft = left
+            for width in colWidths do
+                yield (colLeft, rowTop, width, height)
+                colLeft <- colLeft + width
+            rowTop <- rowTop + height
     ]
+
+let test = divide (0, 0) (100, 100) [0.2; 0.8] [0.2; 0.8]
