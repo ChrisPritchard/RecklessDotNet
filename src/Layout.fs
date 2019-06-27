@@ -28,3 +28,6 @@ let divide (left, top) (totalWidth, totalHeight) (rows: float list) (cols: float
     ]
 
 let test = divide (0, 0) (100, 100) [0.2; 0.8] [0.2; 0.8]
+let test2 = divide (0, 0) (100, 100) [0.2] [0.2]
+
+test = test2
