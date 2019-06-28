@@ -1,6 +1,6 @@
 ﻿module Layout
 
-let divide (left, top) (totalWidth, totalHeight) (rows: float list) (cols: float list) =
+let divide (left, top, totalWidth, totalHeight) (rows: float list) (cols: float list) =
     let folder (results, remainder) segment = 
         if remainder = 0 then results, remainder
         elif remainder < segment then remainder::results, 0
@@ -12,7 +12,7 @@ let divide (left, top) (totalWidth, totalHeight) (rows: float list) (cols: float
         |> fun (res, rem) -> if rem <> 0 then rem::res else res
 
     let colWidths = 
-        Seq.map (fun colDef -> int (colDef * float totalWidth)) rows
+        Seq.map (fun colDef -> int (colDef * float totalWidth)) cols
         |> Seq.fold folder ([], totalWidth) 
         |> fun (res, rem) -> if rem <> 0 then rem::res else res 
         |> Seq.toList // colWidths is iterated over repeatedly, so compute once
