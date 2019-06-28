@@ -15,19 +15,11 @@ let divide (left, top) (totalWidth, totalHeight) (rows: float list) (cols: float
         Seq.map (fun colDef -> int (colDef * float totalWidth)) rows
         |> Seq.fold folder ([], totalWidth) 
         |> fun (res, rem) -> if rem <> 0 then rem::res else res 
-        |> Seq.toList
+        |> Seq.toList // colWidths is iterated over repeatedly, so compute once
 
-    [
-        let mutable rowTop = top
-        for height in rowHeights do
-            let mutable colLeft = left
-            for width in colWidths do
-                yield (colLeft, rowTop, width, height)
-                colLeft <- colLeft + width
-            rowTop <- rowTop + height
-    ]
+    let colFolder currentTop height currentLeft width =
+        (currentTop, currentLeft, width, height), currentLeft + width
+    let rowFolder currentTop height =
+        Seq.mapFold (colFolder currentTop height) left colWidths |> fst, currentTop + height
 
-let test = divide (0, 0) (100, 100) [0.2; 0.8] [0.2; 0.8]
-let test2 = divide (0, 0) (100, 100) [0.2] [0.2]
-
-test = test2
+    Seq.mapFold rowFolder top rowHeights |> fst |> Seq.collect id |> Seq.toList
