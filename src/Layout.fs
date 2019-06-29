@@ -14,20 +14,25 @@ let rowsAndCols (left, top, totalWidth, totalHeight) (rows: float list) (cols: f
         Seq.map (fun rowDef -> int (rowDef * float totalHeight)) rows
         |> Seq.fold folder ([], totalHeight) 
         |> fun (res, rem) -> if rem <> 0 then rem::res else res
+        |> Seq.rev
 
     let colWidths = 
         Seq.map (fun colDef -> int (colDef * float totalWidth)) cols
         |> Seq.fold folder ([], totalWidth) 
         |> fun (res, rem) -> if rem <> 0 then rem::res else res 
+        |> Seq.rev
         |> Seq.toList // colWidths is iterated over repeatedly, so compute once
 
     let colFolder currentTop height currentLeft width =
-        (currentTop, currentLeft, width, height), currentLeft + width
+        (currentLeft, currentTop, width, height), currentLeft + width
     let rowFolder currentTop height =
         Seq.mapFold (colFolder currentTop height) left colWidths |> fst, currentTop + height
 
-    Seq.mapFold rowFolder top rowHeights |> fst |> Seq.collect id |> Seq.toArray
-
+    Seq.mapFold rowFolder top rowHeights 
+    |> fst |> Seq.collect id 
+    |> Seq.sortBy (fun (x, y, _, _) -> x, y) 
+    |> Seq.toArray
+    
 /// Simple mapping function on a rect to return its position.
 /// Use with rowsAndCols or similar if you don't care about width and height
 let topLeft (x, y, _, _) = x, y
