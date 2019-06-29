@@ -4,7 +4,7 @@
 /// Ignores rows/columns that do not fix, and/or truncates them as necessary. 
 /// Also returns remainder space as a rect if the outer rect is not totally consumed.
 /// Returns a list of subrects in the same x,y,w,h tuple format as the outer rect.
-let divide (left, top, totalWidth, totalHeight) (rows: float list) (cols: float list) =
+let rowsAndCols (left, top, totalWidth, totalHeight) (rows: float list) (cols: float list) =
     let folder (results, remainder) segment = 
         if remainder = 0 then results, remainder
         elif remainder < segment then remainder::results, 0
@@ -26,7 +26,15 @@ let divide (left, top, totalWidth, totalHeight) (rows: float list) (cols: float 
     let rowFolder currentTop height =
         Seq.mapFold (colFolder currentTop height) left colWidths |> fst, currentTop + height
 
-    Seq.mapFold rowFolder top rowHeights |> fst |> Seq.collect id |> Seq.toList
+    Seq.mapFold rowFolder top rowHeights |> fst |> Seq.collect id |> Seq.toArray
+
+/// Simple mapping function on a rect to return its position.
+/// Use with rowsAndCols or similar if you don't care about width and height
+let topLeft (x, y, _, _) = x, y
+
+/// Simple function to return the point at the middle of a rect.
+/// Useful when placing centre-aligned text.
+let middle (x, y, w, h) = x + w / 2, y + h / 2
 
 /// Returns a rectangle that is within the out rectangle by a margin. 
 /// Also returns a rectangle inside this first rectangle by a padding amount.
