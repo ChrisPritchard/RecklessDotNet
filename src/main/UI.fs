@@ -7,15 +7,23 @@ open Layout
 
 let controlPanelRect = 
     let percentage = 0.3
-    rowsAndCols (0, 0, winw, winh) [1. - percentage; percentage] []
+    rowsAndCols [1. - percentage; percentage] [] (0, 0, winw, winh)
     |> Array.last
 
 let corpInfoRect, execRect, selectedInfoRect = 
-    rowsAndCols controlPanelRect [] [0.3; 0.3]
+    rowsAndCols [] [0.3; 0.3] controlPanelRect
     |> fun a -> a.[0], a.[1], a.[2]
 
-let orderSelectPanelRect = 
-    rowsAndCols controlPanelRect [0.2; 0.16; 0.16; 0.16; 0.16; 0.16] [0.25; 0.25; 0.25; 0.25]
+let orderSelectTabRects, orderSelectButtonRects = 
+    let tabPanel, buttonPanel =
+        rowsAndCols [0.2;0.8] [] controlPanelRect
+        |> fun a -> a.[0], a.[1]
+    let tabRects = rowsAndCols [] [0.125; 0.125; 0.125; 0.125; 0.125; 0.125; 0.125; 0.125] tabPanel
+    let buttonRects = 
+        rowsAndCols [0.25; 0.25; 0.25; 0.25] [0.25; 0.25; 0.25; 0.25] buttonPanel
+        |> Array.map (marginPad 5 0 >> fst) 
+    tabRects, buttonRects
+
 
 let text = text "defaultFont" 20.
 let colours = {|
@@ -32,4 +40,3 @@ let button (x, y, w, h) displayText action enabled =
     [   yield colour backColour (w, h) (x, y)
         yield text colours.text (-0.5, -0.5) displayText textPos
         if enabled then yield onclick action (w, h) (x, y) ]
-    
