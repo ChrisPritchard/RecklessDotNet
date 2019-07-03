@@ -23,8 +23,7 @@ let orderSelectTabRects, orderSelectButtonRects =
         rowsAndCols [0.25; 0.25; 0.25; 0.25] [0.25; 0.25; 0.25; 0.25] buttonPanel
         |> Array.map (marginPad 5 0 >> fst) 
     tabRects, buttonRects
-
-
+    
 let text = text "defaultFont" 20.
 let colours = {|
         text = Colour.White
@@ -39,10 +38,15 @@ let button (x, y, w, h) displayText action enabled =
     let hovering inputs = contains (inputs.mouseState.X, inputs.mouseState.Y) (x, y, w, h)
     let notHovering = hovering >> not
 
-    [   yield conditionalColour colours.buttonDisabled (w, h) (x, y) (fun _ -> not enabled)
-        yield conditionalColour colours.button (w, h) (x, y) (fun inputs -> enabled && notHovering inputs)
-        yield conditionalColour colours.buttonHover (w, h) (x, y) (fun inputs -> enabled && hovering inputs)
+    [   yield conditionalColour colours.buttonDisabled (w, h) (x, y) (fun _ -> 
+            not enabled)
+        yield conditionalColour colours.button (w, h) (x, y) (fun inputs -> 
+            enabled && notHovering inputs)
+        yield conditionalColour colours.buttonHover (w, h) (x, y) (fun inputs -> 
+            enabled && hovering inputs)
         yield conditionalColour colours.buttonPressed (w, h) (x, y) (fun inputs -> 
             enabled && hovering inputs && inputs.mouseState.LeftButton = ButtonState.Pressed)
+
         yield text colours.text (-0.5, -0.5) displayText textPos
-        if enabled then yield onclick action (w, h) (x, y) ]
+        if enabled then 
+            yield onclick action (w, h) (x, y) ]
