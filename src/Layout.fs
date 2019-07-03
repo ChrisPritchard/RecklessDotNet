@@ -54,3 +54,7 @@ let splitHorizontally (x, y, w, h) =
 let marginPad margin padding (x, y, w, h) =
     (x + margin, y + margin, w - (margin * 2), h - (margin * 2)),
     (x + margin + padding, y + margin + padding, w - ((margin + padding) * 2), h - ((margin + padding) * 2))
+
+let contains (tx, ty) (x, y, w, h) =
+    tx >= x && tx < x + w &&
+    ty >= y && ty < y + h

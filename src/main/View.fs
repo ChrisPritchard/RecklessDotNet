@@ -185,4 +185,7 @@ let view model dispatch =
     [   yield! renderMarket model
         yield! renderUserInterface model dispatch
         
-        yield onkeydown Keys.Escape exit ]
+        yield onkeydown Keys.Escape exit
+        
+        yield! UI.button (300, 300, 200, 40) "HELLO WORLD" (fun () -> ()) true
+        yield! UI.button (300, 350, 200, 40) "HELLO WORLD" (fun () -> ()) false ]
