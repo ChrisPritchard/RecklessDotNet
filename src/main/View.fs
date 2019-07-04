@@ -58,97 +58,6 @@ let private renderHighlight (market: Market) (mx, my) = [
         | _ -> ()            
     ]
 
-let text = text "defaultFont"
-
-let button s event (width, height) (x, y) = 
-    [   colour Colour.Blue (width, height) (x, y)
-        text 20. Colour.White (-0.5, -0.5) s (x + width/2, y+height/2)
-        onclick event (width, height) (x, y) ]
-
-let officeInfoWindowFor market officeInfo dispatch =
-    [   yield setSmoothSampling ()
-
-        // general info
-        yield colour Colour.LightGray (300, 60 + officeInfo.office.departments.Length * 20) (10, 10)
-        let heading = 
-            sprintf "%sOffice of %s (%s)" 
-                (if officeInfo.headOffice then "Head " else "")
-                officeInfo.corporation.name 
-                officeInfo.corporation.abbreviation
-        yield text 18. Colour.Black (0., 0.) heading (20, 20)
-        yield text 16. Colour.Black (0., 0.) "departments:" (20, 40)
-        yield! officeInfo.office.departments
-            |> List.mapi (fun i dep ->
-                let label = "  " +
-                            match dep with
-                            | Product n -> sprintf "Product (quality: %i)" n
-                            | Admin (Some _) -> "Admin (occupied)"
-                            | Admin _ -> "Admin (unoccupied)"
-                            | other -> string other
-                text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
-
-        // exec info
-        match officeInfo.executive with
-        | None -> ()
-        | Some executive ->
-            yield colour Colour.LightGray (300, 140) (320, 10)
-            yield text 16. Colour.Black (0., 0.) "Managing Executive:" (330, 20)
-            yield text 18. Colour.Black (0., 0.) executive.name (330, 40)
-            if officeInfo.corporation = market.player then
-                let orderMessage = ShowWindow (SelectOrder executive)
-                yield! button "Give Order" (fun () -> dispatch orderMessage) (220, 30) (360, 110)
-
-        yield setPixelSampling () ]
-    
-let tileInfoWindowFor owners =
-    [   yield setSmoothSampling ()
-        yield colour Colour.LightGray (300, 60 + List.length owners * 20) (10, 10)
-        yield text 18. Colour.Black (0., 0.) "Market tile" (20, 20)
-        match owners with
-        | [] ->
-            yield text 16. Colour.Black (0., 0.) "no corporations influence this tile" (20, 40)
-        | _ ->
-            yield text 16. Colour.Black (0., 0.) "products being sold here:" (20, 40)
-            yield! owners
-                |> List.mapi (fun i (corp, quality) ->
-                    let label = 
-                        if i = 0 then
-                            sprintf "  %s (dominant): %i quality" corp.name quality
-                        else
-                            sprintf "  %s: %i quality" corp.name quality
-                    text 16. Colour.Black (0., 0.) label (20, 60 + i * 20))
-        yield setPixelSampling () ]
-
-let contains (x, y) (tx, ty) (tw, th) = 
-    x >= tx && x < tx + tw
-    && y >= ty && y < ty + th
-
-// What does executive offer here? Should it be scoped by exec?
-// Execs need to be tied to orders so they gain experience...todo?
-let renderOrderWindow market _ dispatch =
-
-    // should probably list all orders with valid yes/no. Matches base game with greyed out orders
-    let validOrders = validOrdersFor market.player
-
-    let size = 300, 140
-    let x, y = 640, 10
-    let buttonWidth, buttonHeight = 150, 30
-
-    [   yield colour Colour.LightGray size (x, y)
-
-        yield! 
-            validOrders 
-            |> List.mapi (fun i order -> 
-                let orderMessage = TargetOrder order
-                let buttonX = x + 10 + (buttonWidth * i)
-                let buttonY = y + 10 + ((buttonHeight + 10) * (i % 3))
-                button order.displayName (fun () -> dispatch orderMessage) (buttonWidth, buttonHeight) (buttonX, buttonY))
-            |> List.collect id
-        
-        yield onclickpoint (fun mousePoint ->
-            if not (contains mousePoint (x, y) size) then
-                dispatch CloseWindow) ]
-
 let renderMarket model =
     [   yield! renderMarketTiles model.market
         yield! renderOfficeLinks model.market
@@ -160,26 +69,17 @@ let renderUserInterface model dispatch =
     // - general info or default: shows the player's corp, their selected executive, and the selected entity's information
     // - order screen, giving order options
     // - order select screen, giving instructions on what to select (also shows the currently selected entity)
-    [   match model.market.atTile model.selectedTile with
-        | Some (OfficeInfo info) -> yield! officeInfoWindowFor model.market info dispatch
-        | Some (TileInfo owners) -> yield! tileInfoWindowFor owners
-        | _ -> ()
+    [   yield OnDraw (fun assets inputs spritebatch ->
+        let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
+        if model.market.tiles.Contains mouseTile then 
+            renderHighlight model.market mouseTile
+            |> List.choose (function OnDraw f -> Some f | _ -> None)
+            |> List.iter (fun f -> f assets inputs spritebatch))
 
-        match model.window with
-        | None ->
-            yield OnDraw (fun assets inputs spritebatch ->
-                let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
-                if model.market.tiles.Contains mouseTile then 
-                    renderHighlight model.market mouseTile
-                    |> List.choose (function OnDraw f -> Some f | _ -> None)
-                    |> List.iter (fun f -> f assets inputs spritebatch))
-
-            yield onclickpoint (fun mousePos -> 
-                let mouseTile = mouseTile mousePos
-                if model.market.tiles.Contains mouseTile then 
-                    dispatch (SelectTile mouseTile))
-        | Some (SelectOrder executive) ->
-            yield! renderOrderWindow model.market executive dispatch ]
+        yield onclickpoint (fun mousePos -> 
+            let mouseTile = mouseTile mousePos
+            if model.market.tiles.Contains mouseTile then 
+                dispatch (SelectTile mouseTile)) ]
 
 let view model dispatch =
     [   yield! renderMarket model
