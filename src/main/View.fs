@@ -69,14 +69,7 @@ let renderUserInterface model dispatch =
     // - general info or default: shows the player's corp, their selected executive, and the selected entity's information
     // - order screen, giving order options
     // - order select screen, giving instructions on what to select (also shows the currently selected entity)
-    [   yield OnDraw (fun assets inputs spritebatch ->
-        let mouseTile = mouseTile (inputs.mouseState.X, inputs.mouseState.Y)
-        if model.market.tiles.Contains mouseTile then 
-            renderHighlight model.market mouseTile
-            |> List.choose (function OnDraw f -> Some f | _ -> None)
-            |> List.iter (fun f -> f assets inputs spritebatch))
-
-        yield onclickpoint (fun mousePos -> 
+    [   yield onclickpoint (fun mousePos -> 
             let mouseTile = mouseTile mousePos
             if model.market.tiles.Contains mouseTile then 
                 dispatch (SelectTile mouseTile)) ]
