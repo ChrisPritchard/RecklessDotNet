@@ -16,6 +16,7 @@
     <Compile Include="main\Init.fs" />
     <Compile Include="main\Update.fs" />
     <Compile Include="main\UI.fs" />
+    <Compile Include="main\View_Market.fs" />
     <Compile Include="main\View.fs" />
     <Content Include="content\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -34,6 +35,7 @@
     <EmbeddedResource Remove="bin\**" />
     <MonoGameContentReference Remove="bin\**" />
   </ItemGroup>
+  <ItemGroup />
 
   <ItemGroup>
     <ProjectReference Include="..\lib\Xelmish.fsproj" />
