@@ -1,8 +1,8 @@
 module Common
 
-let windowSize = 1680, 900
+let windowSize = 800, 600
 let winw, winh = windowSize
-let tileWidth, tileHeight = 96, 48
+let tileWidth, tileHeight = 64, 32
 let maxMapSize = 10
 
 let turnTransitionTime = 500.
