@@ -3,7 +3,7 @@
 open Xelmish.Model
 open Model
 
-let private dim = Common.maxMapSize
+let private dim = Constants.maxMapSize
 
 let playerExec = { name = "Christopher Aquinas" }
 let evilExec = { name = "Quinton Charlemagne" }
@@ -100,4 +100,4 @@ let init () =
         others = others }
     { 
         market = market
-        uiState = Information (player.headOffice.pos) }
+        currentInterface = Information (player.headOffice.pos) }

@@ -107,8 +107,8 @@ and OfficeInfo =
 
 type MainModel = 
     {   market: Market
-        uiState: UIState  }
-and UIState =
+        currentInterface: Interface  }
+and Interface =
     | Information of selectedTile: (int * int)
     | OrderTypeSelect
     | TargetOrder

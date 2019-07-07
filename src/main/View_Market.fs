@@ -2,10 +2,35 @@
 
 open Xelmish.Model
 open Xelmish.Viewables
-open Common
-open Iso
+open Constants
 open Model
-open Pathing
+open Update
+
+let private centreX = (windowWidth - (tileWidth * maxMapSize)) / 2 + (tileWidth/2)
+let private centreY = windowHeight / 3 + (tileHeight/2)
+
+let private iso x y = 
+    centreX + (x * tileWidth/2 + y*tileWidth/2), centreY + (y*tileHeight/2 - x*tileHeight/2)
+
+let private bottomCentre x y w h =
+    x - (w/2), y - h
+
+let isoRect x y w h = 
+    let ix, iy = iso x y
+    let ox, oy = bottomCentre ix iy w h
+    ox, oy, w, h
+
+let mouseTile (mousePosition: int * int) = 
+    let mx, my = mousePosition
+    // offset to where the tiles have been rendered from
+    let mx, my = float (mx - centreX), float (my - centreY)
+    // convert tilesize to float (so ceil/floor work)
+    let ftw, fth = float tileWidth, float tileHeight
+
+    // calculate tile. this works when tiles are rendered from 
+    // left point (e.g. +x is up-right, +y is down-right)
+    (floor >> int) ((-my / fth) + (mx / ftw)),
+    (ceil >> int) ((mx / ftw) + (my / fth))
 
 let private renderMarketTiles market =
     market.tiles
@@ -16,7 +41,63 @@ let private renderMarketTiles market =
             match Map.tryFind (x, y) market.productTiles with 
             | Some ((corp, _)::_) -> corp.colour | _ -> Colour.White
         image "tile" colour (tw, th) (tx, ty))
+
+let findPathBetween (sourceOffice: Office) (destOffice: Office) (market: Market) =
+    let rec bfs paths visited =
+        let next = 
+            paths
+            |> List.collect (fun path ->
+                let (x, y) = List.head path
+                [-1, 0; 1, 0; 0, -1; 0, 1]
+                |> List.map (fun (dx, dy) -> x + dx, y + dy)
+                |> List.filter (fun p -> not (Set.contains p visited))
+                |> List.map (fun p -> p::path))
+        if next = [] then None 
+        else
+            match List.tryFind (fun path -> List.head path = destOffice.pos) next with
+            | Some path -> Some path
+            | _ ->
+                let newHeads = paths |> List.map List.head
+                let newVisited = List.foldBack Set.add newHeads visited
+                bfs next newVisited
+    let startVisited = 
+        market.allOffices 
+        |> List.filter (fun info -> info.office <> destOffice) 
+        |> List.map (fun info -> info.office.pos)
+        |> Set.ofList
+    bfs [[sourceOffice.pos]] startVisited
+
+let rec graphicsForPath path soFar =
+    let sprite (px, py) (x, y) =
+        OnDraw (fun loadedAssets _ (spriteBatch: SpriteBatch) ->
+            let texture = loadedAssets.textures.["office-links"]
+
+            let tx, ty, tw, th = isoRect x y tileWidth tileHeight
+            let otx, oty = int (px * float tw), int (py * float th)
+            let destRect = rect (tx + otx) (ty + oty) (tw/2) (th/2)
+
+            let sx, sy = int (px * float texture.Width), int (py * float texture.Height)
+            let sourceRect = System.Nullable(rect sx sy (texture.Width/2) (texture.Height/2))
             
+            spriteBatch.Draw (texture, destRect, sourceRect, Colour.White))
+
+    match path with
+    | (cx, cy)::(nx, ny)::rest ->
+        let centre = 
+            let tx, ty, tw, th = isoRect cx cy tileWidth tileHeight
+            image "office-link-centre" Colour.White (tw, th) (tx, ty)
+        let current, next =
+            if cx = nx && cy < ny then
+                sprite (0.5, 0.5) (cx, cy), sprite (0., 0.) (nx, ny)
+            elif cx = nx && cy > ny then
+                sprite (0., 0.) (cx, cy), sprite (0.5, 0.5) (nx, ny)
+            elif cx < nx then
+                sprite (0.5, 0.) (cx, cy), sprite (0., 0.5) (nx, ny)
+            else
+                sprite (0., 0.5) (cx, cy), sprite (0.5, 0.) (nx, ny)
+        graphicsForPath ((nx, ny)::rest) (centre::current::next::soFar)
+    | _ -> soFar
+
 let private renderOfficeLinks market =
     let rec linkOfficeAndManaged office = 
         office.managedOffices
@@ -56,11 +137,17 @@ let private renderHighlight (market: Market) (mx, my) = [
         | _ -> ()            
     ]
 
-let renderMarket model =
+let renderMarket model dispatch =
     [   yield! renderMarketTiles model.market
         yield! renderOfficeLinks model.market
         yield! renderOffices model.market
-        match model.uiState with
+        
+        match model.currentInterface with
         | Information selectedTile ->
             yield! renderHighlight model.market selectedTile
-        | _ -> () ]
+        | _ -> ()
+        
+        yield onclickpoint (fun mousePos -> 
+            let mouseTile = mouseTile mousePos
+            if model.market.tiles.Contains mouseTile then 
+                dispatch (SelectTile mouseTile)) ]

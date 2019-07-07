@@ -1,7 +1,7 @@
 ﻿
 open Elmish
 open Xelmish.Model
-open Common
+open Constants
 
 type Model = Playing of Main.Model.MainModel
 
@@ -35,6 +35,6 @@ let main _ =
     ]
 
     Program.mkProgram init update view
-    |> Xelmish.Program.runSimpleGameLoop assets (winw, winh) Colour.WhiteSmoke
+    |> Xelmish.Program.runSimpleGameLoop assets windowSize Colour.WhiteSmoke
 
     0

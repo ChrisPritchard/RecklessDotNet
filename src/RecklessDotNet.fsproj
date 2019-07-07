@@ -7,16 +7,13 @@
 
 
   <ItemGroup>
-    <Compile Include="Common.fs" />
-    <Compile Include="Iso.fs" />
-    <Compile Include="Layout.fs" />
+    <Compile Include="Constants.fs" />
     <Compile Include="main\Model.fs" />
-    <Compile Include="main\Pathing.fs" />
     <Compile Include="main\Orders.fs" />
     <Compile Include="main\Init.fs" />
     <Compile Include="main\Update.fs" />
-    <Compile Include="main\UI.fs" />
     <Compile Include="main\View_Market.fs" />
+    <Compile Include="main\View_Interface.fs" />
     <Compile Include="main\View.fs" />
     <Content Include="content\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
