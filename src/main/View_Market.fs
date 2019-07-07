@@ -60,4 +60,7 @@ let renderMarket model =
     [   yield! renderMarketTiles model.market
         yield! renderOfficeLinks model.market
         yield! renderOffices model.market
-        yield! renderHighlight model.market model.selectedTile ]
+        match model.uiState with
+        | Information selectedTile ->
+            yield! renderHighlight model.market selectedTile
+        | _ -> () ]

@@ -105,10 +105,10 @@ and OfficeInfo =
         executive:Executive option
         headOffice: bool    }
 
-type Window = 
-    | SelectOrder of exec:Executive
-
 type MainModel = 
     {   market: Market
-        selectedTile: (int * int)
-        window: Window option   }
+        uiState: UIState  }
+and UIState =
+    | Information of selectedTile: (int * int)
+    | OrderTypeSelect
+    | TargetOrder
