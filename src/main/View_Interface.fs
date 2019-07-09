@@ -3,6 +3,7 @@
 open Xelmish.Model
 open Xelmish.Viewables
 open Constants
+open Model
 
 /// Divides a rectangle into rows and columns, with rows and columns given as float percentages.
 /// Ignores rows/columns that do not fix, and/or truncates them as necessary. 
@@ -63,15 +64,6 @@ let contains (tx, ty) (x, y, w, h) =
     tx >= x && tx < x + w &&
     ty >= y && ty < y + h
 
-let controlPanelRect = 
-    let percentage = 0.3
-    rowsAndCols [1. - percentage; percentage] [] (0, 0, windowWidth, windowHeight)
-    |> Array.last
-
-let corpInfoRect, execRect, selectedInfoRect = 
-    rowsAndCols [] [0.3; 0.3] controlPanelRect
-    |> fun a -> a.[0], a.[1], a.[2]
-
 let orderSelectTabRects, orderSelectButtonRects = 
     let tabPanel, buttonPanel =
         rowsAndCols [0.2;0.8] [] controlPanelRect
@@ -109,10 +101,28 @@ let button (x, y, w, h) displayText action enabled =
         if enabled then 
             yield onclick action (w, h) (x, y) ]
 
+let corpInfo corporation windowRect = []
+let executiveInfo corporation dispatch windowRect = []
+let selectedInfo selected windowRect = []
+
+let informationPanels corporation selected dispatch windowRect =     
+    let corpInfoRect, execRect, selectedInfoRect = 
+        rowsAndCols [] [0.3; 0.3] windowRect
+        |> fun a -> a.[0], a.[1], a.[2]
+    [
+        yield! corpInfo corporation corpInfoRect
+        yield! executiveInfo corporation dispatch execRect
+        yield! selectedInfo selected selectedInfoRect
+    ]
 
 let renderUserInterface model dispatch = 
-    // the user interface is in one of three modes:
-    // - general info or default: shows the player's corp, their selected executive, and the selected entity's information
-    // - order screen, giving order options
-    // - order select screen, giving instructions on what to select (also shows the currently selected entity)
-    [ ]
+    let controlPanelRect = 
+        let percentage = 0.3
+        rowsAndCols [1. - percentage; percentage] [] (0, 0, windowWidth, windowHeight)
+        |> Array.last
+    match model.currentInterface with
+    | Information selectedTile -> 
+        let selected = model.market.atTile selectedTile
+        let corp = match selected with Some (OfficeInfo o) -> o.corporation | _ -> model.market.player
+        informationPanels corp selected dispatch controlPanelRect
+    | _ -> []
