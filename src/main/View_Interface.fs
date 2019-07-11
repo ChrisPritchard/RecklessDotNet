@@ -9,7 +9,8 @@ open Model
 /// Ignores rows/columns that do not fix, and/or truncates them as necessary. 
 /// Also returns remainder space as a rect if the outer rect is not totally consumed.
 /// Returns a list of subrects in the same x,y,w,h tuple format as the outer rect.
-let private rowsAndCols (rows: float list) (cols: float list) (x, y, w, h) =
+/// Note: returns rects col by col
+let rowsAndCols (rows: float list) (cols: float list) (x, y, w, h) =
     let folder (results, remainder) segment = 
         if remainder = 0 then results, remainder
         elif remainder < segment then remainder::results, 0
@@ -70,8 +71,9 @@ let colours = {|
         buttonHover = Colour.LightBlue
         buttonPressed = Colour.DarkBlue
     |}
-let normalText = text "defaultFont" 20. colours.text
+let normalText = text "defaultFont" 16. colours.text
 let titleText = text "defaultFont" 25. colours.text
+let buttonText = text "defaultFont" 16. colours.text
 
 let button (x, y, w, h) displayText action enabled =
     let textPos = middle (x, y, w, h)
@@ -93,7 +95,7 @@ let button (x, y, w, h) displayText action enabled =
 
 let corpInfo corporation (x, y, w, h) = [
     let rects = 
-        rowsAndCols [0.18;0.14;0.14;0.14;0.14;0.14;0.14] [0.5;0.5] (x, y, w, h)
+        rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [0.5;0.5] (x, y, w, h)
         |> Array.map (marginPad 5 0 >> fst)
 
     yield colour colours.background (w, h) (x, y)
@@ -102,17 +104,17 @@ let corpInfo corporation (x, y, w, h) = [
 
     let listItem i (label, value) =
         [
-            normalText (-1., 0.) label (topRight rects.[2 + (i*2)])
-            normalText (0., 0.) value (topLeft rects.[2 + (i*2) + 1])
+            normalText (-1., 0.) label (topRight rects.[1 + i])
+            normalText (0., 0.) value (topLeft rects.[8 + i])
         ]
 
     yield! [
         "Ideas", string corporation.ideas
-        //"Prospects", "TODO"
-        //"Stock Value", "TODO"
-        //"Market Share", "TODO"
-        //"Cash", sprintf "$%i" corporation.cash
-        //"Expenses", "TODO"
+        "Prospects", "TODO"
+        "Stock Value", "TODO"
+        "Market Share", "TODO"
+        "Cash", sprintf "$%i" corporation.cash
+        "Expenses", "TODO"
     ] |> List.mapi listItem |> List.collect id
 ]
 let executiveInfo corporation dispatch (x, y, w, h) = [
