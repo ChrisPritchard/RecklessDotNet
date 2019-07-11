@@ -108,11 +108,11 @@ let corpInfo corporation (x, y, w, h) = [
 
     yield! [
         "Ideas", string corporation.ideas
-        "Prospects", "TODO"
-        "Stock Value", "TODO"
-        "Market Share", "TODO"
-        "Cash", sprintf "$%i" corporation.cash
-        "Expenses", "TODO"
+        //"Prospects", "TODO"
+        //"Stock Value", "TODO"
+        //"Market Share", "TODO"
+        //"Cash", sprintf "$%i" corporation.cash
+        //"Expenses", "TODO"
     ] |> List.mapi listItem |> List.collect id
 ]
 let executiveInfo corporation dispatch (x, y, w, h) = [
