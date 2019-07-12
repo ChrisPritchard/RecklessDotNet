@@ -103,6 +103,10 @@ let renderUserInterface model dispatch =
     match model.currentInterface with
     | Information selectedTile -> 
         let selected = model.market.atTile selectedTile
-        let corp = match selected with Some (OfficeInfo o) -> o.corporation | _ -> model.market.player
+        let corp = 
+            match selected with 
+            | Some (OfficeInfo o) -> o.corporation 
+            | Some (TileInfo ((dominant, _)::_)) -> dominant
+            | _ -> model.market.player
         informationPanels corp selected dispatch controlPanelRect
     | _ -> []
