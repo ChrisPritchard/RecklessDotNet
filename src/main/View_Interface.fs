@@ -37,7 +37,7 @@ let button displayText action enabled (x, y, w, h) =
 let corpInfo corporation (x, y, w, h) = [
     let rects = 
         rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [0.5;0.5] (x, y, w, h)
-        |> Array.map (marginPad defaultMargin 0 >> fst)
+        |> Array.map (contractBy defaultMargin)
 
     yield colour colours.background (w, h) (x, y)
     yield setSmoothSampling ()
@@ -58,11 +58,12 @@ let corpInfo corporation (x, y, w, h) = [
         "Expenses", "TODO"
     ] |> List.mapi listItem |> List.collect id
 ]
+
 let executiveInfo executive dispatch (x, y, w, h) = [
     let split = rowsAndCols [] [0.5;0.5] (x, y, w, h)
     let stats = 
         rowsAndCols [0.18;0.13;0.13;0.13;0.21;0.21] [] split.[0]
-        |> Array.skip 1 |> Array.map (marginPad defaultMargin 0 >> fst)
+        |> Array.skip 1 |> Array.map (contractBy defaultMargin)
 
     yield colour colours.background (w, h) (x, y)
 
@@ -72,9 +73,10 @@ let executiveInfo executive dispatch (x, y, w, h) = [
     yield! button "Orders" (fun _ -> ()) true stats.[3]
     yield! button "Corp Report" (fun _ -> ()) false stats.[4]
 
-    let (px, py, pw, ph) = marginPad defaultMargin 0 split.[1] |> fst
+    let (px, py, pw, ph) = contractBy defaultMargin split.[1]
     yield colour colours.temp (pw, ph) (px, py)
 ]
+
 let selectedInfo selected (x, y, w, h) = [
     yield colour colours.background (w, h) (x, y)
 ]

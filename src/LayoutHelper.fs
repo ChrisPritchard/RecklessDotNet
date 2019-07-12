@@ -39,10 +39,8 @@ let topRight (x, y, w, _) = x + w, y
 let middle (x, y, w, h) = x + w / 2, y + h / 2
 
 /// Returns a rectangle that is within the out rectangle by a margin. 
-/// Also returns a rectangle inside this first rectangle by a padding amount.
-let marginPad margin padding (x, y, w, h) =
-    (x + margin, y + margin, w - (margin * 2), h - (margin * 2)),
-    (x + margin + padding, y + margin + padding, w - ((margin + padding) * 2), h - ((margin + padding) * 2))
+let contractBy margin (x, y, w, h) =
+    x + margin, y + margin, w - (margin * 2), h - (margin * 2)
 
 let contains (tx, ty) (x, y, w, h) =
     tx >= x && tx < x + w &&
