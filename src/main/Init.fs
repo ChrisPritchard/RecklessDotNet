@@ -66,7 +66,7 @@ let private jadeHeadOffice = {
 }
 
 let player = {   
-    name = "Aquinas Corp"
+    displayName = "Aquinas Corp"
     abbreviation = "AQU"
     cash = 5000
     ideas = 1
@@ -76,7 +76,7 @@ let player = {
 
 let private others = [
     {   
-        name = "Evil Corp"
+        displayName = "Evil Corp"
         abbreviation = "EVL"
         cash = 5000
         ideas = 0
@@ -84,7 +84,7 @@ let private others = [
         colour = Colour.Purple
     }
     {   
-        name = "Jade Systems"
+        displayName = "Jade Systems"
         abbreviation = "JAS"
         cash = 5000
         ideas = 0

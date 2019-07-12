@@ -17,14 +17,17 @@ let quitOnEscape = true
 
 // Common UI constants and config
 
+let defaultMargin = 5
+
 let colours = {|
-        background = Colour.DarkGray
-        text = Colour.White
-        button = Colour.Blue
-        buttonDisabled = Colour.Gray
-        buttonHover = Colour.LightBlue
-        buttonPressed = Colour.DarkBlue
-    |}
+    temp = Colour.Magenta
+    background = Colour.DarkGray
+    text = Colour.White
+    button = Colour.Blue
+    buttonDisabled = Colour.Gray
+    buttonHover = Colour.LightBlue
+    buttonPressed = Colour.DarkBlue
+|}
 let normalText = text "defaultFont" 16. colours.text
 let titleText = text "defaultFont" 25. colours.text
 let buttonText = text "defaultFont" 16. colours.text

@@ -7,7 +7,7 @@ type Executive = {
 }
 
 type Corporation = {
-    name: string
+    displayName: string
     abbreviation: string
     cash: int
     ideas: int

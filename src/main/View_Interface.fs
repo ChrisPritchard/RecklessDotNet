@@ -16,7 +16,7 @@ open Model
 //        |> Array.map (marginPad 5 0 >> fst) 
 //    tabRects, buttonRects
 
-let button (x, y, w, h) displayText action enabled =
+let button displayText action enabled (x, y, w, h) =
     let textPos = middle (x, y, w, h)
     let hovering inputs = contains (inputs.mouseState.X, inputs.mouseState.Y) (x, y, w, h)
     let notHovering = hovering >> not
@@ -37,11 +37,11 @@ let button (x, y, w, h) displayText action enabled =
 let corpInfo corporation (x, y, w, h) = [
     let rects = 
         rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [0.5;0.5] (x, y, w, h)
-        |> Array.map (marginPad 5 0 >> fst)
+        |> Array.map (marginPad defaultMargin 0 >> fst)
 
     yield colour colours.background (w, h) (x, y)
     yield setSmoothSampling ()
-    yield titleText (0., 0.) corporation.name (topLeft rects.[0])
+    yield titleText (0., 0.) corporation.displayName (topLeft rects.[0])
 
     let listItem i (label, value) =
         [
@@ -58,8 +58,22 @@ let corpInfo corporation (x, y, w, h) = [
         "Expenses", "TODO"
     ] |> List.mapi listItem |> List.collect id
 ]
-let executiveInfo corporation dispatch (x, y, w, h) = [
+let executiveInfo executive dispatch (x, y, w, h) = [
+    let split = rowsAndCols [] [0.5;0.5] (x, y, w, h)
+    let stats = 
+        rowsAndCols [0.18;0.13;0.13;0.13;0.21;0.21] [] split.[0]
+        |> Array.skip 1 |> Array.map (marginPad defaultMargin 0 >> fst)
+
     yield colour colours.background (w, h) (x, y)
+
+    yield normalText (0., 0.) (sprintf "LVL:   1") (topLeft stats.[0])
+    yield normalText (0., 0.) (sprintf "XP:    0") (topLeft stats.[1])
+    yield normalText (0., 0.) (sprintf "TODO") (topLeft stats.[2])
+    yield! button "Orders" (fun _ -> ()) true stats.[3]
+    yield! button "Corp Report" (fun _ -> ()) false stats.[4]
+
+    let (px, py, pw, ph) = marginPad defaultMargin 0 split.[1] |> fst
+    yield colour colours.temp (pw, ph) (px, py)
 ]
 let selectedInfo selected (x, y, w, h) = [
     yield colour colours.background (w, h) (x, y)
