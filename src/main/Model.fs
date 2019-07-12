@@ -14,7 +14,8 @@ type Corporation = {
     headOffice: Office
     colour: Colour
 }
-with member corp.allOffices =
+with 
+    member corp.allOffices =
         let rec allOffices parentOffice parentExec (office: Office) = 
             let exec = 
                 office.departments 
@@ -22,6 +23,9 @@ with member corp.allOffices =
                 |> Option.defaultValue parentExec
             (office, office.productQuality parentOffice, exec)::(List.collect (allOffices (Some office) exec) office.managedOffices)
         allOffices None None corp.headOffice
+    member corp.ceo =
+        let (_, _, exec) = List.head corp.allOffices
+        exec.Value
 and Office = {
     x: int
     y: int

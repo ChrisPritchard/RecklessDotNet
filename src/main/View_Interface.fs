@@ -69,7 +69,7 @@ let executiveInfo executive dispatch (x, y, w, h) = [
 
     yield normalText (0., 0.) (sprintf "LVL:   1") (topLeft stats.[0])
     yield normalText (0., 0.) (sprintf "XP:    0") (topLeft stats.[1])
-    yield normalText (0., 0.) (sprintf "TODO") (topLeft stats.[2])
+    yield normalText (0., 0.) executive.name (topLeft stats.[2])
     yield! button "Orders" (fun _ -> ()) true stats.[3]
     yield! button "Corp Report" (fun _ -> ()) false stats.[4]
 
@@ -87,7 +87,11 @@ let informationPanels corporation selected dispatch windowRect =
         |> fun a -> a.[0], a.[1], a.[2]
     [
         yield! corpInfo corporation corpInfoRect
-        yield! executiveInfo corporation dispatch execRect
+        let executive = 
+            match selected with
+            | Some (OfficeInfo o) -> o.executive.Value
+            | _ -> corporation.ceo
+        yield! executiveInfo executive dispatch execRect
         yield! selectedInfo selected selectedInfoRect
     ]
 
