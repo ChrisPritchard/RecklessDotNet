@@ -3,7 +3,10 @@
 open Xelmish.Model
 
 type Executive = {
-    name: string
+    firstName: string
+    lastName: string
+    experience: int
+    level: int
 }
 
 type Corporation = {

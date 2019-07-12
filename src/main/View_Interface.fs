@@ -67,9 +67,9 @@ let executiveInfo executive dispatch (x, y, w, h) = [
 
     yield colour colours.background (w, h) (x, y)
 
-    yield normalText (0., 0.) (sprintf "LVL:   1") (topLeft stats.[0])
-    yield normalText (0., 0.) (sprintf "XP:    0") (topLeft stats.[1])
-    yield normalText (0., 0.) executive.name (topLeft stats.[2])
+    yield normalText (0., 0.) (sprintf "LVL:   %i" executive.level) (topLeft stats.[0])
+    yield normalText (0., 0.) (sprintf "XP:    %i" executive.experience) (topLeft stats.[1])
+    yield normalText (0., 0.) executive.lastName (topLeft stats.[2])
     yield! button "Orders" (fun _ -> ()) true stats.[3]
     yield! button "Corp Report" (fun _ -> ()) false stats.[4]
 

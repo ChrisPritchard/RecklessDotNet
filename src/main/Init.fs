@@ -5,9 +5,21 @@ open Model
 
 let private dim = Constants.maxMapSize
 
-let playerExec = { name = "Christopher Aquinas" }
-let evilExec = { name = "Quinton Charlemagne" }
-let jadeExec = { name = "Satya Vishal" }
+let playerExec = { 
+    firstName = "Christopher"
+    lastName = "Aquinas"
+    experience = 3
+    level = 6 }
+let evilExec = { 
+    firstName = "Quinton"
+    lastName = "Charlemagne"
+    experience = 2
+    level = 4 }
+let jadeExec = { 
+    firstName = "Satya"
+    lastName = "Vishal"
+    experience = 1
+    level = 3 }
 
 let private startMarket = 
     [0..dim*dim-1] 
@@ -78,16 +90,16 @@ let private others = [
     {   
         displayName = "Evil Corp"
         abbreviation = "EVL"
-        cash = 5000
-        ideas = 0
+        cash = 6000
+        ideas = 2
         headOffice = evilHeadOffice
         colour = Colour.Purple
     }
     {   
         displayName = "Jade Systems"
         abbreviation = "JAS"
-        cash = 5000
-        ideas = 0
+        cash = 4000
+        ideas = 3
         headOffice = jadeHeadOffice
         colour =Colour. Green
     }
