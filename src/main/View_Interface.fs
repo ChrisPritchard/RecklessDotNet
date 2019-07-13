@@ -79,7 +79,7 @@ let executiveInfo executive dispatch (x, y, w, h) = [
 
 let selectedInfo selected (x, y, w, h) = [
     let split = rowsAndCols [] [0.3] (x, y, w, h)
-    let infoRects = rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [] split.[1]
+    let infoRects = rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [] split.[1] |> Array.map topLeft
     
     yield colour colours.background (w, h) (x, y)
 
@@ -91,6 +91,13 @@ let selectedInfo selected (x, y, w, h) = [
         match ti with 
         | (dominant, quality)::_ ->
             yield image "tile" dominant.colour (tw, th) (tx, ty)
+
+            yield titleText (0., 0.) dominant.displayName infoRects.[0]
+            yield normalText (0., 0.) (sprintf "Quality        %i" quality) infoRects.[1]
+
+            yield! ti |> List.skip 1 |> List.truncate 5 
+                |> List.mapi (fun i (corp, _) ->
+                    normalText (0., 0.) corp.displayName infoRects.[i + 2])
         | _ -> 
             yield image "tile" Colour.White (tw, th) (tx, ty)
     | Some (OfficeInfo oi) ->
