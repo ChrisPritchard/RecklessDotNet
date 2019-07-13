@@ -78,7 +78,12 @@ let executiveInfo executive dispatch (x, y, w, h) = [
 ]
 
 let selectedInfo selected (x, y, w, h) = [
+    let split = rowsAndCols [] [0.3] (x, y, w, h)
+    
     yield colour colours.background (w, h) (x, y)
+
+    let dx, dy, dw, dh = contractBy defaultMargin split.[0]
+    yield colour colours.temp (dw, dh) (dx, dy)
 ]
 
 let informationPanels corporation selected dispatch windowRect =     
