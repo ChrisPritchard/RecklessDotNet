@@ -79,11 +79,24 @@ let executiveInfo executive dispatch (x, y, w, h) = [
 
 let selectedInfo selected (x, y, w, h) = [
     let split = rowsAndCols [] [0.3] (x, y, w, h)
+    let infoRects = rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [] split.[1]
     
     yield colour colours.background (w, h) (x, y)
 
-    let dx, dy, dw, dh = contractBy defaultMargin split.[0]
-    yield colour colours.temp (dw, dh) (dx, dy)
+    match selected with
+    | Some (TileInfo ti) -> 
+        let dx, dy, dw, dh = contractBy defaultMargin split.[0]
+        let th = dw / 2
+        let (tx, ty, tw, th) = dx, (dy + dh) - th, dw, th
+        match ti with 
+        | (dominant, quality)::_ ->
+            yield image "tile" dominant.colour (tw, th) (tx, ty)
+        | _ -> 
+            yield image "tile" Colour.White (tw, th) (tx, ty)
+    | Some (OfficeInfo oi) ->
+        let dx, dy, dw, dh = contractBy defaultMargin split.[0]
+        yield colour colours.temp (dw, dh) (dx, dy) // TODO render what is selected
+    | _ -> ()    
 ]
 
 let informationPanels corporation selected dispatch windowRect =     

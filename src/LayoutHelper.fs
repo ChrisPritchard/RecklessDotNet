@@ -37,6 +37,7 @@ let rowsAndCols (rows: float list) (cols: float list) (x, y, w, h) =
 let topLeft (x, y, _, _) = x, y
 let topRight (x, y, w, _) = x + w, y
 let middle (x, y, w, h) = x + w / 2, y + h / 2
+let bottomCentre (x, y, w, h) = x + w / 2, y + h
 
 /// Returns a rectangle that is within the out rectangle by a margin. 
 let contractBy margin (x, y, w, h) =
