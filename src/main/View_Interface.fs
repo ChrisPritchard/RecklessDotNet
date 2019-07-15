@@ -77,13 +77,19 @@ let executiveInfo executive dispatch (x, y, w, h) = [
     yield colour colours.temp (pw, ph) (px, py)
 ]
 
-let departmentLabel department =
-    let cost = departmentCost department
-    match department with
-    | Product _ ->          "Product         0"
-    | Marketing -> sprintf  "Marketing      -%i" cost
-    | Research -> sprintf   "Research       -%i" cost
-    | Admin _ -> sprintf    "Admin          -%i" cost
+let departmentLabels departments = 
+    let departmentLabel department =
+        let cost = departmentCost department
+        match department with
+        | Marketing -> sprintf  "Marketing      -%i" cost
+        | Research -> sprintf   "Research       -%i" cost
+        | Admin _ -> sprintf    "Admin          -%i" cost
+        | _ -> ""
+    let products, other = departments |> List.partition (function Product _ -> true | _ -> false)
+    let otherLabels = other |> List.map departmentLabel
+    match products with
+    | [] -> otherLabels
+    | _ -> (sprintf "%i Products" (List.length products))::otherLabels
 
 let selectedInfo selected (x, y, w, h) = [
     let split = rowsAndCols [] [0.3] (x, y, w, h)
@@ -112,10 +118,11 @@ let selectedInfo selected (x, y, w, h) = [
         yield image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)
         yield! View_Market.renderOffice ox oy tileWidth (tileHeight * 3) oi.corporation.colour oi.headOffice
 
-        yield normalText (0., 0.) (sprintf "Cash Flow: %i     Q: %i" 0 oi.quality) infoRects.[0]
+        yield normalText (0., 0.) (sprintf "Cash Flow: %i     Q: %i" 0 oi.quality) infoRects.[1]
         yield! oi.office.departments
-            |> List.mapi (fun i dep ->
-                normalText (0., 0.) (departmentLabel dep) infoRects.[i + 2]) // TODO label and cost for dep
+            |> departmentLabels
+            |> List.mapi (fun i label ->
+                normalText (0., 0.) label infoRects.[i + 2])
     | _ -> ()    
 ]
 
