@@ -77,6 +77,14 @@ let executiveInfo executive dispatch (x, y, w, h) = [
     yield colour colours.temp (pw, ph) (px, py)
 ]
 
+let departmentLabel department =
+    let cost = departmentCost department
+    match department with
+    | Product _ ->          "Product         0"
+    | Marketing -> sprintf  "Marketing      -%i" cost
+    | Research -> sprintf   "Research       -%i" cost
+    | Admin _ -> sprintf    "Admin          -%i" cost
+
 let selectedInfo selected (x, y, w, h) = [
     let split = rowsAndCols [] [0.3] (x, y, w, h)
     let infoRects = rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [] split.[1] |> Array.map topLeft
@@ -103,6 +111,11 @@ let selectedInfo selected (x, y, w, h) = [
         let ox, oy = dx + ((dw - tileWidth) / 2), dy + (dh - (tileHeight*4))
         yield image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)
         yield! View_Market.renderOffice ox oy tileWidth (tileHeight * 3) oi.corporation.colour oi.headOffice
+
+        yield normalText (0., 0.) (sprintf "Cash Flow: %i     Q: %i" 0 oi.quality) infoRects.[0]
+        yield! oi.office.departments
+            |> List.mapi (fun i dep ->
+                normalText (0., 0.) (departmentLabel dep) infoRects.[i + 2]) // TODO label and cost for dep
     | _ -> ()    
 ]
 
