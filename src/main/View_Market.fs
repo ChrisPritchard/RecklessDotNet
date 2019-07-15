@@ -87,16 +87,20 @@ let private renderOfficeLinks market =
     |> List.collect (fun corp -> 
         linkOfficeAndManaged corp.headOffice)
 
+let renderOffice x y w h corpColour isHeadOffice = [
+    yield image "office" corpColour (w, h) (x, y)
+    if isHeadOffice then
+        let (x, y, w, h) = x, y, tileWidth, tileHeight
+        yield colour Colour.White (tileWidth/4, tileHeight/2) (x+(tileWidth/8)*3, y+tileHeight/4) // this background makes the star white
+        yield image "icon-head-office" corpColour (w, h) (x, y)
+    ]
+
 let private renderOffices (market: Market) =
     market.allOffices
     |> List.sortBy (fun info -> info.office.y, -info.office.x)
     |> List.collect (fun info -> 
         let (x, y, w, h) = isoRect info.office.x info.office.y tileWidth (tileHeight*3)
-        [   yield image "office" info.corporation.colour (w, h) (x, y)
-            if info.headOffice then
-                let (x, y, w, h) = isoRect (info.office.x+2) (info.office.y-2) tileWidth tileHeight
-                yield colour Colour.White (tileWidth/4, tileHeight/2) (x+(tileWidth/8)*3, y+tileHeight/4) // this background makes the star white
-                yield image "icon-head-office" info.corporation.colour (w, h) (x, y) ])
+        renderOffice x y w h info.corporation.colour info.headOffice)
 
 let private renderHighlight (market: Market) (mx, my) = [
         let (x, y, w, h) = isoRect mx my tileWidth tileHeight

@@ -82,15 +82,14 @@ let selectedInfo selected (x, y, w, h) = [
     let infoRects = rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [] split.[1] |> Array.map topLeft
     
     yield colour colours.background (w, h) (x, y)
+    let dx, dy, dw, dh = contractBy defaultMargin split.[0]
+    let tx, ty = dx + ((dw - tileWidth) / 2), dy + (dh - (tileHeight*2))
 
     match selected with
     | Some (TileInfo ti) -> 
-        let dx, dy, dw, dh = contractBy defaultMargin split.[0]
-        let th = dw / 2
-        let (tx, ty, tw, th) = dx, (dy + dh) - th, dw, th
         match ti with 
         | (dominant, quality)::_ ->
-            yield image "tile" dominant.colour (tw, th) (tx, ty)
+            yield image "tile" dominant.colour (tileWidth, tileHeight) (tx, ty)
 
             yield titleText (0., 0.) dominant.displayName infoRects.[0]
             yield normalText (0., 0.) (sprintf "Quality        %i" quality) infoRects.[1]
@@ -99,10 +98,11 @@ let selectedInfo selected (x, y, w, h) = [
                 |> List.mapi (fun i (corp, _) ->
                     normalText (0., 0.) corp.displayName infoRects.[i + 2])
         | _ -> 
-            yield image "tile" Colour.White (tw, th) (tx, ty)
+            yield image "tile" Colour.White (tileWidth, tileHeight) (tx, ty)
     | Some (OfficeInfo oi) ->
-        let dx, dy, dw, dh = contractBy defaultMargin split.[0]
-        yield colour colours.temp (dw, dh) (dx, dy) // TODO render what is selected
+        let ox, oy = dx + ((dw - tileWidth) / 2), dy + (dh - (tileHeight*4))
+        yield image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)
+        yield! View_Market.renderOffice ox oy tileWidth (tileHeight * 3) oi.corporation.colour oi.headOffice
     | _ -> ()    
 ]
 
