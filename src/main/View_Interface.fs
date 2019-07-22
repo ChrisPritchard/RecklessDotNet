@@ -93,7 +93,7 @@ let departmentLabels departments =
 
 let selectedInfo selected (x, y, w, h) = [
     let split = rowsAndCols [] [0.3] (x, y, w, h)
-    let infoRects = rowsAndCols [0.18;0.13;0.13;0.13;0.13;0.13] [] split.[1] |> Array.map topLeft
+    let infoRects = rowsAndCols [0.18;0.13;0.1;0.1;0.1;0.1;0.1;0.1] [] split.[1] |> Array.map topLeft
     
     yield colour colours.background (w, h) (x, y)
     let dx, dy, dw, dh = contractBy defaultMargin split.[0]
@@ -113,6 +113,7 @@ let selectedInfo selected (x, y, w, h) = [
                     normalText (0., 0.) corp.displayName infoRects.[i + 2])
         | _ -> 
             yield image "tile" Colour.White (tileWidth, tileHeight) (tx, ty)
+            yield titleText (0., 0.) "Empty Market Tile" infoRects.[0]
     | Some (OfficeInfo oi) ->
         let ox, oy = dx + ((dw - tileWidth) / 2), dy + (dh - (tileHeight*4))
         yield image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)
