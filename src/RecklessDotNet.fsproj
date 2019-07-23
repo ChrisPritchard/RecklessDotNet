@@ -34,13 +34,15 @@
     <EmbeddedResource Remove="bin\**" />
     <MonoGameContentReference Remove="bin\**" />
   </ItemGroup>
-  <ItemGroup />
 
   <ItemGroup>
-    <ProjectReference Include="..\lib\Xelmish.fsproj" />
     <!-- Required to trigger the content build -->
     <PackageReference Include="MonoGame.Content.Builder" Version="3.7.0.4" />
     <PackageReference Include="MonoGame.Framework.DesktopGL.Core" Version="3.7.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\lib\Xelmish\Xelmish.fsproj" />
   </ItemGroup>
 
 </Project>
