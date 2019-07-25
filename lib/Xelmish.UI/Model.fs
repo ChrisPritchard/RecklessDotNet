@@ -13,6 +13,8 @@ module Model =
         | Button
     and Attribute = 
         | Style of style: (Style -> Style)
+        | Width of int
+        | Height of int
         | Text of string
         | OnClick of event: (unit -> unit)
     and Style = {
@@ -35,6 +37,8 @@ module Model =
 
     let text s = Text s
     let onclick f = OnClick f
+    let width i = Width i
+    let height i = Height i
     
     let fontName s = Style (fun style -> { style with fontName = s })
     let fontSize s = Style (fun style -> { style with fontSize = s })
