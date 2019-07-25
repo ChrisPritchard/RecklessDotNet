@@ -40,7 +40,6 @@ let corpInfo corporation (x, y, w, h) = [
         |> Array.map (contractBy defaultMargin)
 
     yield colour colours.background (w, h) (x, y)
-    yield setSmoothSampling ()
     yield titleText (0., 0.) corporation.displayName (topLeft rects.[0])
 
     let listItem i (label, value) =

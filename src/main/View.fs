@@ -7,7 +7,8 @@ open View_Market
 open View_Interface
 
 let view model dispatch =
-    [   yield! renderMarket model dispatch
+    [   yield setSmoothSampling ()
+        yield! renderMarket model dispatch
         yield! renderUserInterface model dispatch
         
         if quitOnEscape then
