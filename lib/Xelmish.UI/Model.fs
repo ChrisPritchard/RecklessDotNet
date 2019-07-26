@@ -61,19 +61,32 @@ module Model =
         let x, y = topLeft
         let width, height = spaceToFill
         let newStyle = (style, element.attributes) ||> List.fold (fun style -> function | Style f -> f style | _ -> style)
+
+        let rec renderRow left spaceRemaining elementsRemaining =
+            match elementsRemaining with
+            | [] -> ()
+            | element::rest ->
+                let width = 
+                    element.attributes 
+                    |> List.tryPick (function Width x -> Some x | _ -> None) 
+                    |> Option.defaultValue (spaceRemaining / elementsRemaining.Length)
+                render newStyle (left, y) (width, height) element
+                renderRow (left + width) (spaceRemaining - width) rest
+
+        let rec renderCol top spaceRemaining elementsRemaining =
+            match elementsRemaining with
+            | [] -> ()
+            | element::rest ->
+                let height = 
+                    element.attributes 
+                    |> List.tryPick (function Height x -> Some x | _ -> None) 
+                    |> Option.defaultValue (spaceRemaining / elementsRemaining.Length)
+                render newStyle (x, top) (width, height) element
+                renderRow (top + height) (spaceRemaining - height) rest
+
         match element.elementType with
-        | Row children ->
-            let count = children.Length
-            let colSize = width / count
-            children 
-            |> List.iteri (fun i child ->
-                render newStyle (x + (i * colSize), y) (colSize, height) child)
-        | Column children ->
-            let count = children.Length
-            let rowSize = height / count
-            children 
-            |> List.iteri (fun i child ->
-                render newStyle (x, y + (i * rowSize)) (width, rowSize) child)
+        | Row children -> renderRow x width children
+        | Column children -> renderCol y height children
         | Span ->
             // draw in place (children are overlayed)
             ()
