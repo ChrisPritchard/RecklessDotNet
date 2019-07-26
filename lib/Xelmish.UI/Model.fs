@@ -62,34 +62,33 @@ module Model =
         let width, height = spaceToFill
         let newStyle = (style, element.attributes) ||> List.fold (fun style -> function | Style f -> f style | _ -> style)
 
-        let rec renderRow left spaceRemaining elementsRemaining =
-            match elementsRemaining with
+        let rec renderRow left spaceRemaining childrenRemaining =
+            match childrenRemaining with
             | [] -> ()
-            | element::rest ->
+            | child::rest ->
                 let width = 
-                    element.attributes 
+                    child.attributes 
                     |> List.tryPick (function Width x -> Some x | _ -> None) 
-                    |> Option.defaultValue (spaceRemaining / elementsRemaining.Length)
-                render newStyle (left, y) (width, height) element
+                    |> Option.defaultValue (spaceRemaining / childrenRemaining.Length)
+                render newStyle (left, y) (width, height) child
                 renderRow (left + width) (spaceRemaining - width) rest
 
-        let rec renderCol top spaceRemaining elementsRemaining =
-            match elementsRemaining with
+        let rec renderCol top spaceRemaining childrenRemaining =
+            match childrenRemaining with
             | [] -> ()
-            | element::rest ->
+            | child::rest ->
                 let height = 
-                    element.attributes 
+                    child.attributes 
                     |> List.tryPick (function Height x -> Some x | _ -> None) 
-                    |> Option.defaultValue (spaceRemaining / elementsRemaining.Length)
-                render newStyle (x, top) (width, height) element
+                    |> Option.defaultValue (spaceRemaining / childrenRemaining.Length)
+                render newStyle (x, top) (width, height) child
                 renderRow (top + height) (spaceRemaining - height) rest
+
+        let renderSpan () = ()
+        let renderButton () = ()
 
         match element.elementType with
         | Row children -> renderRow x width children
         | Column children -> renderCol y height children
-        | Span ->
-            // draw in place (children are overlayed)
-            ()
-        | Button ->
-            // draw in place (default padding)?
-            ()
+        | Span -> renderSpan ()
+        | Button -> renderButton ()
