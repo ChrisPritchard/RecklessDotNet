@@ -58,12 +58,8 @@ module Model =
             button [ enabled false ] "Can't click Me"
         ]
 
-    let rec render style topLeft spaceToFill element = 
-        let x, y = topLeft
-        let width, height = spaceToFill
-        let newStyle = (style, element.attributes) ||> List.fold (fun style -> function | Style f -> f style | _ -> style)
-
-        let rec renderRow left spaceRemaining childrenRemaining =
+    let rec private renderRow renderImpl left spaceRemaining childrenRemaining =
+        [
             match childrenRemaining with
             | [] -> ()
             | child::rest ->
@@ -71,10 +67,12 @@ module Model =
                     child.attributes 
                     |> List.tryPick (function Width x -> Some x | _ -> None) 
                     |> Option.defaultValue (spaceRemaining / childrenRemaining.Length)
-                render newStyle (left, y) (width, height) child
-                renderRow (left + width) (spaceRemaining - width) rest
-
-        let rec renderCol top spaceRemaining childrenRemaining =
+                yield! renderImpl left width child
+                yield! renderRow renderImpl (left + width) (spaceRemaining - width) rest
+        ]
+    
+    let rec private renderCol renderImpl top spaceRemaining childrenRemaining =
+        [ 
             match childrenRemaining with
             | [] -> ()
             | child::rest ->
@@ -82,14 +80,26 @@ module Model =
                     child.attributes 
                     |> List.tryPick (function Height x -> Some x | _ -> None) 
                     |> Option.defaultValue (spaceRemaining / childrenRemaining.Length)
-                render newStyle (x, top) (width, height) child
-                renderRow (top + height) (spaceRemaining - height) rest
+                yield! renderImpl top height child
+                yield! renderCol renderImpl (top + height) (spaceRemaining - height) rest 
+        ]
 
-        let renderSpan s = ()
-        let renderButton s = ()
+    let private renderText style (x, y) (width, height) text = []
+    let private renderButton style (x, y) (width, height) text = []
+
+    let rec render style (x, y) (width, height) element = 
+        let newStyle = 
+            (style, element.attributes) 
+            ||> List.fold (fun style -> function | Style f -> f style | _ -> style)
 
         match element.elementType with
-        | Row children -> renderRow x width children
-        | Column children -> renderCol y height children
-        | Text s -> renderSpan s
-        | Button s -> renderButton s
+        | Row children -> 
+            let renderImpl = fun left width child -> render newStyle (left, y) (width, height) child
+            renderRow renderImpl x width children
+        | Column children -> 
+            let renderImpl = fun top height child -> render newStyle (x, top) (width, height) child
+            renderCol renderImpl y height children
+        | Text s -> renderText newStyle (x, y) (width, height) s
+        | Button s -> renderButton newStyle (x, y) (width, height) s
+
+    //let renderElements = render 
