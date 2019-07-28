@@ -21,9 +21,9 @@ module Model =
         fontSize: float
         colour: Colour
         backgroundColour: Colour
-        margin: float
-        padding: float
-        borderSize: float
+        margin: int
+        padding: int
+        borderSize: int
         borderColour: Colour
         alignment: float
         enabled: bool
@@ -89,8 +89,19 @@ module Model =
 
     let rec render style (x, y) (width, height) element = 
         let newStyle = 
-            (style, element.attributes) 
+            ({ style with padding = 0; margin = 0 }, element.attributes) 
             ||> List.fold (fun style -> function | Style f -> f style | _ -> style)
+
+        let x, y = x + style.margin, y + style.margin
+        let width, height = width - (2 * style.margin), height - (2 * style.margin)
+
+        if style.borderSize > 0 then
+            () // render border
+
+        // render background - border size
+
+        let x, y = x + style.padding, y + style.padding
+        let width, height = width - (2 * style.padding), height - (2 * style.padding)
 
         match element.elementType with
         | Row children -> 
