@@ -64,6 +64,31 @@ module Model =
             ]
         ]
 
+    let testModel2 = 
+        row [ padding (px 10) ] [
+            col [] [
+                yield row [ height (pct 0.18) ] [
+                    text [] "Aquinas Corp"
+                ]
+                yield! [
+                    "Ideas", "1"
+                    "Prospects", "TODO"
+                    "Stock Value", "TODO"
+                    "Market Share", "TODO"
+                    "Cash", "$500"
+                    "Expenses", "TODO"
+                ] |> List.map (fun (label, value) -> 
+                    row [] [ 
+                        text [ width (pct 0.5) ] label
+                        text [ width (pct 0.5) ] value
+                    ])
+            ]
+            col [] [
+            ]
+            col [] [
+            ]
+        ]
+
     let rec private renderRow renderImpl left totalSpace spaceRemaining childrenRemaining =
         [
             match childrenRemaining with
