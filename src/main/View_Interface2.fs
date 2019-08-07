@@ -52,9 +52,6 @@ let departmentLabels departments =
 
 let selectedInfo selected =
     
-    //let split = rowsAndCols [] [0.3] (x, y, w, h)
-    //let infoRects = rowsAndCols [0.18;0.13;0.1;0.1;0.1;0.1;0.1;0.1] [] split.[1] |> Array.map topLeft
-    
     let tx, ty = px (tileWidth / 2), px (tileHeight*2)
     let tw, th = px tileWidth, px tileHeight
 
@@ -64,7 +61,7 @@ let selectedInfo selected =
             match ti with 
             | (dominant, quality)::_ ->
                 let left = [
-                    image [ colour dominant.colour; x tx; y ty; width tw; height th ] "tile"
+                    image [ colour dominant.colour; left tx; top ty; width tw; height th ] "tile"
                 ]
                 let right = [
                     yield text [ height (pct 0.18); fontSize 25. ] dominant.displayName
@@ -77,11 +74,11 @@ let selectedInfo selected =
                 ]
                 left, right                
             | _ -> 
-                [ image [ colour Colour.White; x tx; y ty; width tw; height th ] "tile" ],
+                [ image [ colour Colour.White; left tx; top ty; width tw; height th ] "tile" ],
                 [ text [ fontSize 25. ] "Empty Market Tile" ]
         | Some (OfficeInfo oi) ->
             let left = [
-                image [ colour oi.corporation.colour; x tx; y ty; width tw; height th ] "tile"
+                image [ colour oi.corporation.colour; left tx; top ty; width tw; height th ] "tile"
                 // todo : office
             ]
             let right = [
@@ -122,7 +119,7 @@ let commandArea model dispatch =
 
     col [] [
         row [ height (pct 0.7) ] []
-        row [ backgroundColour colours.background ]
+        row [ ]
             body
     ]
 
@@ -132,6 +129,7 @@ let renderUserInterface model dispatch =
         fontName = "defaultFont"
         fontSize = 16.
         colour = colours.text
+        backgroundColour = colours.background
         enabled = true
     }
     render globalStyle (0, 0) (windowWidth, windowHeight) all
