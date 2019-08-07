@@ -11,12 +11,15 @@ type Element = {
 and ElementType =
     | Row of children: Element list
     | Column of children: Element list
+    | Image of key: string
     | Text of string
-    | Button of string
+    | Button of text: string
 and Attribute = 
     | Style of style: (Style -> Style)
     | Width of Size
     | Height of Size
+    | X of Size
+    | Y of Size
     | OnClick of event: (unit -> unit)
 and Style = {
     fontName: string
@@ -34,12 +37,15 @@ and Size = Percent of float | Pixels of int
 
 let col attributes children = { elementType = Column children; attributes = attributes }
 let row attributes children = { elementType = Row children; attributes = attributes }
+let image attributes k = { elementType = Image k; attributes = attributes }
 let text attributes s = { elementType = Text s; attributes = attributes } 
 let button attributes s = { elementType = Button s; attributes = attributes }
 
 let onclick f = OnClick f
 let width i = Width i
 let height i = Height i
+let x i = X i
+let y i = Y i
 
 let px n = Pixels n
 let pct n = Percent n
@@ -91,6 +97,10 @@ let private renderColour (x, y) (width, height) colour =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, colour))
 
+let private renderImage style (x, y) (width, height) key =
+    OnDraw (fun loadedAssets _ spriteBatch -> 
+        spriteBatch.Draw(loadedAssets.textures.[key], rect x y width height, style.colour))
+
 let private renderText style (x, y) _ (text: string) = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
         let font = loadedAssets.fonts.[style.fontName]
@@ -137,8 +147,18 @@ let rec render style (x, y) (width, height) element =
             match style.padding with 
             | Pixels n -> n, n 
             | Percent p -> int (p * float height), int (p * float width)
-        let x, y = x + leftPadding, y + topPadding
+        let dx, dy = x + leftPadding, y + topPadding
         let width, height = width - (2 * leftPadding), height - (2 * topPadding)
+
+        let x, y = 
+            ((dx, dy), element.attributes) 
+            ||> List.fold (fun (x, y) -> 
+                function
+                | X (Pixels ox) -> dx + ox, y
+                | X (Percent ox) -> dx + int (ox * float width), y
+                | Y (Pixels oy) -> x, dy + oy
+                | Y (Percent oy) -> x, dy + int (oy * float height)
+                | _ -> x, y) 
 
         match element.elementType with
         | Row children -> 
@@ -149,4 +169,6 @@ let rec render style (x, y) (width, height) element =
             yield! renderCol renderImpl y height height children
         | Text s | Button s -> 
             yield renderText newStyle (x, y) (width, height) s
+        | Image key ->
+            yield renderImage newStyle (x, y) (width, height) key
     ]
