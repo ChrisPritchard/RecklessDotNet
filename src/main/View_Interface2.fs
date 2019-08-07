@@ -122,22 +122,16 @@ let commandArea model dispatch =
 
     col [] [
         row [ height (pct 0.7) ] []
-        row [ ]
+        row [ backgroundColour colours.background ]
             body
     ]
 
 let renderUserInterface model dispatch = 
     let all = commandArea model dispatch
-    let style = {
-        backgroundColour = colours.background
+    let globalStyle = {
         fontName = "defaultFont"
         fontSize = 16.
         colour = colours.text
-        margin = px (0)
-        padding = px (0)
-        borderSize = 0
-        borderColour = colours.temp
-        alignment = 0., 0.
         enabled = true
     }
-    render style (0, 0) (windowWidth, windowHeight) all
+    render globalStyle (0, 0) (windowWidth, windowHeight) all

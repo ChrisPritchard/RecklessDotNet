@@ -15,23 +15,26 @@ and ElementType =
     | Text of string
     | Button of text: string
 and Attribute = 
-    | Style of style: (Style -> Style)
+    | GlobalStyle of style: (GlobalStyle -> GlobalStyle)
+    | LocalStyle of style: (LocalStyle -> LocalStyle)
     | Width of Size
     | Height of Size
     | X of Size
     | Y of Size
     | OnClick of event: (unit -> unit)
-and Style = {
+and GlobalStyle = {
     fontName: string
     fontSize: float
     colour: Colour
+    enabled: bool    
+}
+and LocalStyle = {
     backgroundColour: Colour
     margin: Size
     padding: Size
     borderSize: int
     borderColour: Colour
     alignment: float * float
-    enabled: bool
 }
 and Size = Percent of float | Pixels of int
 
@@ -50,16 +53,26 @@ let y i = Y i
 let px n = Pixels n
 let pct n = Percent n
     
-let fontName s = Style (fun style -> { style with fontName = s })
-let fontSize s = Style (fun style -> { style with fontSize = s })
-let colour s = Style (fun style -> { style with colour = s })
-let backgroundColour s = Style (fun style -> { style with backgroundColour = s })
-let margin s = Style (fun style -> { style with margin = s })
-let padding s = Style (fun style -> { style with padding = s })
-let borderSize s = Style (fun style -> { style with borderSize = s })
-let borderColour s = Style (fun style -> { style with borderColour = s })
-let alignment x y = Style (fun style -> { style with alignment = (x, y) })
-let enabled s = Style (fun style -> { style with enabled = s })
+let fontName s = GlobalStyle (fun style -> { style with fontName = s })
+let fontSize s = GlobalStyle (fun style -> { style with fontSize = s })
+let colour s = GlobalStyle (fun style -> { style with colour = s })
+let enabled s = GlobalStyle (fun style -> { style with enabled = s })
+
+let defaultLocalStyle = {
+    backgroundColour = Colour.Transparent
+    margin = px 0
+    padding = px 0
+    borderSize = 0
+    borderColour = Colour.Transparent
+    alignment = 0., 0.
+}
+
+let backgroundColour s = LocalStyle (fun style -> { style with backgroundColour = s })
+let margin s = LocalStyle (fun style -> { style with margin = s })
+let padding s = LocalStyle (fun style -> { style with padding = s })
+let borderSize s = LocalStyle (fun style -> { style with borderSize = s })
+let borderColour s = LocalStyle (fun style -> { style with borderColour = s })
+let alignment x y = LocalStyle (fun style -> { style with alignment = (x, y) })
 
 let rec private renderRow renderImpl left totalSpace spaceRemaining childrenRemaining =
     [
@@ -97,30 +110,34 @@ let private renderColour (x, y) (width, height) colour =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, colour))
 
-let private renderImage style (x, y) (width, height) key =
+let private renderImage globalStyle (x, y) (width, height) key =
     OnDraw (fun loadedAssets _ spriteBatch -> 
-        spriteBatch.Draw(loadedAssets.textures.[key], rect x y width height, style.colour))
+        spriteBatch.Draw(loadedAssets.textures.[key], rect x y width height, globalStyle.colour))
 
-let private renderText style (x, y) _ (text: string) = 
+let private renderText globalStyle localStyle (x, y) _ (text: string) = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
-        let font = loadedAssets.fonts.[style.fontName]
+        let font = loadedAssets.fonts.[globalStyle.fontName]
         let measured = font.MeasureString (text)
-        let scale = let v = float32 style.fontSize / measured.Y in Vector2(v, v)
-        let ox, oy = style.alignment
+        let scale = let v = float32 globalStyle.fontSize / measured.Y in Vector2(v, v)
+        let ox, oy = localStyle.alignment
         let origin = Vector2 (float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y)
         let position = Vector2.Add(origin, Vector2(float32 x, float32 y))
-        spriteBatch.DrawString (font, text, position, style.colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f))
+        spriteBatch.DrawString (font, text, position, globalStyle.colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f))
         
 let private isInside tx ty tw th x y = x >= tx && x <= tx + tw && y >= ty && y <= ty + th
 
-let rec render style (x, y) (width, height) element = 
+let rec render globalStyle (x, y) (width, height) element = 
     [
-        let newStyle = 
-            ({ style with padding = px 0; margin = px 0 }, element.attributes) 
-            ||> List.fold (fun style -> function | Style f -> f style | _ -> style)
+        let globalStyle, localStyle = 
+            ((globalStyle, defaultLocalStyle), element.attributes) 
+            ||> List.fold (fun (globalStyle, localStyle) -> 
+                function 
+                | GlobalStyle f -> f globalStyle, localStyle 
+                | LocalStyle f -> globalStyle, f localStyle
+                | _ -> globalStyle, localStyle)
 
         let topMargin, leftMargin = 
-            match style.margin with 
+            match localStyle.margin with 
             | Pixels n -> n, n 
             | Percent p -> int (p * float height), int (p * float width)
         let x, y = x + leftMargin, y + topMargin
@@ -128,7 +145,7 @@ let rec render style (x, y) (width, height) element =
         
         let onClick = List.tryPick (function OnClick e -> Some e | _ -> None) element.attributes
         match onClick with
-        | Some e when style.enabled ->
+        | Some e when globalStyle.enabled ->
             yield OnUpdate (fun inputs -> 
                 if (inputs.mouseState.X, inputs.mouseState.Y) ||> isInside x y width height then
                     if inputs.mouseState.LeftButton = ButtonState.Pressed 
@@ -136,15 +153,15 @@ let rec render style (x, y) (width, height) element =
                         e ())
         | _ -> ()
 
-        if style.borderSize > 0 then
-            yield renderColour (x, y) (width, height) style.borderColour
+        if localStyle.borderSize > 0 then
+            yield renderColour (x, y) (width, height) localStyle.borderColour
 
-        let x, y = x + style.borderSize, y + style.borderSize
-        let width, height = width - (2 * style.borderSize), height - (2 * style.borderSize)
-        yield renderColour (x, y) (width, height) style.backgroundColour
+        let x, y = x + localStyle.borderSize, y + localStyle.borderSize
+        let width, height = width - (2 * localStyle.borderSize), height - (2 * localStyle.borderSize)
+        yield renderColour (x, y) (width, height) localStyle.backgroundColour
 
         let topPadding, leftPadding = 
-            match style.padding with 
+            match localStyle.padding with 
             | Pixels n -> n, n 
             | Percent p -> int (p * float height), int (p * float width)
         let dx, dy = x + leftPadding, y + topPadding
@@ -162,13 +179,13 @@ let rec render style (x, y) (width, height) element =
 
         match element.elementType with
         | Row children -> 
-            let renderImpl = fun left width child -> render newStyle (left, y) (width, height) child
+            let renderImpl = fun left width child -> render globalStyle (left, y) (width, height) child
             yield! renderRow renderImpl x width width children
         | Column children -> 
-            let renderImpl = fun top height child -> render newStyle (x, top) (width, height) child
+            let renderImpl = fun top height child -> render globalStyle (x, top) (width, height) child
             yield! renderCol renderImpl y height height children
         | Text s | Button s -> 
-            yield renderText newStyle (x, y) (width, height) s
+            yield renderText globalStyle localStyle (x, y) (width, height) s
         | Image key ->
-            yield renderImage newStyle (x, y) (width, height) key
+            yield renderImage globalStyle (x, y) (width, height) key
     ]
