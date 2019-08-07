@@ -114,6 +114,7 @@ and OfficeInfo =
 
 type MainModel = 
     {   market: Market
+        newInterfaceMode: bool
         currentInterface: Interface  }
 and Interface =
     | Information of selectedTile: (int * int)

@@ -30,8 +30,8 @@ let executiveInfo executive dispatch =
             text [ height (pct 0.13) ] (sprintf "XP:    %i" executive.experience)
             text [ height (pct 0.13) ] executive.lastName
 
-            button [ onclick (fun _ -> ()) ] "Orders"
-            button [ onclick (fun _ -> ()); enabled false ] "Corp Report"
+            button [ height (pct 0.21); onclick (fun _ -> ()) ] "Orders"
+            button [ height (pct 0.21); onclick (fun _ -> ()); enabled false ] "Corp Report"
         ]
         col [ margin (px defaultMargin); backgroundColour colours.temp ] []
     ]
@@ -99,8 +99,7 @@ let selectedInfo selected =
         col [] right
     ]
 
-let renderUserInterface model dispatch = 
-
+let commandArea model dispatch = 
     let body = 
         match model.currentInterface with
         | Information selectedTile -> 
@@ -123,10 +122,22 @@ let renderUserInterface model dispatch =
 
     col [] [
         row [ height (pct 0.7) ] []
-        row [ 
-            backgroundColour colours.background
-            fontName "defaultFont"
-            fontSize 16.
-            colour colours.text ]
+        row [ ]
             body
     ]
+
+let renderUserInterface model dispatch = 
+    let all = commandArea model dispatch
+    let style = {
+        backgroundColour = colours.background
+        fontName = "defaultFont"
+        fontSize = 16.
+        colour = colours.text
+        margin = px (0)
+        padding = px (0)
+        borderSize = 0
+        borderColour = colours.temp
+        alignment = 0., 0.
+        enabled = true
+    }
+    render style (0, 0) (windowWidth, windowHeight) all
