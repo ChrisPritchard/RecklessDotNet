@@ -185,7 +185,7 @@ let rec render globalStyle (x, y) (width, height) element =
         | Text s ->
             yield renderText newGlobalStyle (x, y) (width, height) s
         | Button s -> 
-            yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } (x, y) (width, height) s
+            yield renderText { newGlobalStyle with alignment = -0.5, -0.5 } (x, y) (width, height) s
         | Image key ->
             yield renderImage newGlobalStyle (x, y) (width, height) key
     ]

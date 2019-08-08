@@ -17,7 +17,7 @@ let corpInfo corporation =
             "Expenses", "TODO"
         ] |> List.map (fun (label, value) ->
             row [ height (pct 0.13) ] [
-                text [ alignment 1. 0. ] label
+                text [ alignment -1. 0. ] label
                 text [] value
             ])
     ]
