@@ -6,7 +6,7 @@ open Constants
 open Model
 
 let corpInfo corporation = 
-    col [] [
+    col [ padding (px 10) ] [
         yield text [ fontSize 25.; height (pct 0.18) ] corporation.displayName
         yield! [
             "Ideas", string corporation.ideas
@@ -17,13 +17,13 @@ let corpInfo corporation =
             "Expenses", "TODO"
         ] |> List.map (fun (label, value) ->
             row [ height (pct 0.13) ] [
-                text [] label
+                text [ alignment 1. 0. ] label
                 text [] value
             ])
     ]
 
 let executiveInfo executive dispatch = 
-    row [] [
+    row [ padding (px 10) ] [
         col [] [
             row [ height (pct 0.18) ] [ ]
             text [ height (pct 0.13) ] (sprintf "LVL:   %i" executive.level)
@@ -91,7 +91,7 @@ let selectedInfo selected =
             left, right
         | _ -> [], []
 
-    row [] [
+    row [ padding (px 10) ] [
         col [ width (pct 0.3) ] left
         col [] right
     ]
@@ -119,7 +119,7 @@ let commandArea model dispatch =
 
     col [] [
         row [ height (pct 0.7) ] []
-        row [ ]
+        row [ backgroundColour colours.background ]
             body
     ]
 
@@ -128,8 +128,9 @@ let renderUserInterface model dispatch =
     let globalStyle = {
         fontName = "defaultFont"
         fontSize = 16.
+        alignment = 0., 0.
         colour = colours.text
-        backgroundColour = colours.background
+        backgroundColour = Colour.Transparent
         enabled = true
     }
     render globalStyle (0, 0) (windowWidth, windowHeight) all

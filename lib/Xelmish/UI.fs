@@ -21,6 +21,7 @@ and Attribute =
 and GlobalStyle = {
     fontName: string
     fontSize: float
+    alignment: float * float
     colour: Colour
     backgroundColour: Colour
     enabled: bool    
@@ -30,7 +31,6 @@ and LocalStyle = {
     padding: Size
     borderSize: int
     borderColour: Colour
-    alignment: float * float
     top: Size
     left: Size
     width: Size option
@@ -51,6 +51,7 @@ let pct n = Percent n
     
 let fontName s = GlobalStyle (fun style -> { style with fontName = s })
 let fontSize s = GlobalStyle (fun style -> { style with fontSize = s })
+let alignment x y = GlobalStyle (fun style -> { style with alignment = (x, y) })
 let colour s = GlobalStyle (fun style -> { style with colour = s })
 let backgroundColour s = GlobalStyle (fun style -> { style with backgroundColour = s })
 let enabled s = GlobalStyle (fun style -> { style with enabled = s })
@@ -60,7 +61,6 @@ let defaultLocalStyle = {
     padding = px 0
     borderSize = 0
     borderColour = Colour.Transparent
-    alignment = 0., 0.
     top = px 0
     left = px 0
     width = None
@@ -71,7 +71,6 @@ let margin s = LocalStyle (fun style -> { style with margin = s })
 let padding s = LocalStyle (fun style -> { style with padding = s })
 let borderSize s = LocalStyle (fun style -> { style with borderSize = s })
 let borderColour s = LocalStyle (fun style -> { style with borderColour = s })
-let alignment x y = LocalStyle (fun style -> { style with alignment = (x, y) })
 let width i = LocalStyle (fun style -> { style with width = Some i })
 let height i = LocalStyle (fun style -> { style with height = Some i })
 let top i = LocalStyle (fun style -> { style with top = i })
@@ -125,12 +124,12 @@ let private renderImage globalStyle (x, y) (width, height) key =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.textures.[key], rect x y width height, globalStyle.colour))
 
-let private renderText globalStyle localStyle (x, y) _ (text: string) = 
+let private renderText globalStyle (x, y) _ (text: string) = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
         let font = loadedAssets.fonts.[globalStyle.fontName]
         let measured = font.MeasureString (text)
         let scale = let v = float32 globalStyle.fontSize / measured.Y in Vector2(v, v)
-        let ox, oy = localStyle.alignment
+        let ox, oy = globalStyle.alignment
         let origin = Vector2 (float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y)
         let position = Vector2.Add(origin, Vector2(float32 x, float32 y))
         spriteBatch.DrawString (font, text, position, globalStyle.colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f))
@@ -183,8 +182,10 @@ let rec render globalStyle (x, y) (width, height) element =
         | Column children -> 
             let renderImpl = fun top height child -> render newGlobalStyle (x, top) (width, height) child
             yield! renderCol newGlobalStyle renderImpl y height height children
-        | Text s | Button s -> 
-            yield renderText newGlobalStyle localStyle (x, y) (width, height) s
+        | Text s ->
+            yield renderText newGlobalStyle (x, y) (width, height) s
+        | Button s -> 
+            yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } (x, y) (width, height) s
         | Image key ->
             yield renderImage newGlobalStyle (x, y) (width, height) key
     ]
