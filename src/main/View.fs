@@ -6,9 +6,9 @@ open Constants
 open View_Market
 open Update
 
-let view model dispatch =
+let view (model: Model.MainModel) dispatch =
     [   yield setSmoothSampling ()
-        yield! renderMarket model dispatch
+        //yield! renderMarket model dispatch
 
         if model.newInterfaceMode then
             yield! View_Interface2.renderUserInterface model dispatch
