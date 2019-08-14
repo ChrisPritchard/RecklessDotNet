@@ -51,10 +51,13 @@ let pct n = Percent n
     
 let fontName s = GlobalStyle (fun style -> { style with fontName = s })
 let fontSize s = GlobalStyle (fun style -> { style with fontSize = s })
-let alignment x y = GlobalStyle (fun style -> { style with alignment = (x, y) })
 let colour s = GlobalStyle (fun style -> { style with colour = s })
 let backgroundColour s = GlobalStyle (fun style -> { style with backgroundColour = s })
 let enabled s = GlobalStyle (fun style -> { style with enabled = s })
+let alignment x y = GlobalStyle (fun style -> 
+    let x = if abs x > 1. then abs x % 1. else abs x
+    let y = if abs y > 1. then abs y % 1. else abs y
+    { style with alignment = x, y }) // alignment can only be from 0. to 1.
 
 let defaultLocalStyle = {
     margin = px 0
@@ -124,14 +127,19 @@ let private renderImage globalStyle (x, y) (width, height) key =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.textures.[key], rect x y width height, globalStyle.colour))
 
-let private renderText globalStyle (x, y) _ (text: string) = 
+let private renderText globalStyle (x, y) (width, height) (text: string) = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
         let font = loadedAssets.fonts.[globalStyle.fontName]
         let measured = font.MeasureString (text)
         let scale = let v = float32 globalStyle.fontSize / measured.Y in Vector2(v, v)
+
         let ox, oy = globalStyle.alignment
-        let origin = Vector2 (float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y)
+        let relWidth, relHeight = float32 (float width * ox), float32 (float height * ox)
+        let offWidth, offHeight = float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y
+
+        let origin = Vector2 (relWidth - offWidth, relHeight - offHeight)
         let position = Vector2.Add(origin, Vector2(float32 x, float32 y))
+
         spriteBatch.DrawString (font, text, position, globalStyle.colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f))
         
 let private isInside tx ty tw th x y = x >= tx && x <= tx + tw && y >= ty && y <= ty + th
@@ -185,7 +193,7 @@ let rec render globalStyle (x, y) (width, height) element =
         | Text s ->
             yield renderText newGlobalStyle (x, y) (width, height) s
         | Button s -> 
-            yield renderText { newGlobalStyle with alignment = -0.5, -0.5 } (x, y) (width, height) s
+            yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } (x, y) (width, height) s
         | Image key ->
             yield renderImage newGlobalStyle (x, y) (width, height) key
     ]
