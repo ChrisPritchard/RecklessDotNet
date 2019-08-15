@@ -6,7 +6,7 @@ open Constants
 open Model
 
 let corpInfo corporation = 
-    col [ padding (px 10) ] [
+    col [ padding (px defaultMargin) ] [
         yield text [ fontSize 25.; height (pct 0.18) ] corporation.displayName
         yield! [
             "Ideas", string corporation.ideas
@@ -17,8 +17,8 @@ let corpInfo corporation =
             "Expenses", "TODO"
         ] |> List.map (fun (label, value) ->
             row [ height (pct 0.13) ] [
-                text [ alignment 1. 0. ] label
-                text [] value
+                text [ alignment 1. 0.; padding (px defaultMargin) ] label
+                text [ padding (px defaultMargin) ] value
             ])
     ]
 
@@ -30,8 +30,8 @@ let executiveInfo executive dispatch =
             text [ height (pct 0.13) ] (sprintf "XP:    %i" executive.experience)
             text [ height (pct 0.13) ] executive.lastName
 
-            button [ height (pct 0.21); onclick (fun _ -> ()) ] "Orders"
-            button [ height (pct 0.21); onclick (fun _ -> ()); enabled false ] "Corp Report"
+            button [ margin (px defaultMargin); height (pct 0.21); onclick (fun _ -> ()) ] "Orders"
+            button [ margin (px defaultMargin); height (pct 0.21); onclick (fun _ -> ()); enabled false ] "Corp Report"
         ]
         col [ margin (px defaultMargin); backgroundColour colours.temp ] []
     ]
