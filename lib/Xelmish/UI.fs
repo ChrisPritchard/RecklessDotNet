@@ -138,7 +138,7 @@ let private renderText globalStyle colour (x, y) (width, height) (text: string) 
         let scale = let v = float32 globalStyle.fontSize / measured.Y in Vector2(v, v)
 
         let ox, oy = globalStyle.alignment
-        let relWidth, relHeight = float32 (float width * ox), float32 (float height * ox)
+        let relWidth, relHeight = float32 (float width * ox), float32 (float height * oy)
         let offWidth, offHeight = float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y
 
         let origin = Vector2 (relWidth - offWidth, relHeight - offHeight)
