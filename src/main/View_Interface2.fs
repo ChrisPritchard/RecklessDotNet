@@ -138,4 +138,4 @@ let renderUserInterface model dispatch =
         buttonBackgroundColour = colours.button
         enabled = true
     }
-    render globalStyle (0, 0) (windowWidth, windowHeight) all
+    render true globalStyle (0, 0) (windowWidth, windowHeight) all

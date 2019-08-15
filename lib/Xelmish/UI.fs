@@ -168,10 +168,22 @@ let private renderText globalStyle colour (x, y) (width, height) (text: string) 
         
 let private isInside tx ty tw th x y = x >= tx && x <= tx + tw && y >= ty && y <= ty + th
 
-let rec render globalStyle (x, y) (width, height) element = 
+let private renderBorder (x, y) (width, height) borderWidth borderColour = 
     [
+        renderColour (x, y) (width, borderWidth) borderColour
+        renderColour (x, y + height - borderWidth) (width, borderWidth) borderColour
+        renderColour (x, y) (borderWidth, height) Colour.Red
+        renderColour (x + width - borderWidth, y) (borderWidth, height) borderColour
+    ]
+
+let rec render debugOutlines globalStyle (x, y) (width, height) element = 
+    [
+        if debugOutlines then
+            yield! renderBorder (x, y) (width, height) 1 Colour.Red
+
         let newGlobalStyle, localStyle = styles globalStyle element.attributes            
 
+        // Apply margin
         let topMargin, leftMargin = 
             match localStyle.margin with 
             | Pixels n -> n, n 
@@ -179,6 +191,10 @@ let rec render globalStyle (x, y) (width, height) element =
         let x, y = x + leftMargin, y + topMargin
         let width, height = width - (2 * leftMargin), height - (2 * topMargin)
         
+        if debugOutlines then
+            yield! renderBorder (x, y) (width, height) 1 Colour.Green
+        
+        // Test for onclick
         let onClick = List.tryPick (function OnClick e -> Some e | _ -> None) element.attributes
         match onClick with
         | Some e when newGlobalStyle.enabled ->
@@ -190,13 +206,9 @@ let rec render globalStyle (x, y) (width, height) element =
         | _ -> ()
 
         if localStyle.borderSize > 0 then
-            yield renderColour (x, y) (width, height) localStyle.borderColour
+            yield! renderBorder (x, y) (width, height) localStyle.borderSize localStyle.borderColour
 
-        let x, y = x + localStyle.borderSize, y + localStyle.borderSize
-        let width, height = width - (2 * localStyle.borderSize), height - (2 * localStyle.borderSize)
-        if newGlobalStyle.backgroundColour <> globalStyle.backgroundColour then
-            yield renderColour (x, y) (width, height) newGlobalStyle.backgroundColour
-
+        // Apply padding            
         let topPadding, leftPadding = 
             match localStyle.padding with 
             | Pixels n -> n, n 
@@ -204,15 +216,19 @@ let rec render globalStyle (x, y) (width, height) element =
         let dx, dy = x + leftPadding, y + topPadding
         let width, height = width - (2 * leftPadding), height - (2 * topPadding)
 
+        // Apply top/left (defaults to 0)
         let x = match localStyle.left with Pixels ox -> dx + ox | Percent ox -> dx + int (ox * float width)
         let y = match localStyle.top with Pixels oy -> dy + oy | Percent oy -> dy + int (oy * float height)
+        
+        if debugOutlines then
+            yield! renderBorder (x, y) (width, height) 1 Colour.Blue
 
         match element.elementType with
         | Row children -> 
-            let renderImpl = fun left width child -> render newGlobalStyle (left, y) (width, height) child
+            let renderImpl = fun left width child -> render debugOutlines newGlobalStyle (left, y) (width, height) child
             yield! renderRow newGlobalStyle renderImpl x width width children
         | Column children -> 
-            let renderImpl = fun top height child -> render newGlobalStyle (x, top) (width, height) child
+            let renderImpl = fun top height child -> render debugOutlines newGlobalStyle (x, top) (width, height) child
             yield! renderCol newGlobalStyle renderImpl y height height children
         | Text s ->
             yield renderText newGlobalStyle newGlobalStyle.colour (x, y) (width, height) s
