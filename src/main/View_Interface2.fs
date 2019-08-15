@@ -5,9 +5,12 @@ open Xelmish.UI
 open Constants
 open Model
 
+let defaultPadding = padding (px defaultMargin)
+let defaultMargin = margin (px defaultMargin)
+
 let corpInfo corporation = 
-    col [ padding (px defaultMargin) ] [
-        yield text [ fontSize 25.; height (pct 0.18) ] corporation.displayName
+    col [] [
+        yield text [ fontSize 25.; height (pct 0.18); defaultPadding ] corporation.displayName
         yield! [
             "Ideas", string corporation.ideas
             "Prospects", "TODO"
@@ -17,8 +20,8 @@ let corpInfo corporation =
             "Expenses", "TODO"
         ] |> List.map (fun (label, value) ->
             row [ height (pct 0.13) ] [
-                text [ alignment 1. 0.; padding (px defaultMargin) ] label
-                text [ padding (px defaultMargin) ] value
+                text [ alignment 1. 0.; defaultPadding ] label
+                text [ defaultPadding ] value
             ])
     ]
 
@@ -30,10 +33,10 @@ let executiveInfo executive dispatch =
             text [ height (pct 0.13) ] (sprintf "XP:    %i" executive.experience)
             text [ height (pct 0.13) ] executive.lastName
 
-            button [ margin (px defaultMargin); height (pct 0.21); onclick (fun _ -> ()) ] "Orders"
-            button [ margin (px defaultMargin); height (pct 0.21); onclick (fun _ -> ()); enabled false ] "Corp Report"
+            button [ defaultMargin; height (pct 0.21); onclick (fun _ -> ()) ] "Orders"
+            button [ defaultMargin; height (pct 0.21); onclick (fun _ -> ()); enabled false ] "Corp Report"
         ]
-        col [ margin (px defaultMargin); backgroundColour colours.temp ] []
+        col [ defaultMargin; backgroundColour colours.temp ] []
     ]
 
 let departmentLabels departments = 
