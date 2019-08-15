@@ -19,10 +19,10 @@ let view model dispatch =
     match model with
     | Playing model ->
         Main.View.view model (PlayingMessage >> dispatch)
-
+        
 [<EntryPoint>]
 let main _ =
-    
+
     let assets = [
         FileTexture ("tile", "content/tile.png")
         FileTexture ("tile-highlight", "content/tile-highlight.png")

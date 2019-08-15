@@ -130,7 +130,9 @@ let renderUserInterface model dispatch =
         fontSize = 16.
         alignment = 0., 0.
         colour = colours.text
+        buttonColour = colours.text
         backgroundColour = Colour.Transparent
+        buttonBackgroundColour = colours.button
         enabled = true
     }
     render globalStyle (0, 0) (windowWidth, windowHeight) all

@@ -23,7 +23,9 @@ and GlobalStyle = {
     fontSize: float
     alignment: float * float
     colour: Colour
+    buttonColour: Colour
     backgroundColour: Colour
+    buttonBackgroundColour: Colour
     enabled: bool    
 }
 and LocalStyle = {
@@ -52,7 +54,9 @@ let pct n = Percent n
 let fontName s = GlobalStyle (fun style -> { style with fontName = s })
 let fontSize s = GlobalStyle (fun style -> { style with fontSize = s })
 let colour s = GlobalStyle (fun style -> { style with colour = s })
+let buttonColour s = GlobalStyle (fun style -> { style with buttonColour = s })
 let backgroundColour s = GlobalStyle (fun style -> { style with backgroundColour = s })
+let buttonBackgroundColour s = GlobalStyle (fun style -> { style with buttonBackgroundColour = s })
 let enabled s = GlobalStyle (fun style -> { style with enabled = s })
 let alignment x y = GlobalStyle (fun style -> 
     let x = if abs x > 1. then abs x % 1. else abs x
@@ -127,7 +131,7 @@ let private renderImage globalStyle (x, y) (width, height) key =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.textures.[key], rect x y width height, globalStyle.colour))
 
-let private renderText globalStyle (x, y) (width, height) (text: string) = 
+let private renderText globalStyle colour (x, y) (width, height) (text: string) = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
         let font = loadedAssets.fonts.[globalStyle.fontName]
         let measured = font.MeasureString (text)
@@ -138,9 +142,9 @@ let private renderText globalStyle (x, y) (width, height) (text: string) =
         let offWidth, offHeight = float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y
 
         let origin = Vector2 (relWidth - offWidth, relHeight - offHeight)
-        let position = Vector2.Add(origin, Vector2(float32 x, float32 y))
+        let position = Vector2.Add (origin, Vector2(float32 x, float32 y))
 
-        spriteBatch.DrawString (font, text, position, globalStyle.colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f))
+        spriteBatch.DrawString (font, text, position, colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f))
         
 let private isInside tx ty tw th x y = x >= tx && x <= tx + tw && y >= ty && y <= ty + th
 
@@ -191,9 +195,10 @@ let rec render globalStyle (x, y) (width, height) element =
             let renderImpl = fun top height child -> render newGlobalStyle (x, top) (width, height) child
             yield! renderCol newGlobalStyle renderImpl y height height children
         | Text s ->
-            yield renderText newGlobalStyle (x, y) (width, height) s
+            yield renderText newGlobalStyle newGlobalStyle.colour (x, y) (width, height) s
         | Button s -> 
-            yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } (x, y) (width, height) s
+            yield renderColour (x, y) (width, height) newGlobalStyle.buttonBackgroundColour
+            yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } newGlobalStyle.buttonColour (x, y) (width, height) s
         | Image key ->
             yield renderImage newGlobalStyle (x, y) (width, height) key
     ]
