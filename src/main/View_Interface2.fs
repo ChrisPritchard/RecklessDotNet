@@ -26,7 +26,7 @@ let corpInfo corporation =
     ]
 
 let executiveInfo executive dispatch = 
-    row [ padding (px 10) ] [
+    row [] [
         col [] [
             row [ height (pct 0.18) ] [ ]
             text [ height (pct 0.13) ] (sprintf "LVL:   %i" executive.level)

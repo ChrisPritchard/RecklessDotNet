@@ -205,6 +205,11 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
                         e ())
         | _ -> ()
 
+        // background colour (if different than prior)
+        if newGlobalStyle.backgroundColour <> globalStyle.backgroundColour then
+            yield renderColour (x, y) (width, height) newGlobalStyle.backgroundColour
+
+        // border
         if localStyle.borderSize > 0 then
             yield! renderBorder (x, y) (width, height) localStyle.borderSize localStyle.borderColour
 
