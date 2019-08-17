@@ -125,6 +125,7 @@ let commandArea model dispatch =
 
     let style = [
         colour colours.text
+        backgroundColour colours.background 
         buttonTextColour colours.text
         buttonBackgroundColour colours.button
         buttonDisabledColour colours.buttonDisabled
@@ -132,12 +133,11 @@ let commandArea model dispatch =
         buttonPressedColour colours.buttonPressed
     ]
 
-    col style [
+    col [] [
         row [ height (pct 0.7) ] []
-        row [ backgroundColour colours.background ]
-            body
+        row style body
     ]
 
 let renderUserInterface model dispatch = 
     let all = commandArea model dispatch
-    renderUI true "defaultFont" (0, 0) (windowWidth, windowHeight) all
+    renderUI false "defaultFont" (0, 0) (windowWidth, windowHeight) all
