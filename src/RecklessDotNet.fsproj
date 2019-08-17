@@ -15,7 +15,6 @@
     <Compile Include="main\Update.fs" />
     <Compile Include="main\View_Market.fs" />
     <Compile Include="main\View_Interface.fs" />
-    <Compile Include="main\View_Interface2.fs" />
     <Compile Include="main\View.fs" />
     <Content Include="content\*">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

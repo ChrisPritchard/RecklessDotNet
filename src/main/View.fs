@@ -4,18 +4,12 @@ open Xelmish.Model
 open Xelmish.Viewables
 open Constants
 open View_Market
-open Update
+open View_Interface
 
 let view (model: Model.MainModel) dispatch =
     [   yield setSmoothSampling ()
         yield! renderMarket model dispatch
-
-        if model.newInterfaceMode then
-            yield! View_Interface2.renderUserInterface model dispatch
-        else
-            yield! View_Interface.renderUserInterface model dispatch
-        
-        yield onkeyup Keys.Space (fun () -> dispatch ChangeInterfaceMode)
+        yield! renderUserInterface model dispatch
 
         if quitOnEscape then
             yield onkeydown Keys.Escape exit ]
