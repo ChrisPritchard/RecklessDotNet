@@ -81,8 +81,11 @@ let selectedInfo selected =
                 [ text [ fontSize 25. ] "Empty Market Tile" ]
         | Some (OfficeInfo oi) ->
             let left = [
-                viewable [] (fun info -> image "tile" oi.corporation.colour (tileWidth, tileHeight) (tilePosFor info))
-                // todo : office
+                viewables [] (fun info -> [
+                    let tx, ty = tilePosFor info
+                    yield image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)
+                    yield! View_Market.renderOffice tx (ty - tileHeight * 2) tileWidth (tileHeight * 3) oi.corporation.colour oi.headOffice
+                    ])
             ]
             let right = [
                 yield text [ height (pct 0.18) ] (sprintf "Cash Flow: %i     Q: %i" 0 oi.quality)
