@@ -123,7 +123,16 @@ let commandArea model dispatch =
             ]
         | _ -> []
 
-    col [] [
+    let style = [
+        colour colours.text
+        buttonTextColour colours.text
+        buttonBackgroundColour colours.button
+        buttonDisabledColour colours.buttonDisabled
+        buttonHoverColour colours.buttonHover
+        buttonPressedColour colours.buttonPressed
+    ]
+
+    col style [
         row [ height (pct 0.7) ] []
         row [ backgroundColour colours.background ]
             body
@@ -131,17 +140,4 @@ let commandArea model dispatch =
 
 let renderUserInterface model dispatch = 
     let all = commandArea model dispatch
-    let globalStyle = {
-        fontName = "defaultFont"
-        fontSize = 16.
-        alignment = 0., 0.
-        colour = colours.text
-        buttonColour = colours.text
-        backgroundColour = Colour.Transparent
-        buttonBackgroundColour = colours.button
-        buttonDisabledColour = colours.buttonDisabled
-        buttonHoverColour = Some colours.buttonHover
-        buttonPressedColour = Some colours.buttonPressed
-        enabled = true
-    }
-    render true globalStyle (0, 0) (windowWidth, windowHeight) all
+    renderUI true "defaultFont" (0, 0) (windowWidth, windowHeight) all

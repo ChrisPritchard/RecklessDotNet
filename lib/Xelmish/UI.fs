@@ -30,13 +30,16 @@ and GlobalStyle = {
     fontSize: float
     alignment: float * float
     colour: Colour
-    buttonColour: Colour
     backgroundColour: Colour
-    buttonDisabledColour: Colour
-    buttonBackgroundColour: Colour
-    buttonHoverColour: Colour option
-    buttonPressedColour: Colour option
+    buttonColours: ButtonColours
     enabled: bool    
+}
+and ButtonColours = {
+    text: Colour
+    defaultBackground: Colour
+    disabledBackground: Colour
+    hoverBackground: Colour option
+    pressedBackground: Colour option
 }
 /// Note: use the onclick/fontname/colour etc functions than these types directly
 and LocalStyle = {
@@ -74,12 +77,12 @@ let pct n = Percent n
 let fontName s = GlobalStyle (fun style -> { style with fontName = s })
 let fontSize s = GlobalStyle (fun style -> { style with fontSize = s })
 let colour s = GlobalStyle (fun style -> { style with colour = s })
-let buttonColour s = GlobalStyle (fun style -> { style with buttonColour = s })
 let backgroundColour s = GlobalStyle (fun style -> { style with backgroundColour = s })
-let buttonBackgroundColour s = GlobalStyle (fun style -> { style with buttonBackgroundColour = s })
-let buttonDisabledColour s = GlobalStyle (fun style -> { style with buttonDisabledColour = s })
-let buttonHoverColour s = GlobalStyle (fun style -> { style with buttonHoverColour = Some s })
-let buttonPressedColour s = GlobalStyle (fun style -> { style with buttonPressedColour = Some s })
+let buttonTextColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with text = s } })
+let buttonBackgroundColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with defaultBackground = s } })
+let buttonDisabledColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with disabledBackground = s } })
+let buttonHoverColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with hoverBackground = Some s } })
+let buttonPressedColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with pressedBackground = Some s } })
 let enabled s = GlobalStyle (fun style -> { style with enabled = s })
 /// For printed text, what its alignment should be. From 0. to 1. top left to bottom right
 let alignment x y = GlobalStyle (fun style -> 
@@ -177,18 +180,21 @@ let private renderButton globalStyle (x, y) (width, height) text =
         let mouseOver = isInside x y width height inputs.mouseState.X inputs.mouseState.Y
 
         let backgroundColour = 
-            if not globalStyle.enabled then globalStyle.buttonDisabledColour
-            elif not mouseOver then globalStyle.buttonBackgroundColour
+            if not globalStyle.enabled then globalStyle.buttonColours.disabledBackground
+            elif not mouseOver then globalStyle.buttonColours.defaultBackground
             elif inputs.mouseState.LeftButton <> ButtonState.Pressed then 
-                globalStyle.buttonHoverColour |> Option.defaultValue globalStyle.buttonBackgroundColour
+                globalStyle.buttonColours.hoverBackground 
+                |> Option.defaultValue globalStyle.buttonColours.defaultBackground
             else
-                globalStyle.buttonPressedColour |> Option.orElse globalStyle.buttonHoverColour |> Option.defaultValue globalStyle.buttonBackgroundColour
+                globalStyle.buttonColours.pressedBackground  
+                |> Option.orElse globalStyle.buttonColours.hoverBackground  
+                |> Option.defaultValue globalStyle.buttonColours.defaultBackground
 
         spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, backgroundColour)
 
         drawText 
             loadedAssets spriteBatch 
-            globalStyle.fontName globalStyle.fontSize (0.5, 0.5) globalStyle.buttonColour 
+            globalStyle.fontName globalStyle.fontSize (0.5, 0.5) globalStyle.buttonColours.text 
             (x, y) (width, height) text)
 
 let private renderBorder (x, y) (width, height) borderWidth borderColour = 
@@ -199,7 +205,7 @@ let private renderBorder (x, y) (width, height) borderWidth borderColour =
         renderColour (x + width - borderWidth, y) (borderWidth, height) borderColour
     ]
 
-let rec render debugOutlines globalStyle (x, y) (width, height) element = 
+let rec private render debugOutlines globalStyle (x, y) (width, height) element = 
     [
         if debugOutlines then
             yield! renderBorder (x, y) (width, height) 1 Colour.Red
@@ -261,3 +267,21 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
         | Viewables impl ->
             yield! impl { globalStyle = newGlobalStyle; x = x; y = y; width = width; height = height }
     ]
+
+let renderUI showDebugOutlines defaultFont (x, y) (width, height) rootElement =
+    let defaultGlobalStyle = {
+        fontName = defaultFont
+        fontSize = 16.
+        alignment = 0., 0.
+        colour = Colour.Black
+        backgroundColour = Colour.Transparent
+        buttonColours = {
+            text = Colour.Black
+            defaultBackground = Colour.Gray
+            disabledBackground = Colour.LightGray
+            hoverBackground = None
+            pressedBackground = None
+        }
+        enabled = true
+    }
+    render showDebugOutlines defaultGlobalStyle (x, y) (width, height) rootElement
