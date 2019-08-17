@@ -1,6 +1,7 @@
 ﻿module Main.View_Interface2
 
 open Xelmish.Model
+open Xelmish.Viewables
 open Xelmish.UI
 open Constants
 open Model
@@ -66,7 +67,7 @@ let selectedInfo selected =
                 let left = [
                     custom [] (fun (_, x, y, width, height) ->
                         let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
-                        [Xelmish.Viewables.image "tile" dominant.colour (tileWidth, tileHeight) (tx, ty)])
+                        [image "tile" dominant.colour (tileWidth, tileHeight) (tx, ty)])
                 ]
                 let right = [
                     yield text [ height (pct 0.18); fontSize 25. ] dominant.displayName
@@ -81,13 +82,13 @@ let selectedInfo selected =
             | _ -> 
                 [ custom [] (fun (_, x, y, width, height) ->
                     let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
-                    [Xelmish.Viewables.image "tile" Colour.White (tileWidth, tileHeight) (tx, ty)]) ],
+                    [image "tile" Colour.White (tileWidth, tileHeight) (tx, ty)]) ],
                 [ text [ fontSize 25. ] "Empty Market Tile" ]
         | Some (OfficeInfo oi) ->
             let left = [
                 custom [] (fun (_, x, y, width, height) ->
                     let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
-                    [Xelmish.Viewables.image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)])
+                    [image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)])
                 // todo : office
             ]
             let right = [

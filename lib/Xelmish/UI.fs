@@ -6,16 +6,15 @@ open Model
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 
-/// Note: use the col/row/image/text/button functions rather than these types directly
+/// Note: use the col/row/text/button/custom functions rather than these types directly
 type Element = {
     elementType: ElementType
     attributes: Attribute list
 }
-/// Note: use the col/row/image/text/button functions rather than these types directly
+/// Note: use the col/row/text/button/custom functions rather than these types directly
 and ElementType =
     | Row of children: Element list
     | Column of children: Element list
-    | Image of key: string
     | Text of string
     | Button of text: string
     | Custom of impl: (GlobalStyle * int * int * int * int -> Viewable list)
@@ -41,8 +40,6 @@ and LocalStyle = {
     padding: Size
     borderSize: int
     borderColour: Colour
-    top: Size
-    left: Size
     width: Size option
     height: Size option
 }
@@ -53,8 +50,6 @@ and Size = Percent of float | Pixels of int
 let col attributes children = { elementType = Column children; attributes = attributes }
 /// Specifies a row, with its children distributed horizontally
 let row attributes children = { elementType = Row children; attributes = attributes }
-/// Specifies a texture image to be drawn
-let image attributes textureKey = { elementType = Image textureKey; attributes = attributes }
 /// Specifies some text to render
 let text attributes s = { elementType = Text s; attributes = attributes } 
 /// Specifies a button (background colour with text) to render
@@ -90,18 +85,12 @@ let borderSize s = LocalStyle (fun style -> { style with borderSize = s })
 let borderColour s = LocalStyle (fun style -> { style with borderColour = s })
 let width i = LocalStyle (fun style -> { style with width = Some i })
 let height i = LocalStyle (fun style -> { style with height = Some i })
-/// The offset from the top of its wrapping container an element should be drawn
-let top i = LocalStyle (fun style -> { style with top = i })
-/// The offset from the left of its wrapping container an element should be drawn
-let left i = LocalStyle (fun style -> { style with left = i })
 
 let private defaultLocalStyle = {
     margin = px 0
     padding = px 0
     borderSize = 0
     borderColour = Colour.Transparent
-    top = px 0
-    left = px 0
     width = None
     height = None
 }
@@ -221,13 +210,9 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
             match localStyle.padding with 
             | Pixels n -> n, n 
             | Percent p -> int (p * float height), int (p * float width)
-        let dx, dy = x + leftPadding, y + topPadding
+        let x, y = x + leftPadding, y + topPadding
         let width, height = width - (2 * leftPadding), height - (2 * topPadding)
-
-        // Apply top/left (defaults to 0)
-        let x = match localStyle.left with Pixels ox -> dx + ox | Percent ox -> dx + int (ox * float width)
-        let y = match localStyle.top with Pixels oy -> dy + oy | Percent oy -> dy + int (oy * float height)
-        
+                
         if debugOutlines then
             yield! renderBorder (x, y) (width, height) 1 Colour.Blue
 
@@ -243,8 +228,6 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
         | Button s -> 
             yield renderColour (x, y) (width, height) newGlobalStyle.buttonBackgroundColour
             yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } newGlobalStyle.buttonColour (x, y) (width, height) s
-        | Image key ->
-            yield renderImage newGlobalStyle (x, y) (width, height) key
         | Custom impl ->
             yield! impl (newGlobalStyle, x, y, width, height)
     ]
