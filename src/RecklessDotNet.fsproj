@@ -9,7 +9,6 @@
   <ItemGroup>
     <Compile Include="Constants.fs" />
     <Compile Include="IsoHelper.fs" />
-    <Compile Include="LayoutHelper.fs" />
     <Compile Include="main\Model.fs" />
     <Compile Include="main\Orders.fs" />
     <Compile Include="main\Init.fs" />
