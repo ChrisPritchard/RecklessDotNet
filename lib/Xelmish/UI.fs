@@ -18,6 +18,7 @@ and ElementType =
     | Image of key: string
     | Text of string
     | Button of text: string
+    | Custom of impl: (GlobalStyle * int * int * int * int -> Viewable list)
 /// Note: use the onclick/fontname/colour etc functions than these types directly
 and Attribute = 
     | GlobalStyle of style: (GlobalStyle -> GlobalStyle)
@@ -58,6 +59,8 @@ let image attributes textureKey = { elementType = Image textureKey; attributes =
 let text attributes s = { elementType = Text s; attributes = attributes } 
 /// Specifies a button (background colour with text) to render
 let button attributes s = { elementType = Button s; attributes = attributes }
+/// Allows drawing something custom (e.g. an image or animation) using the derived characteristics
+let custom attributes impl = { elementType = Custom impl; attributes = attributes }
 
 /// A function to call when the containing element is clicked
 let onclick f = OnClick f
@@ -242,4 +245,6 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
             yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } newGlobalStyle.buttonColour (x, y) (width, height) s
         | Image key ->
             yield renderImage newGlobalStyle (x, y) (width, height) key
+        | Custom impl ->
+            yield! impl (newGlobalStyle, x, y, width, height)
     ]

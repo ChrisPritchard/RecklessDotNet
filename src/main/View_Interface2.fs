@@ -64,7 +64,9 @@ let selectedInfo selected =
             match ti with 
             | (dominant, quality)::_ ->
                 let left = [
-                    image [ colour dominant.colour; left tx; top ty; width tw; height th ] "tile"
+                    custom [] (fun (_, x, y, width, height) ->
+                        let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
+                        [Xelmish.Viewables.image "tile" dominant.colour (tileWidth, tileHeight) (tx, ty)])
                 ]
                 let right = [
                     yield text [ height (pct 0.18); fontSize 25. ] dominant.displayName
@@ -77,11 +79,15 @@ let selectedInfo selected =
                 ]
                 left, right                
             | _ -> 
-                [ image [ colour Colour.White; left tx; top ty; width tw; height th ] "tile" ],
+                [ custom [] (fun (_, x, y, width, height) ->
+                    let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
+                    [Xelmish.Viewables.image "tile" Colour.White (tileWidth, tileHeight) (tx, ty)]) ],
                 [ text [ fontSize 25. ] "Empty Market Tile" ]
         | Some (OfficeInfo oi) ->
             let left = [
-                image [ colour oi.corporation.colour; left tx; top ty; width tw; height th ] "tile"
+                custom [] (fun (_, x, y, width, height) ->
+                    let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
+                    [Xelmish.Viewables.image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)])
                 // todo : office
             ]
             let right = [
