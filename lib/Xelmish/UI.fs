@@ -6,18 +6,19 @@ open Model
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 
-/// Note: use the col/row/text/button/custom functions rather than these types directly
+/// Note: use the col/row/text/button/inplace functions rather than these types directly
 type Element = {
     elementType: ElementType
     attributes: Attribute list
 }
-/// Note: use the col/row/text/button/custom functions rather than these types directly
+/// Note: use the col/row/text/button/inplace functions rather than these types directly
 and ElementType =
     | Row of children: Element list
     | Column of children: Element list
     | Text of string
     | Button of text: string
-    | Custom of impl: (GlobalStyle * int * int * int * int -> Viewable list)
+    | InPlace of withInfo: (DrawInfo -> Viewable list)
+and DrawInfo = { globalStyle: GlobalStyle; x: int; y: int; width: int; height: int }
 /// Note: use the onclick/fontname/colour etc functions than these types directly
 and Attribute = 
     | GlobalStyle of style: (GlobalStyle -> GlobalStyle)
@@ -55,7 +56,7 @@ let text attributes s = { elementType = Text s; attributes = attributes }
 /// Specifies a button (background colour with text) to render
 let button attributes s = { elementType = Button s; attributes = attributes }
 /// Allows drawing something custom (e.g. an image or animation) using the derived characteristics
-let custom attributes impl = { elementType = Custom impl; attributes = attributes }
+let inplace attributes withInfo = { elementType = InPlace withInfo; attributes = attributes }
 
 /// A function to call when the containing element is clicked
 let onclick f = OnClick f
@@ -138,10 +139,6 @@ let rec private renderCol globalStyle renderImpl top totalSpace spaceRemaining c
 let private renderColour (x, y) (width, height) colour =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, colour))
-
-let private renderImage globalStyle (x, y) (width, height) key =
-    OnDraw (fun loadedAssets _ spriteBatch -> 
-        spriteBatch.Draw(loadedAssets.textures.[key], rect x y width height, globalStyle.colour))
 
 let private renderText globalStyle colour (x, y) (width, height) (text: string) = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
@@ -228,6 +225,6 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
         | Button s -> 
             yield renderColour (x, y) (width, height) newGlobalStyle.buttonBackgroundColour
             yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } newGlobalStyle.buttonColour (x, y) (width, height) s
-        | Custom impl ->
-            yield! impl (newGlobalStyle, x, y, width, height)
+        | InPlace withInfo ->
+            yield! withInfo { globalStyle = newGlobalStyle; x = x; y = y; width = width; height = height }
     ]

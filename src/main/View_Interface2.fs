@@ -65,8 +65,8 @@ let selectedInfo selected =
             match ti with 
             | (dominant, quality)::_ ->
                 let left = [
-                    custom [] (fun (_, x, y, width, height) ->
-                        let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
+                    inplace [] (fun info ->
+                        let tx, ty = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
                         [image "tile" dominant.colour (tileWidth, tileHeight) (tx, ty)])
                 ]
                 let right = [
@@ -80,14 +80,14 @@ let selectedInfo selected =
                 ]
                 left, right                
             | _ -> 
-                [ custom [] (fun (_, x, y, width, height) ->
-                    let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
+                [ inplace [] (fun info ->
+                    let tx, ty = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
                     [image "tile" Colour.White (tileWidth, tileHeight) (tx, ty)]) ],
                 [ text [ fontSize 25. ] "Empty Market Tile" ]
         | Some (OfficeInfo oi) ->
             let left = [
-                custom [] (fun (_, x, y, width, height) ->
-                    let tx, ty = x + ((width - tileWidth) / 2), y + (height - (tileHeight*2))
+                inplace [] (fun info ->
+                    let tx, ty = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
                     [image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)])
                 // todo : office
             ]
