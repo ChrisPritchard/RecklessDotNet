@@ -56,8 +56,7 @@ let departmentLabels departments =
 
 let selectedInfo selected =
     
-    let tx, ty = px (tileWidth / 2), px (tileHeight*2)
-    let tw, th = px tileWidth, px tileHeight
+    let tilePosFor (info: DrawInfo) = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
 
     let left, right =
         match selected with
@@ -65,9 +64,7 @@ let selectedInfo selected =
             match ti with 
             | (dominant, quality)::_ ->
                 let left = [
-                    inplace [] (fun info ->
-                        let tx, ty = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
-                        [image "tile" dominant.colour (tileWidth, tileHeight) (tx, ty)])
+                    viewable [] (fun info -> image "tile" dominant.colour (tileWidth, tileHeight) (tilePosFor info))
                 ]
                 let right = [
                     yield text [ height (pct 0.18); fontSize 25. ] dominant.displayName
@@ -80,15 +77,11 @@ let selectedInfo selected =
                 ]
                 left, right                
             | _ -> 
-                [ inplace [] (fun info ->
-                    let tx, ty = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
-                    [image "tile" Colour.White (tileWidth, tileHeight) (tx, ty)]) ],
+                [ viewable [] (fun info -> image "tile" Colour.White (tileWidth, tileHeight) (tilePosFor info)) ],
                 [ text [ fontSize 25. ] "Empty Market Tile" ]
         | Some (OfficeInfo oi) ->
             let left = [
-                inplace [] (fun info ->
-                    let tx, ty = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
-                    [image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)])
+                viewable [] (fun info -> image "tile" oi.corporation.colour (tileWidth, tileHeight) (tilePosFor info))
                 // todo : office
             ]
             let right = [

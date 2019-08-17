@@ -6,18 +6,18 @@ open Model
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 
-/// Note: use the col/row/text/button/inplace functions rather than these types directly
+/// Note: use the col/row/text/button/viewables functions rather than these types directly
 type Element = {
     elementType: ElementType
     attributes: Attribute list
 }
-/// Note: use the col/row/text/button/inplace functions rather than these types directly
+/// Note: use the col/row/text/button/viewables functions rather than these types directly
 and ElementType =
     | Row of children: Element list
     | Column of children: Element list
     | Text of string
     | Button of text: string
-    | InPlace of withInfo: (DrawInfo -> Viewable list)
+    | Viewables of withInfo: (DrawInfo -> Viewable list)
 and DrawInfo = { globalStyle: GlobalStyle; x: int; y: int; width: int; height: int }
 /// Note: use the onclick/fontname/colour etc functions than these types directly
 and Attribute = 
@@ -55,8 +55,10 @@ let row attributes children = { elementType = Row children; attributes = attribu
 let text attributes s = { elementType = Text s; attributes = attributes } 
 /// Specifies a button (background colour with text) to render
 let button attributes s = { elementType = Button s; attributes = attributes }
+/// Allows drawing something custom (e.g. a set of images or animations) using the derived characteristics
+let viewables attributes impl = { elementType = Viewables impl; attributes = attributes }
 /// Allows drawing something custom (e.g. an image or animation) using the derived characteristics
-let inplace attributes withInfo = { elementType = InPlace withInfo; attributes = attributes }
+let viewable attributes impl = { elementType = Viewables (impl >> List.singleton); attributes = attributes }
 
 /// A function to call when the containing element is clicked
 let onclick f = OnClick f
@@ -225,6 +227,6 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
         | Button s -> 
             yield renderColour (x, y) (width, height) newGlobalStyle.buttonBackgroundColour
             yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } newGlobalStyle.buttonColour (x, y) (width, height) s
-        | InPlace withInfo ->
-            yield! withInfo { globalStyle = newGlobalStyle; x = x; y = y; width = width; height = height }
+        | Viewables impl ->
+            yield! impl { globalStyle = newGlobalStyle; x = x; y = y; width = width; height = height }
     ]
