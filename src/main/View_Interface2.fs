@@ -139,6 +139,9 @@ let renderUserInterface model dispatch =
         buttonColour = colours.text
         backgroundColour = Colour.Transparent
         buttonBackgroundColour = colours.button
+        buttonDisabledColour = colours.buttonDisabled
+        buttonHoverColour = Some colours.buttonHover
+        buttonPressedColour = Some colours.buttonPressed
         enabled = true
     }
     render true globalStyle (0, 0) (windowWidth, windowHeight) all

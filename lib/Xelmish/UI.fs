@@ -32,7 +32,10 @@ and GlobalStyle = {
     colour: Colour
     buttonColour: Colour
     backgroundColour: Colour
+    buttonDisabledColour: Colour
     buttonBackgroundColour: Colour
+    buttonHoverColour: Colour option
+    buttonPressedColour: Colour option
     enabled: bool    
 }
 /// Note: use the onclick/fontname/colour etc functions than these types directly
@@ -74,6 +77,9 @@ let colour s = GlobalStyle (fun style -> { style with colour = s })
 let buttonColour s = GlobalStyle (fun style -> { style with buttonColour = s })
 let backgroundColour s = GlobalStyle (fun style -> { style with backgroundColour = s })
 let buttonBackgroundColour s = GlobalStyle (fun style -> { style with buttonBackgroundColour = s })
+let buttonDisabledColour s = GlobalStyle (fun style -> { style with buttonDisabledColour = s })
+let buttonHoverColour s = GlobalStyle (fun style -> { style with buttonHoverColour = Some s })
+let buttonPressedColour s = GlobalStyle (fun style -> { style with buttonPressedColour = Some s })
 let enabled s = GlobalStyle (fun style -> { style with enabled = s })
 /// For printed text, what its alignment should be. From 0. to 1. top left to bottom right
 let alignment x y = GlobalStyle (fun style -> 
@@ -142,22 +148,48 @@ let private renderColour (x, y) (width, height) colour =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, colour))
 
-let private renderText globalStyle colour (x, y) (width, height) (text: string) = 
+let private drawText loadedAssets (spriteBatch: SpriteBatch) fontName fontSize alignment colour (x, y) (width, height) (text: string) =
+    let font = loadedAssets.fonts.[fontName]
+    let measured = font.MeasureString (text)
+    let scale = let v = float32 fontSize / measured.Y in Vector2(v, v)
+
+    let ox, oy = alignment
+    let relWidth, relHeight = float32 (float width * ox), float32 (float height * oy)
+    let offWidth, offHeight = float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y
+
+    let origin = Vector2 (relWidth - offWidth, relHeight - offHeight)
+    let position = Vector2.Add (origin, Vector2(float32 x, float32 y))
+
+    spriteBatch.DrawString (font, text, position, colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f)
+
+let private renderText globalStyle (x, y) (width, height) text = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
-        let font = loadedAssets.fonts.[globalStyle.fontName]
-        let measured = font.MeasureString (text)
-        let scale = let v = float32 globalStyle.fontSize / measured.Y in Vector2(v, v)
+        drawText 
+            loadedAssets spriteBatch 
+            globalStyle.fontName globalStyle.fontSize globalStyle.alignment globalStyle.colour 
+            (x, y) (width, height) text)
 
-        let ox, oy = globalStyle.alignment
-        let relWidth, relHeight = float32 (float width * ox), float32 (float height * oy)
-        let offWidth, offHeight = float32 ox * measured.X * scale.X, float32 oy * measured.Y * scale.Y
-
-        let origin = Vector2 (relWidth - offWidth, relHeight - offHeight)
-        let position = Vector2.Add (origin, Vector2(float32 x, float32 y))
-
-        spriteBatch.DrawString (font, text, position, colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f))
-        
 let private isInside tx ty tw th x y = x >= tx && x <= tx + tw && y >= ty && y <= ty + th
+
+let private renderButton globalStyle (x, y) (width, height) text =
+    OnDraw (fun loadedAssets inputs spriteBatch -> 
+        
+        let mouseOver = isInside x y width height inputs.mouseState.X inputs.mouseState.Y
+
+        let backgroundColour = 
+            if not globalStyle.enabled then globalStyle.buttonDisabledColour
+            elif not mouseOver then globalStyle.buttonBackgroundColour
+            elif inputs.mouseState.LeftButton <> ButtonState.Pressed then 
+                globalStyle.buttonHoverColour |> Option.defaultValue globalStyle.buttonBackgroundColour
+            else
+                globalStyle.buttonPressedColour |> Option.orElse globalStyle.buttonHoverColour |> Option.defaultValue globalStyle.buttonBackgroundColour
+
+        spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, backgroundColour)
+
+        drawText 
+            loadedAssets spriteBatch 
+            globalStyle.fontName globalStyle.fontSize (0.5, 0.5) globalStyle.buttonColour 
+            (x, y) (width, height) text)
 
 let private renderBorder (x, y) (width, height) borderWidth borderColour = 
     [
@@ -223,10 +255,9 @@ let rec render debugOutlines globalStyle (x, y) (width, height) element =
             let renderImpl = fun top height child -> render debugOutlines newGlobalStyle (x, top) (width, height) child
             yield! renderCol newGlobalStyle renderImpl y height height children
         | Text s ->
-            yield renderText newGlobalStyle newGlobalStyle.colour (x, y) (width, height) s
+            yield renderText newGlobalStyle (x, y) (width, height) s
         | Button s -> 
-            yield renderColour (x, y) (width, height) newGlobalStyle.buttonBackgroundColour
-            yield renderText { newGlobalStyle with alignment = 0.5, 0.5 } newGlobalStyle.buttonColour (x, y) (width, height) s
+            yield renderButton newGlobalStyle (x, y) (width, height) s
         | Viewables impl ->
             yield! impl { globalStyle = newGlobalStyle; x = x; y = y; width = width; height = height }
     ]
