@@ -2,13 +2,38 @@
 
 open Xelmish.Model
 open Xelmish.Viewables
+open Xelmish.UI
 open Constants
-open View_Market
-open View_Interface
+open Model
 
-let view (model: Model.MainModel) dispatch =
+let renderUserInterface (model: Model.MainModel) dispatch = 
+    let body = 
+        match model.currentInterface with
+        | Information selectedTile -> 
+            Views.InfoPanels.contentFor model selectedTile dispatch
+        | _ -> []
+
+    let style = [
+        colour colours.text
+        backgroundColour colours.background 
+        buttonTextColour colours.text
+        buttonBackgroundColour colours.button
+        buttonDisabledColour colours.buttonDisabled
+        buttonHoverColour colours.buttonHover
+        buttonPressedColour colours.buttonPressed
+    ]
+
+    let all = 
+        col [] [
+            row [ height (pct 0.7) ] []
+            row style body
+        ]
+
+    renderUI false "defaultFont" (0, 0) (windowWidth, windowHeight) all
+
+let view model dispatch =
     [   yield setSmoothSampling ()
-        yield! renderMarket model dispatch
+        yield! Views.Market.renderMarket model dispatch
         yield! renderUserInterface model dispatch
 
         if quitOnEscape then

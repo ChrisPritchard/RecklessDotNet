@@ -1,10 +1,10 @@
-﻿module Main.View_Interface
+﻿module Main.Views.InfoPanels
 
 open Xelmish.Model
 open Xelmish.Viewables
 open Xelmish.UI
 open Constants
-open Model
+open Main.Model
 
 let defaultPadding = padding (px defaultMargin)
 let defaultMargin = margin (px defaultMargin)
@@ -84,7 +84,7 @@ let selectedInfo selected =
                 viewables [] (fun info -> [
                     let tx, ty = tilePosFor info
                     yield image "tile" oi.corporation.colour (tileWidth, tileHeight) (tx, ty)
-                    yield! View_Market.renderOffice tx (ty - tileHeight * 2) tileWidth (tileHeight * 3) oi.corporation.colour oi.headOffice
+                    yield! Market.renderOffice tx (ty - tileHeight * 2) tileWidth (tileHeight * 3) oi.corporation.colour oi.headOffice
                     ])
             ]
             let right = [
@@ -102,42 +102,19 @@ let selectedInfo selected =
         col [] right
     ]
 
-let commandArea model dispatch = 
-    let body = 
-        match model.currentInterface with
-        | Information selectedTile -> 
-            let selected = model.market.atTile selectedTile
-            let corp = 
-                match selected with 
-                | Some (OfficeInfo o) -> o.corporation 
-                | Some (TileInfo ((dominant, _)::_)) -> dominant
-                | _ -> model.market.player
-            let executive = 
-                match selected with
-                | Some (OfficeInfo o) -> o.executive.Value
-                | _ -> corp.ceo
-            [
-                corpInfo corp
-                executiveInfo executive dispatch
-                selectedInfo selected
-            ]
-        | _ -> []
-
-    let style = [
-        colour colours.text
-        backgroundColour colours.background 
-        buttonTextColour colours.text
-        buttonBackgroundColour colours.button
-        buttonDisabledColour colours.buttonDisabled
-        buttonHoverColour colours.buttonHover
-        buttonPressedColour colours.buttonPressed
+let contentFor model selectedTile dispatch = 
+    let selected = model.market.atTile selectedTile
+    let corp = 
+        match selected with 
+        | Some (OfficeInfo o) -> o.corporation 
+        | Some (TileInfo ((dominant, _)::_)) -> dominant
+        | _ -> model.market.player
+    let executive = 
+        match selected with
+        | Some (OfficeInfo o) -> o.executive.Value
+        | _ -> corp.ceo
+    [
+        corpInfo corp
+        executiveInfo executive dispatch
+        selectedInfo selected
     ]
-
-    col [] [
-        row [ height (pct 0.7) ] []
-        row style body
-    ]
-
-let renderUserInterface model dispatch = 
-    let all = commandArea model dispatch
-    renderUI false "defaultFont" (0, 0) (windowWidth, windowHeight) all

@@ -1,11 +1,11 @@
-﻿module Main.View_Market
+﻿module Main.Views.Market
 
 open Xelmish.Model
 open Xelmish.Viewables
 open Constants
 open IsoHelper
-open Model
-open Update
+open Main.Model
+open Main.Update
 
 let private renderMarketTiles market =
     market.tiles
