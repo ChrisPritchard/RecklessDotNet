@@ -22,8 +22,12 @@ let contentFor (model: MainModel) dispatch =
             else buttons @ List.replicate padding (row [] []))
         |> Seq.toArray
     [       
-        col [] buttons.[0]
-        col [] (if buttons.Length > 1 then buttons.[1] else [])
-        col [] (if buttons.Length > 2 then buttons.[2] else [])
-        col [] (if buttons.Length > 3 then buttons.[3] else [])
+        col [ width (pct 0.225) ] buttons.[0]
+        col [ width (pct 0.225) ] (if buttons.Length > 1 then buttons.[1] else [])
+        col [ width (pct 0.225) ] (if buttons.Length > 2 then buttons.[2] else [])
+        col [ width (pct 0.225) ] (if buttons.Length > 3 then buttons.[3] else [])
+        col [] [
+            row [ height (pct 0.8) ] []
+            button [ defaultMargin; onclick (fun () -> dispatch Cancel) ] "X"
+        ]
     ]
