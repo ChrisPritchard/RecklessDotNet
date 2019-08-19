@@ -41,16 +41,18 @@ let contentFor (model: MainModel) activeCategory dispatch =
                 if padding = 0 then buttons
                 else buttons @ List.replicate padding (row [] []))
         |> Seq.toArray
-    [       
-        row [ height (pct 0.15) ] headings
-        row [] [
-            col [ padding (px 10); width (pct 0.225) ] orderButtons.[0]
-            col [ padding (px 10); width (pct 0.225) ] (if orderButtons.Length > 1 then orderButtons.[1] else [])
-            col [ padding (px 10); width (pct 0.225) ] (if orderButtons.Length > 2 then orderButtons.[2] else [])
-            col [ padding (px 10); width (pct 0.225) ] (if orderButtons.Length > 3 then orderButtons.[3] else [])
-            col [ padding (px 10); ] [
-                row [ height (pct 0.8) ] []
-                button [ defaultMargin; onclick (fun () -> dispatch Cancel) ] "X"
+    [    
+        col [ padding (px 5); fontSize 14. ] [
+            row [ height (pct 0.15) ] headings
+            row [ ] [
+                col [ width (pct 0.225) ] orderButtons.[0]
+                col [ width (pct 0.225) ] (if orderButtons.Length > 1 then orderButtons.[1] else [])
+                col [ width (pct 0.225) ] (if orderButtons.Length > 2 then orderButtons.[2] else [])
+                col [ width (pct 0.225) ] (if orderButtons.Length > 3 then orderButtons.[3] else [])
+                col [] [
+                    row [ height (pct 0.8) ] []
+                    button [ defaultMargin; onclick (fun () -> dispatch Cancel) ] "X"
+                ]
             ]
         ]
     ]
