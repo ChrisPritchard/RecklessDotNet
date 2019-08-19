@@ -27,16 +27,17 @@ let corpInfo corporation =
             ])
     ]
 
-let executiveInfo executive dispatch = 
+let executiveInfo executive isPlayer dispatch = 
     row [] [
         col [] [
-            row [ height (pct 0.18) ] [ ]
-            text [ height (pct 0.13) ] (sprintf "LVL:   %i" executive.level)
-            text [ height (pct 0.13) ] (sprintf "XP:    %i" executive.experience)
-            text [ height (pct 0.13) ] executive.lastName
+            yield row [ height (pct 0.18) ] [ ]
+            yield text [ height (pct 0.13) ] (sprintf "LVL:   %i" executive.level)
+            yield text [ height (pct 0.13) ] (sprintf "XP:    %i" executive.experience)
+            yield text [ height (pct 0.13) ] executive.lastName
 
-            button [ defaultMargin; height (pct 0.21); onclick (fun _ -> dispatch ViewOrders) ] "Orders"
-            button [ defaultMargin; height (pct 0.21); enabled false ] "Corp Report"
+            if isPlayer then
+                yield button [ defaultMargin; height (pct 0.21); onclick (fun _ -> dispatch ViewOrders) ] "Orders"
+                yield button [ defaultMargin; height (pct 0.21); enabled false ] "Corp Report"
         ]
         col [ defaultMargin; backgroundColour colours.temp ] []
     ]
@@ -116,6 +117,6 @@ let contentFor model selectedTile dispatch =
         | _ -> corp.ceo
     [
         corpInfo corp
-        executiveInfo executive dispatch
+        executiveInfo executive (corp = model.market.player) dispatch
         selectedInfo selected
     ]
