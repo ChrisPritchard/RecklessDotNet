@@ -2,9 +2,20 @@
 
 open Model
 
+//let rec orderCost =
+//    function
+//    | BuildDepartment (_, Product _) -> 0
+//    | BuildDepartment (_, Marketing) -> 2500
+//    | BuildDepartment (_, Research) -> 2500
+//    | BuildDepartment (_, Acquisitions) -> 3000
+//    | BuildExtension (_, QA) -> 500
+//    | ResearchIdea _ -> 1000
+//    | BuildOffice (_, _, _, dep) -> 
+//        7500 + 
+//        orderCost (BuildDepartment (Unchecked.defaultof<Office>, dep))
+
 let buildProductOrder = {
     displayName = "Build New Product"
-    category = "Corporate"
     components = [
         CorpTransform (
             (fun corp -> corp.ideas > 0), 
@@ -15,9 +26,70 @@ let buildProductOrder = {
     ]
 }
 
+let otherDepBuildOrders = 
+    [ 
+        "Build New Marketing", 2500, Marketing
+        "Build New R & D", 2500, Research
+        "Build New Admin", 2500, Admin None
+        "Build New HR", 5000, HR  // TODO: source real values
+        "Build New Acquisitions", 5000, Acquisitions  // TODO: source real values
+        "Build New Legal", 5000, Legal  // TODO: source real values
+        "Build New Security", 5000, Security  // TODO: source real values
+        "Build New Computer Core", 5000, ComputerCore  // TODO: source real values
+    ] |> List.map (fun (display, cost, dep) ->
+        {
+            displayName = display
+            components = [
+                CorpTransform (
+                    (fun corp -> corp.cash >= cost), 
+                    fun corp -> { corp with cash = corp.cash - cost })
+                OfficeTransform (
+                    (fun office isOwn -> isOwn && office.departments.Length < 6), 
+                    fun office -> { office with departments = dep::office.departments })
+            ]
+        })
+
+let buildBuildingOrder = {
+    displayName = "Build New Building"
+    components = [
+        CorpTransform (
+            (fun corp -> corp.cash >= 7500), 
+            fun corp -> { corp with 
+                            cash = corp.cash - 7500 }) // add new office
+        // tileselect
+        // department select
+        //OfficeTransform (
+        //    (fun office isOwn -> isOwn && List.contains Research office.departments), 
+        //    fun office -> office) // TODO: office with used = research?
+    ]
+}
+
+let downSizeOrder = {
+    displayName = "Downsize Department"
+    components = [
+        OfficeTransform (
+            (fun office isOwn -> isOwn && office.departments.Length > 0), 
+            fun office -> { office with departments = office.departments })
+        // select department
+        // remove department
+    ]
+}
+
+let transferOrder = {
+    displayName = "Transfer Department"
+    components = [
+        OfficeTransform (
+            (fun office isOwn -> isOwn && office.departments.Length > 0), 
+            fun office -> { office with departments = office.departments })
+        // select department
+        OfficeTransform (
+            (fun office isOwn -> isOwn && office.departments.Length < 6), 
+            fun office -> { office with departments = office.departments })
+    ]
+}
+
 let researchIdeaOrder = {
     displayName = "Research Idea"
-    category = "R & D"
     components = [
         CorpTransform (
             (fun corp -> corp.cash >= 1000), 
@@ -51,14 +123,21 @@ let researchIdeaOrder = {
         // confirm order (as above, no remaining)
             // this last updates the market order list for the corp, for display or cancellation
 
-let allOrders = [buildProductOrder; researchIdeaOrder]
+let ordersByCategory = 
+    [
+        "Corporate", [yield buildProductOrder; yield! otherDepBuildOrders; yield buildBuildingOrder; yield downSizeOrder; yield transferOrder]
+        "R & D", [researchIdeaOrder]
+    ]
 
 let validOrdersFor corp =
-    allOrders 
-    |> List.filter (fun order ->
-        order.components 
-        |> List.forall (function
-            | CorpTransform (checkCorp, _) -> checkCorp corp
-            | OfficeTransform (checkOffice, _) -> 
-                corp.allOffices 
-                |> List.exists (fun (office, _, _) -> checkOffice office true)))
+    ordersByCategory 
+    |> List.map (fun (category, orders) ->
+        category, 
+        orders |> List.map (fun order ->
+            order, 
+            order.components 
+            |> List.forall (function
+                | CorpTransform (checkCorp, _) -> checkCorp corp
+                | OfficeTransform (checkOffice, _) -> 
+                    corp.allOffices 
+                    |> List.exists (fun (office, _, _) -> checkOffice office true))))
