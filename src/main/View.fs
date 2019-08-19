@@ -11,8 +11,8 @@ let renderUserInterface (model: MainModel) dispatch =
         match model.currentInterface with
         | Information selectedTile -> 
             Views.InfoPanels.contentFor model selectedTile dispatch
-        | OrderTypeSelect ->
-            Views.OrderList.contentFor model dispatch
+        | OrderTypeSelect activeCategory ->
+            Views.OrderList.contentFor model activeCategory dispatch
         | _ -> []
 
     let style = [

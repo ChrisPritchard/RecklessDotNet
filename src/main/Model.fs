@@ -124,13 +124,15 @@ and OrderComponent =
     | CorpTransform of condition:(Corporation -> bool) * action:(Corporation -> Corporation)
     | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
 
+let defaultOrderCategory = "Corporate"
+
 type MainModel = 
     {   market: Market
         newInterfaceMode: bool
         currentInterface: Interface  }
 and Interface =
     | Information of selectedTile: (int * int)
-    | OrderTypeSelect
+    | OrderTypeSelect of activeCategory: string
     | TargetOrder of Order
 
 let departmentCost = 
