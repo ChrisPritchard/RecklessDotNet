@@ -5,6 +5,7 @@ open Xelmish.Viewables
 open Xelmish.UI
 open Constants
 open Main.Model
+open Main.Update
 
 let defaultPadding = padding (px defaultMargin)
 let defaultMargin = margin (px defaultMargin)
@@ -34,8 +35,8 @@ let executiveInfo executive dispatch =
             text [ height (pct 0.13) ] (sprintf "XP:    %i" executive.experience)
             text [ height (pct 0.13) ] executive.lastName
 
-            button [ defaultMargin; height (pct 0.21); onclick (fun _ -> ()) ] "Orders"
-            button [ defaultMargin; height (pct 0.21); onclick (fun _ -> ()); enabled false ] "Corp Report"
+            button [ defaultMargin; height (pct 0.21); onclick (fun _ -> dispatch ViewOrders) ] "Orders"
+            button [ defaultMargin; height (pct 0.21); enabled false ] "Corp Report"
         ]
         col [ defaultMargin; backgroundColour colours.temp ] []
     ]

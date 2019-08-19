@@ -6,11 +6,13 @@ open Xelmish.UI
 open Constants
 open Model
 
-let renderUserInterface (model: Model.MainModel) dispatch = 
+let renderUserInterface (model: MainModel) dispatch = 
     let body = 
         match model.currentInterface with
         | Information selectedTile -> 
             Views.InfoPanels.contentFor model selectedTile dispatch
+        | OrderTypeSelect ->
+            Views.OrderList.contentFor model dispatch
         | _ -> []
 
     let style = [
