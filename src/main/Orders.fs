@@ -2,14 +2,6 @@
 
 open Model
 
-type Order = 
-    {   displayName: string
-        category: string
-        components: OrderComponent list }
-and OrderComponent =
-    | CorpTransform of condition:(Corporation -> bool) * action:(Corporation -> Corporation)
-    | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
-
 let buildProductOrder = {
     displayName = "Build New Product"
     category = "Corporate"

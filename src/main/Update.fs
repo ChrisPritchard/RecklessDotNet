@@ -16,6 +16,8 @@ let update message model =
         { model with currentInterface = Information (x, y) }, Cmd.none
     | ViewOrders, Information _ -> 
         { model with currentInterface = OrderTypeSelect }, Cmd.none
+    | SelectOrder order, OrderTypeSelect -> 
+        { model with currentInterface = TargetOrder order }, Cmd.none
     | Cancel, OrderTypeSelect -> 
         { model with currentInterface = Information model.market.player.headOffice.pos }, Cmd.none
     | _ -> model, Cmd.none

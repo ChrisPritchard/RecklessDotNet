@@ -112,6 +112,14 @@ and OfficeInfo =
         executive:Executive option
         headOffice: bool    }
 
+type Order = 
+    {   displayName: string
+        category: string
+        components: OrderComponent list }
+and OrderComponent =
+    | CorpTransform of condition:(Corporation -> bool) * action:(Corporation -> Corporation)
+    | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
+
 type MainModel = 
     {   market: Market
         newInterfaceMode: bool
@@ -119,7 +127,7 @@ type MainModel =
 and Interface =
     | Information of selectedTile: (int * int)
     | OrderTypeSelect
-    | TargetOrder
+    | TargetOrder of Order
 
 //let rec orderCost =
 //    function
