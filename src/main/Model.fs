@@ -119,9 +119,10 @@ and OfficeInfo =
 
 type Order = 
     {   displayName: string
+        corpCondition: Corporation -> bool
+        corpTransform: Corporation -> Corporation
         components: OrderComponent list }
 and OrderComponent =
-    | CorpTransform of condition:(Corporation -> bool) * action:(Corporation -> Corporation)
     | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
 
 let defaultOrderCategory = "Corporate"
@@ -133,7 +134,12 @@ type MainModel =
 and Interface =
     | Information of selectedTile: (int * int)
     | OrderTypeSelect of activeCategory: string
-    | TargetOrder of Order
+    | TargetOrder of Order * OrderTargets * OrderComponent
+and OrderTargets = {
+        corp: Corporation
+        ownOffice: Office option
+        otherOffice: Office option
+    }
 
 let departmentCost = 
     function

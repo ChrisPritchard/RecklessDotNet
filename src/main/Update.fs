@@ -20,7 +20,8 @@ let update message model =
     | SelectOrderCategory category, OrderTypeSelect _ -> 
         { model with currentInterface = OrderTypeSelect category }, Cmd.none
     | SelectOrder order, OrderTypeSelect _ -> 
-        { model with currentInterface = TargetOrder order }, Cmd.none
+        let targets = { corp = order.corpTransform model.market.player; ownOffice = None; otherOffice = None }
+        { model with currentInterface = TargetOrder (order, targets, order.components.[0]) }, Cmd.none
     | Cancel, OrderTypeSelect _ -> 
         { model with currentInterface = Information model.market.player.headOffice.pos }, Cmd.none
     | _ -> model, Cmd.none

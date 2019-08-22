@@ -16,10 +16,9 @@ open Model
 
 let buildProductOrder = {
     displayName = "Build New Product"
+    corpCondition = fun corp -> corp.ideas > 0
+    corpTransform = fun corp -> { corp with ideas = corp.ideas - 1 }
     components = [
-        CorpTransform (
-            (fun corp -> corp.ideas > 0), 
-            fun corp -> { corp with ideas = corp.ideas - 1 })
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length < 6), 
             fun office -> { office with departments = Product 100::office.departments })
@@ -39,10 +38,9 @@ let otherDepBuildOrders =
     ] |> List.map (fun (display, cost, dep) ->
         {
             displayName = display
+            corpCondition = fun corp -> corp.cash >= cost
+            corpTransform = fun corp -> { corp with cash = corp.cash - cost }
             components = [
-                CorpTransform (
-                    (fun corp -> corp.cash >= cost), 
-                    fun corp -> { corp with cash = corp.cash - cost })
                 OfficeTransform (
                     (fun office isOwn -> isOwn && office.departments.Length < 6), 
                     fun office -> { office with departments = dep::office.departments })
@@ -51,11 +49,9 @@ let otherDepBuildOrders =
 
 let buildBuildingOrder = {
     displayName = "Build New Building"
+    corpCondition = fun corp -> corp.cash >= 7500
+    corpTransform = fun corp -> { corp with cash = corp.cash - 7500 } // TODO: add new office
     components = [
-        CorpTransform (
-            (fun corp -> corp.cash >= 7500), 
-            fun corp -> { corp with 
-                            cash = corp.cash - 7500 }) // add new office
         // tileselect
         // department select
         //OfficeTransform (
@@ -66,6 +62,8 @@ let buildBuildingOrder = {
 
 let downSizeOrder = {
     displayName = "Downsize Department"
+    corpCondition = fun _ -> true // TODO: cost?
+    corpTransform = id 
     components = [
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length > 0), 
@@ -77,6 +75,8 @@ let downSizeOrder = {
 
 let transferOrder = {
     displayName = "Transfer Department"
+    corpCondition = fun _ -> true // TODO: cost?
+    corpTransform = id 
     components = [
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length > 0), 
@@ -90,12 +90,12 @@ let transferOrder = {
 
 let researchIdeaOrder = {
     displayName = "Research Idea"
+    corpCondition = fun corp -> corp.cash >= 1000
+    corpTransform = fun corp -> 
+                    { corp with 
+                        cash = corp.cash - 1000
+                        ideas = corp.ideas + 1 }
     components = [
-        CorpTransform (
-            (fun corp -> corp.cash >= 1000), 
-            fun corp -> { corp with 
-                            cash = corp.cash - 1000
-                            ideas = corp.ideas + 1 })
         OfficeTransform (
             (fun office isOwn -> isOwn && List.contains Research office.departments), 
             fun office -> office) // TODO: office with used = research?
@@ -135,9 +135,9 @@ let validOrdersFor corp =
         category, 
         orders |> List.map (fun order ->
             order, 
+            order.corpCondition corp &&
             order.components 
             |> List.forall (function
-                | CorpTransform (checkCorp, _) -> checkCorp corp
                 | OfficeTransform (checkOffice, _) -> 
                     corp.allOffices 
                     |> List.exists (fun (office, _, _) -> checkOffice office true))))
