@@ -158,11 +158,12 @@ let private renderColour (x, y) (width, height) colour =
 let private drawText loadedAssets (spriteBatch: SpriteBatch) fontName fontSize alignment colour (x, y) (width, height) (lines: string []) =
     
     let sb = StringBuilder ()
-    for line in lines do sb.AppendLine line |> ignore
+    for line in lines do 
+        ignore (if line = Array.last lines then sb.Append line else sb.AppendLine line)
 
     let font = loadedAssets.fonts.[fontName]
     let measured = font.MeasureString sb
-    let scale = let v = float32 fontSize / (measured.Y / float32 lines.Length) in Vector2(v, v)
+    let scale = let v = (float32 fontSize * float32 lines.Length) / measured.Y in Vector2(v, v)
 
     let ox, oy = alignment
     let relWidth, relHeight = float32 (float width * ox), float32 (float height * oy)
