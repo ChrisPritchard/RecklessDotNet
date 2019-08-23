@@ -11,8 +11,30 @@ let contentFor (model: MainModel) order componentIndex dispatch =
 
     [    
         col [ width (pct 0.6) ] [
-            yield text [ fontSize 25.; height (pct 0.18); defaultPadding ] order.displayName
-            yield row [] []
+            text [ fontSize 25.; height (pct 0.18); defaultPadding ] order.displayName
+            row [ height (pct 0.5); defaultPadding ] [
+                match order.components.[componentIndex] with
+                | OfficeTransform (description, _, _) ->
+                    yield text [ defaultPadding ] description
+            ]
+            row [] [
+                col [] [
+                    text [ alignment 1. 0. ] "Base Cost: "
+                    text [ alignment 1. 0. ] "Total Cost: "                    
+                ]
+                col [] [
+                    text [] "TODO"//(string order.baseCost)
+                    text [] "TODO"//(string (order.totalCost currentTargets))                    
+                ]
+                col [] [
+                    text [ alignment 1. 0. ] "Cash: "
+                    text [ alignment 1. 0. ] "Expenses: "
+                ]
+                col [] [
+                    text [] (string corp.cash)
+                    text [] "TODO"//(string corp.expenses)
+                ]
+            ]
         ]
         InfoPanels.selectedInfo selected
         col [ padding (px 10); ] [

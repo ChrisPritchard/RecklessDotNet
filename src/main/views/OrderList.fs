@@ -6,6 +6,19 @@ open Main.Model
 open Main.Orders
 open Main.Update
 
+let private validOrdersFor corp =
+    ordersByCategory 
+    |> List.map (fun (category, orders) ->
+        category, 
+        orders |> List.map (fun order ->
+            order, 
+            order.corpCondition corp &&
+            order.components 
+            |> Array.forall (function
+                | OfficeTransform (_, checkOffice, _) -> 
+                    corp.allOffices 
+                    |> List.exists (fun (office, _, _) -> checkOffice office true))))
+
 let contentFor (model: MainModel) activeCategory dispatch = 
     let corp = model.market.player
     let orders = validOrdersFor corp 

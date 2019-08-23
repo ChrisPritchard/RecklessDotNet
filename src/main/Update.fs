@@ -15,13 +15,13 @@ type Message =
 
 let private validateTileFor orderComponent tile (market: Market) =
     match orderComponent, market.atTile tile with
-    | OfficeTransform (checkOffice, _), Some (OfficeInfo ox) ->
+    | OfficeTransform (_, checkOffice, _), Some (OfficeInfo ox) ->
         checkOffice ox.office (ox.corporation = market.player)
     | _ -> false
 
 let private updateTargets orderComponent tile targets (market: Market) =
     match orderComponent, tile |> Option.bind market.atTile with
-    | OfficeTransform (_, transform), Some (OfficeInfo ox) ->
+    | OfficeTransform (_, _, transform), Some (OfficeInfo ox) ->
         if ox.corporation = market.player && targets.ownOffice = None then
             { targets with ownOffice = Some (transform ox.office) }
         else

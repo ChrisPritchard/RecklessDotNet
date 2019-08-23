@@ -20,6 +20,7 @@ let buildProductOrder = {
     corpTransform = fun corp -> { corp with ideas = corp.ideas - 1 }
     components = [|
         OfficeTransform (
+            "Select one of your Buildings to receive the new Product department",
             (fun office isOwn -> isOwn && office.departments.Length < 6), 
             fun office -> { office with departments = Product 100::office.departments })
     |]
@@ -27,21 +28,22 @@ let buildProductOrder = {
 
 let otherDepBuildOrders = 
     [ 
-        "Build New Marketing", 2500, Marketing
-        "Build New R & D", 2500, Research
-        "Build New Admin", 2500, Admin None
-        "Build New HR", 5000, HR  // TODO: source real values
-        "Build New Acquisitions", 5000, Acquisitions  // TODO: source real values
-        "Build New Legal", 5000, Legal  // TODO: source real values
-        "Build New Security", 5000, Security  // TODO: source real values
-        "Build New Computer Core", 5000, ComputerCore  // TODO: source real values
-    ] |> List.map (fun (display, cost, dep) ->
+        "Build New Marketing", 2500, Marketing, "Marketing"
+        "Build New R & D", 2500, Research, "Research"
+        "Build New Admin", 2500, Admin None, "Admin"
+        "Build New HR", 5000, HR, "Human Resources"  // TODO: source real values
+        "Build New Acquisitions", 5000, Acquisitions, "Acquisitions"  // TODO: source real values
+        "Build New Legal", 5000, Legal, "Legal"  // TODO: source real values
+        "Build New Security", 5000, Security, "Security"  // TODO: source real values
+        "Build New Computer Core", 5000, ComputerCore, "Computer Core"  // TODO: source real values
+    ] |> List.map (fun (display, cost, dep, name) ->
         {
             displayName = display
             corpCondition = fun corp -> corp.cash >= cost
             corpTransform = fun corp -> { corp with cash = corp.cash - cost }
             components = [|
                 OfficeTransform (
+                    sprintf "Select one of your Buildings to receive the new %s department" name,
                     (fun office isOwn -> isOwn && office.departments.Length < 6), 
                     fun office -> { office with departments = dep::office.departments })
             |]
@@ -66,6 +68,7 @@ let downSizeOrder = {
     corpTransform = id 
     components = [|
         OfficeTransform (
+            "Select one of your Buildings to downsize a deparment in",
             (fun office isOwn -> isOwn && office.departments.Length > 0), 
             fun office -> { office with departments = office.departments })
         // select department
@@ -79,10 +82,12 @@ let transferOrder = {
     corpTransform = id 
     components = [|
         OfficeTransform (
+            "Select one of your Buildings to transfer a deparment from",
             (fun office isOwn -> isOwn && office.departments.Length > 0), 
             fun office -> { office with departments = office.departments })
         // select department
         OfficeTransform (
+            "Select one of your Buildings to transfer a deparment to",
             (fun office isOwn -> isOwn && office.departments.Length < 6), 
             fun office -> { office with departments = office.departments })
     |]
@@ -97,6 +102,7 @@ let researchIdeaOrder = {
                         ideas = corp.ideas + 1 }
     components = [|
         OfficeTransform (
+            "Select one of your Buildings containing a Research deparment",
             (fun office isOwn -> isOwn && List.contains Research office.departments), 
             fun office -> office) // TODO: office with used = research?
     |]
@@ -128,17 +134,3 @@ let ordersByCategory =
         "Corporate", [yield buildProductOrder; yield! otherDepBuildOrders; yield buildBuildingOrder; yield downSizeOrder; yield transferOrder]
         "R & D", [researchIdeaOrder]
     ]
-
-let validOrdersFor corp =
-    ordersByCategory 
-    |> List.map (fun (category, orders) ->
-        category, 
-        orders |> List.map (fun order ->
-            order, 
-            order.corpCondition corp &&
-            order.components 
-            |> Array.forall (function
-                | OfficeTransform (checkOffice, _) -> 
-                    corp.allOffices 
-                    |> List.exists (fun (office, _, _) -> checkOffice office true))))
-

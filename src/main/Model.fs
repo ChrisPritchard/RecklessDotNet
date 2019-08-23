@@ -130,7 +130,7 @@ and Order =
         corpTransform: Corporation -> Corporation
         components: OrderComponent [] }
 and OrderComponent =
-    | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
+    | OfficeTransform of description: string * condition:(Office -> bool -> bool) * action:(Office -> Office)
 
 and MainModel = 
     {   market: Market
