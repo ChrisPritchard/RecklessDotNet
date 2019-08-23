@@ -30,6 +30,12 @@ with
     member corp.ceo =
         let (_, _, exec) = List.head corp.allOffices
         exec.Value
+    member corp.allExecutivesOrders =
+        corp.allOffices 
+        |> List.choose (fun (_, _, exec) -> 
+            exec 
+            |> Option.map (fun e -> 
+                e, e.orders, e.orders.Length < e.maxOrders))
 and Office = {
     x: int
     y: int
