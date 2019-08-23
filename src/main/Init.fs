@@ -9,17 +9,23 @@ let playerExec = {
     firstName = "Christopher"
     lastName = "Aquinas"
     experience = 3
-    level = 6 }
+    level = 6 
+    orders = []
+    maxOrders = 2 }
 let evilExec = { 
     firstName = "Quinton"
     lastName = "Charlemagne"
     experience = 2
-    level = 4 }
+    level = 4
+    orders = []
+    maxOrders = 2 }
 let jadeExec = { 
     firstName = "Satya"
     lastName = "Vishal"
     experience = 1
-    level = 3 }
+    level = 3
+    orders = []
+    maxOrders = 2 }
 
 let private startMarket = 
     [0..dim*dim-1] 

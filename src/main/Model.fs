@@ -7,9 +7,10 @@ type Executive = {
     lastName: string
     experience: int
     level: int
+    orders: (string * OrderTargets) list
+    maxOrders: int
 }
-
-type Corporation = {
+and Corporation = {
     displayName: string
     abbreviation: string
     cash: int
@@ -117,7 +118,7 @@ and OfficeInfo =
         executive:Executive option
         headOffice: bool    }
 
-type Order = 
+and Order = 
     {   displayName: string
         corpCondition: Corporation -> bool
         corpTransform: Corporation -> Corporation
@@ -125,9 +126,7 @@ type Order =
 and OrderComponent =
     | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
 
-let defaultOrderCategory = "Corporate"
-
-type MainModel = 
+and MainModel = 
     {   market: Market
         selectedTile: (int * int) option
         playerAction: PlayerAction }

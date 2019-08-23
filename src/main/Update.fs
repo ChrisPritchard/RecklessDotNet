@@ -30,6 +30,14 @@ let private updateTargets orderComponent tile targets (market: Market) =
 
 let private applyOrder order targets (market: Market) =
     market
+    //{ market with 
+    //    player = {
+    //        market.player with
+    //            orders = (order.displayName, targets)::market.player.orders 
+    //            // TODO: how to fold targets over player offices for order selection or transformation?
+    //    } }
+
+let defaultOrderCategory = "Corporate"
 
 let update message model = 
     match message, model.playerAction with
