@@ -116,6 +116,16 @@ let private renderHighlight (market: Market) (mx, my) = [
         | _ -> ()            
     ]
 
+let private renderHighlightOffices predicate (market: Market) =
+    market.allCorps
+    |> Seq.collect (fun corp -> 
+        corp.allOffices 
+        |> Seq.map (fun (office, _, _) -> office, corp = market.player))
+    |> Seq.filter (fun (office, isOwn) -> predicate office isOwn)
+    |> Seq.map (fun (office, _) ->
+        let (x, y, w, h) = isoRect office.x office.y tileWidth (tileHeight*3)
+        image "office-highlight" Colour.White (w, h) (x, y))
+
 let renderMarket model dispatch =
     [   yield! renderMarketTiles model.market
         yield! renderOfficeLinks model.market
@@ -124,6 +134,10 @@ let renderMarket model dispatch =
         match model.playerAction, model.selectedTile with
         | Overview, Some selectedTile | TargetOrder _, Some selectedTile ->
             yield! renderHighlight model.market selectedTile
+        | TargetOrder (order, _, componentIndex), None ->
+            match order.components.[componentIndex] with
+            | OfficeTransform (_, checkOffice, _) ->
+                yield! renderHighlightOffices checkOffice model.market
         | _ -> ()
 
         yield onclickpoint (fun mousePos -> 
