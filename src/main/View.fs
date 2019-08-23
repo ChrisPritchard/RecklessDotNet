@@ -13,6 +13,8 @@ let renderUserInterface (model: MainModel) dispatch =
             Views.InfoPanels.contentFor model dispatch
         | OrderTypeSelect activeCategory ->
             Views.OrderList.contentFor model activeCategory dispatch
+        | TargetOrder (order, _, componentIndex) ->
+            Views.CurrentOrder.contentFor model order componentIndex dispatch
         | _ -> []
 
     let style = [

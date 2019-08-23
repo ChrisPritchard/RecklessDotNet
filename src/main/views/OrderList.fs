@@ -6,8 +6,6 @@ open Main.Model
 open Main.Orders
 open Main.Update
 
-let defaultMargin = margin (px defaultMargin)
-
 let contentFor (model: MainModel) activeCategory dispatch = 
     let corp = model.market.player
     let orders = validOrdersFor corp 

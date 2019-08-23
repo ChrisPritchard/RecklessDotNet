@@ -1,7 +1,7 @@
 module Constants
 
 open Xelmish.Model
-open Xelmish.Viewables
+open Xelmish.UI
 
 // Global constants
 
@@ -17,7 +17,8 @@ let quitOnEscape = true
 
 // Common UI constants and config
 
-let defaultMargin = 5
+let defaultPadding = padding (px 5)
+let defaultMargin = margin (px 5)
 
 let colours = {|
     temp = Colour.Magenta
@@ -28,6 +29,3 @@ let colours = {|
     buttonHover = Colour.LightBlue
     buttonPressed = Colour.DarkBlue
 |}
-let normalText = text "defaultFont" 16. colours.text
-let titleText = text "defaultFont" 25. colours.text
-let buttonText = text "defaultFont" 16. colours.text

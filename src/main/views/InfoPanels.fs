@@ -7,11 +7,8 @@ open Constants
 open Main.Model
 open Main.Update
 
-let defaultPadding = padding (px defaultMargin)
-let defaultMargin = margin (px defaultMargin)
-
 let corpInfo (corporation: Corporation) = 
-    col [ width (pct 0.3); padding (px 10) ] [
+    col [ width (pct 0.3); defaultPadding ] [
         yield text [ fontSize 25.; height (pct 0.18); defaultPadding ] corporation.displayName
         yield! [
             "Ideas", string corporation.ideas
@@ -28,7 +25,7 @@ let corpInfo (corporation: Corporation) =
     ]
 
 let executiveInfo executive isPlayer dispatch = 
-    row [ width (pct 0.3); padding (px 10) ] [
+    row [ width (pct 0.3); defaultPadding ] [
         col [] [
             yield row [ height (pct 0.18) ] [ ]
             yield text [ height (pct 0.13) ] (sprintf "LVL:   %i" executive.level)

@@ -122,7 +122,7 @@ let renderMarket model dispatch =
         yield! renderOffices model.market
         
         match model.playerAction, model.selectedTile with
-        | Overview, Some selectedTile ->
+        | Overview, Some selectedTile | TargetOrder _, Some selectedTile ->
             yield! renderHighlight model.market selectedTile
         | _ -> ()
 
