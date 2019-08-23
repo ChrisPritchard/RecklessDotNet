@@ -46,7 +46,13 @@ let contentFor (model: MainModel) order componentIndex dispatch =
         ]
         InfoPanels.selectedInfo selected
         col [ padding (px 10); ] [
-            row [ height (pct 0.8) ] []
-            button [ defaultMargin; onclick (fun () -> dispatch Cancel) ] "X"
+            match model.selectedTile with
+            | None ->
+                yield row [ height (pct 0.8) ] []
+                yield button [ defaultMargin; onclick (fun () -> dispatch Cancel) ] "X"
+            | Some _ ->
+                yield row [ height (pct 0.6) ] []
+                yield button [ defaultMargin; onclick (fun () -> dispatch ConfirmOrderTargetTile) ] "Y"
+                yield button [ defaultMargin; onclick (fun () -> dispatch CancelOrderTargetTile) ] "N"
         ]
     ]
