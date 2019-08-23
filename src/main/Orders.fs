@@ -18,11 +18,11 @@ let buildProductOrder = {
     displayName = "Build New Product"
     corpCondition = fun corp -> corp.ideas > 0
     corpTransform = fun corp -> { corp with ideas = corp.ideas - 1 }
-    components = [
+    components = [|
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length < 6), 
             fun office -> { office with departments = Product 100::office.departments })
-    ]
+    |]
 }
 
 let otherDepBuildOrders = 
@@ -40,44 +40,44 @@ let otherDepBuildOrders =
             displayName = display
             corpCondition = fun corp -> corp.cash >= cost
             corpTransform = fun corp -> { corp with cash = corp.cash - cost }
-            components = [
+            components = [|
                 OfficeTransform (
                     (fun office isOwn -> isOwn && office.departments.Length < 6), 
                     fun office -> { office with departments = dep::office.departments })
-            ]
+            |]
         })
 
 let buildBuildingOrder = {
     displayName = "Build New Building"
     corpCondition = fun corp -> corp.cash >= 7500
     corpTransform = fun corp -> { corp with cash = corp.cash - 7500 } // TODO: add new office
-    components = [
+    components = [|
         // tileselect
         // department select
         //OfficeTransform (
         //    (fun office isOwn -> isOwn && List.contains Research office.departments), 
         //    fun office -> office) // TODO: office with used = research?
-    ]
+    |]
 }
 
 let downSizeOrder = {
     displayName = "Downsize Department"
     corpCondition = fun _ -> true // TODO: cost?
     corpTransform = id 
-    components = [
+    components = [|
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length > 0), 
             fun office -> { office with departments = office.departments })
         // select department
         // remove department
-    ]
+    |]
 }
 
 let transferOrder = {
     displayName = "Transfer Department"
     corpCondition = fun _ -> true // TODO: cost?
     corpTransform = id 
-    components = [
+    components = [|
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length > 0), 
             fun office -> { office with departments = office.departments })
@@ -85,7 +85,7 @@ let transferOrder = {
         OfficeTransform (
             (fun office isOwn -> isOwn && office.departments.Length < 6), 
             fun office -> { office with departments = office.departments })
-    ]
+    |]
 }
 
 let researchIdeaOrder = {
@@ -95,11 +95,11 @@ let researchIdeaOrder = {
                     { corp with 
                         cash = corp.cash - 1000
                         ideas = corp.ideas + 1 }
-    components = [
+    components = [|
         OfficeTransform (
             (fun office isOwn -> isOwn && List.contains Research office.departments), 
             fun office -> office) // TODO: office with used = research?
-    ]
+    |]
 }
 
 // Order process:
@@ -137,7 +137,14 @@ let validOrdersFor corp =
             order, 
             order.corpCondition corp &&
             order.components 
-            |> List.forall (function
+            |> Array.forall (function
                 | OfficeTransform (checkOffice, _) -> 
                     corp.allOffices 
                     |> List.exists (fun (office, _, _) -> checkOffice office true))))
+
+type OrderComponent with
+    member o.validate tile (market: Market) =
+        match o, market.atTile tile with
+        | OfficeTransform (checkOffice, _), Some (OfficeInfo ox) ->
+            checkOffice ox.office (ox.corporation = market.player)
+        | _ -> false

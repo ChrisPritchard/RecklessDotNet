@@ -121,7 +121,7 @@ type Order =
     {   displayName: string
         corpCondition: Corporation -> bool
         corpTransform: Corporation -> Corporation
-        components: OrderComponent list }
+        components: OrderComponent [] }
 and OrderComponent =
     | OfficeTransform of condition:(Office -> bool -> bool) * action:(Office -> Office)
 
@@ -134,7 +134,7 @@ type MainModel =
 and PlayerAction =
     | Overview
     | OrderTypeSelect of activeCategory: string
-    | TargetOrder of Order * OrderTargets * OrderComponent
+    | TargetOrder of Order * OrderTargets * componentIndex: int
 and OrderTargets = {
         corp: Corporation
         ownOffice: Office option
