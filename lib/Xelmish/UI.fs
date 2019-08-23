@@ -5,6 +5,7 @@ module Xelmish.UI
 open Model
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
+open System.Text
 
 /// Note: use the col/row/text/button/viewables functions rather than these types directly
 type Element = {
@@ -16,6 +17,7 @@ and ElementType =
     | Row of children: Element list
     | Column of children: Element list
     | Text of string
+    | Paragraph of string []
     | Button of text: string
     | Viewables of withInfo: (DrawInfo -> Viewable list)
 and DrawInfo = { globalStyle: GlobalStyle; x: int; y: int; width: int; height: int }
@@ -57,8 +59,10 @@ and Size = Percent of float | Pixels of int
 let col attributes children = { elementType = Column children; attributes = attributes }
 /// Specifies a row, with its children distributed horizontally
 let row attributes children = { elementType = Row children; attributes = attributes }
-/// Specifies some text to render
+/// Specifies some single-line text to render
 let text attributes s = { elementType = Text s; attributes = attributes } 
+/// Specifies some multi-line text to render
+let paragraph attributes s = { elementType = Paragraph s; attributes = attributes } 
 /// Specifies a button (background colour with text) to render
 let button attributes s = { elementType = Button s; attributes = attributes }
 /// Allows drawing something custom (e.g. a set of images or animations) using the derived characteristics
@@ -151,10 +155,14 @@ let private renderColour (x, y) (width, height) colour =
     OnDraw (fun loadedAssets _ spriteBatch -> 
         spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, colour))
 
-let private drawText loadedAssets (spriteBatch: SpriteBatch) fontName fontSize alignment colour (x, y) (width, height) (text: string) =
+let private drawText loadedAssets (spriteBatch: SpriteBatch) fontName fontSize alignment colour (x, y) (width, height) (lines: string []) =
+    
+    let sb = StringBuilder ()
+    for line in lines do sb.AppendLine line |> ignore
+
     let font = loadedAssets.fonts.[fontName]
-    let measured = font.MeasureString (text)
-    let scale = let v = float32 fontSize / measured.Y in Vector2(v, v)
+    let measured = font.MeasureString sb
+    let scale = let v = float32 fontSize / (measured.Y / float32 lines.Length) in Vector2(v, v)
 
     let ox, oy = alignment
     let relWidth, relHeight = float32 (float width * ox), float32 (float height * oy)
@@ -163,14 +171,14 @@ let private drawText loadedAssets (spriteBatch: SpriteBatch) fontName fontSize a
     let origin = Vector2 (relWidth - offWidth, relHeight - offHeight)
     let position = Vector2.Add (origin, Vector2(float32 x, float32 y))
 
-    spriteBatch.DrawString (font, text, position, colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f)
+    spriteBatch.DrawString (font, sb, position, colour, 0.f, Vector2.Zero, scale, SpriteEffects.None, 0.f)
 
-let private renderText globalStyle (x, y) (width, height) text = 
+let private renderText globalStyle (x, y) (width, height) lines = 
     OnDraw (fun loadedAssets _ spriteBatch -> 
         drawText 
             loadedAssets spriteBatch 
             globalStyle.fontName globalStyle.fontSize globalStyle.alignment globalStyle.colour 
-            (x, y) (width, height) text)
+            (x, y) (width, height) lines)
 
 let private isInside tx ty tw th x y = x >= tx && x <= tx + tw && y >= ty && y <= ty + th
 
@@ -261,9 +269,11 @@ let rec private render debugOutlines globalStyle (x, y) (width, height) element 
             let renderImpl = fun top height child -> render debugOutlines newGlobalStyle (x, top) (width, height) child
             yield! renderCol newGlobalStyle renderImpl y height height children
         | Text s ->
+            yield renderText newGlobalStyle (x, y) (width, height) [|s|]
+        | Paragraph s ->
             yield renderText newGlobalStyle (x, y) (width, height) s
         | Button s -> 
-            yield renderButton newGlobalStyle (x, y) (width, height) s
+            yield renderButton newGlobalStyle (x, y) (width, height) [|s|]
         | Viewables impl ->
             yield! impl { globalStyle = newGlobalStyle; x = x; y = y; width = width; height = height }
     ]

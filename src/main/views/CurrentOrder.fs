@@ -5,6 +5,14 @@ open Constants
 open Main.Model
 open Main.Update
 
+let wrapText (text: string) charsPerRow =
+    (("", []), text.Split(' '))
+    ||> Array.fold (fun (line, acc) word ->
+        let newLength = line.Length + word.Length + 1
+        if newLength > charsPerRow then "", line::acc
+        else line + " " + word, acc)
+    |> fun (line, acc) -> List.rev (line::acc) |> List.toArray
+
 let contentFor (model: MainModel) order componentIndex dispatch = 
     let corp = model.market.player
     let selected = model.selectedTile |> Option.bind model.market.atTile
@@ -15,7 +23,7 @@ let contentFor (model: MainModel) order componentIndex dispatch =
             row [ height (pct 0.5); defaultPadding ] [
                 match order.components.[componentIndex] with
                 | OfficeTransform (description, _, _) ->
-                    yield text [ defaultPadding ] description
+                    yield paragraph [ defaultPadding ] (wrapText description 45)
             ]
             row [] [
                 col [] [
