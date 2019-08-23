@@ -142,9 +142,3 @@ let validOrdersFor corp =
                     corp.allOffices 
                     |> List.exists (fun (office, _, _) -> checkOffice office true))))
 
-type OrderComponent with
-    member o.validate tile (market: Market) =
-        match o, market.atTile tile with
-        | OfficeTransform (checkOffice, _), Some (OfficeInfo ox) ->
-            checkOffice ox.office (ox.corporation = market.player)
-        | _ -> false

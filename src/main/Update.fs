@@ -13,6 +13,24 @@ type Message =
     | CancelOrderTargetTile
     | Cancel
 
+let private validateTileFor orderComponent tile (market: Market) =
+    match orderComponent, market.atTile tile with
+    | OfficeTransform (checkOffice, _), Some (OfficeInfo ox) ->
+        checkOffice ox.office (ox.corporation = market.player)
+    | _ -> false
+
+let private updateTargets orderComponent tile targets (market: Market) =
+    match orderComponent, tile |> Option.bind market.atTile with
+    | OfficeTransform (_, transform), Some (OfficeInfo ox) ->
+        if ox.corporation = market.player && targets.ownOffice = None then
+            { targets with ownOffice = Some (transform ox.office) }
+        else
+            { targets with otherOffice = Some (transform ox.office) }
+    | _ -> failwith "invalid component for selected tile"
+
+let private applyOrder order targets (market: Market) =
+    market
+
 let update message model = 
     match message, model.playerAction with
     | SelectTile (x, y), Overview when model.market.tiles.Contains (x, y) -> 
@@ -31,13 +49,14 @@ let update message model =
             selectedTile = None
             playerAction = TargetOrder (order, targets, 0) }, Cmd.none
     | SelectTile (x, y), TargetOrder (order, _, componentIndex) 
-        when model.market.tiles.Contains (x, y) && order.components.[componentIndex].validate (x, y) model.market  -> 
+        when model.market.tiles.Contains (x, y) && validateTileFor order.components.[componentIndex] (x, y) model.market  -> 
         { model with selectedTile = Some (x, y) }, Cmd.none
     | ConfirmOrderTargetTile, TargetOrder (order, targets, componentIndex) when model.selectedTile <> None ->
-        let newTargets = updateTargets order.components.[componentIndex] model.selectedTile targets
+        let orderComponent = order.components.[componentIndex]
+        let newTargets = updateTargets orderComponent model.selectedTile targets model.market
         if componentIndex = order.components.Length - 1 then
             { model with 
-                market = applyOrder order newTargets
+                market = applyOrder order newTargets model.market
                 playerAction = Overview
                 selectedTile = Some model.market.player.headOffice.pos }, Cmd.none
         else
