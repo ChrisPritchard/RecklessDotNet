@@ -104,8 +104,8 @@ let selectedInfo selected =
         col [] right
     ]
 
-let contentFor model selectedTile dispatch = 
-    let selected = model.market.atTile selectedTile
+let contentFor model dispatch = 
+    let selected = model.market.atTile model.selectedTile
     let corp = 
         match selected with 
         | Some (OfficeInfo o) -> o.corporation 

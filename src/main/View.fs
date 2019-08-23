@@ -8,9 +8,9 @@ open Model
 
 let renderUserInterface (model: MainModel) dispatch = 
     let body = 
-        match model.currentInterface with
-        | Information selectedTile -> 
-            Views.InfoPanels.contentFor model selectedTile dispatch
+        match model.playerAction with
+        | Overview -> 
+            Views.InfoPanels.contentFor model dispatch
         | OrderTypeSelect activeCategory ->
             Views.OrderList.contentFor model activeCategory dispatch
         | _ -> []

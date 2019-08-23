@@ -12,16 +12,16 @@ type Message =
     | Cancel
 
 let update message model = 
-    match message, model.currentInterface with
-    | SelectTile (x, y), Information _ when model.market.tiles.Contains (x, y) -> 
-        { model with currentInterface = Information (x, y) }, Cmd.none
-    | ViewOrders, Information _ -> 
-        { model with currentInterface = OrderTypeSelect defaultOrderCategory }, Cmd.none
+    match message, model.playerAction with
+    | SelectTile (x, y), Overview when model.market.tiles.Contains (x, y) -> 
+        { model with selectedTile = (x, y) }, Cmd.none
+    | ViewOrders, Overview -> 
+        { model with playerAction = OrderTypeSelect defaultOrderCategory }, Cmd.none
     | SelectOrderCategory category, OrderTypeSelect _ -> 
-        { model with currentInterface = OrderTypeSelect category }, Cmd.none
+        { model with playerAction = OrderTypeSelect category }, Cmd.none
     | SelectOrder order, OrderTypeSelect _ -> 
         let targets = { corp = order.corpTransform model.market.player; ownOffice = None; otherOffice = None }
-        { model with currentInterface = TargetOrder (order, targets, order.components.[0]) }, Cmd.none
+        { model with playerAction = TargetOrder (order, targets, order.components.[0]) }, Cmd.none
     | Cancel, OrderTypeSelect _ -> 
-        { model with currentInterface = Information model.market.player.headOffice.pos }, Cmd.none
+        { model with playerAction = Overview }, Cmd.none
     | _ -> model, Cmd.none

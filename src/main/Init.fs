@@ -112,5 +112,5 @@ let init () =
         others = others }
     { 
         market = market
-        newInterfaceMode = false
-        currentInterface = Information (player.headOffice.pos) }
+        selectedTile = player.headOffice.pos
+        playerAction = Overview }

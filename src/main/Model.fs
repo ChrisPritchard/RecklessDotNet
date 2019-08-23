@@ -129,10 +129,10 @@ let defaultOrderCategory = "Corporate"
 
 type MainModel = 
     {   market: Market
-        newInterfaceMode: bool
-        currentInterface: Interface  }
-and Interface =
-    | Information of selectedTile: (int * int)
+        selectedTile: int * int
+        playerAction: PlayerAction }
+and PlayerAction =
+    | Overview
     | OrderTypeSelect of activeCategory: string
     | TargetOrder of Order * OrderTargets * OrderComponent
 and OrderTargets = {
