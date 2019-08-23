@@ -121,12 +121,13 @@ let renderMarket model dispatch =
         yield! renderOfficeLinks model.market
         yield! renderOffices model.market
         
-        match model.playerAction with
-        | Overview ->
-            yield! renderHighlight model.market model.selectedTile
-            yield onclickpoint (fun mousePos -> 
-                let mouseTile = mouseTile mousePos
-                if model.market.tiles.Contains mouseTile then 
-                    dispatch (SelectTile mouseTile))
+        match model.playerAction, model.selectedTile with
+        | Overview, Some selectedTile ->
+            yield! renderHighlight model.market selectedTile
         | _ -> ()
+
+        yield onclickpoint (fun mousePos -> 
+            let mouseTile = mouseTile mousePos
+            if model.market.tiles.Contains mouseTile then 
+                dispatch (SelectTile mouseTile))
     ]

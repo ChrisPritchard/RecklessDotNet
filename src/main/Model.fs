@@ -129,7 +129,7 @@ let defaultOrderCategory = "Corporate"
 
 type MainModel = 
     {   market: Market
-        selectedTile: int * int
+        selectedTile: (int * int) option
         playerAction: PlayerAction }
 and PlayerAction =
     | Overview

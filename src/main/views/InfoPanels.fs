@@ -105,7 +105,7 @@ let selectedInfo selected =
     ]
 
 let contentFor model dispatch = 
-    let selected = model.market.atTile model.selectedTile
+    let selected = model.selectedTile |> Option.bind model.market.atTile
     let corp = 
         match selected with 
         | Some (OfficeInfo o) -> o.corporation 

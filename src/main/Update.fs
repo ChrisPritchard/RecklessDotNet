@@ -14,7 +14,7 @@ type Message =
 let update message model = 
     match message, model.playerAction with
     | SelectTile (x, y), Overview when model.market.tiles.Contains (x, y) -> 
-        { model with selectedTile = (x, y) }, Cmd.none
+        { model with selectedTile = Some (x, y) }, Cmd.none
     | ViewOrders, Overview -> 
         { model with playerAction = OrderTypeSelect defaultOrderCategory }, Cmd.none
     | SelectOrderCategory category, OrderTypeSelect _ -> 

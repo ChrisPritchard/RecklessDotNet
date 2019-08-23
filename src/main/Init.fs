@@ -112,5 +112,5 @@ let init () =
         others = others }
     { 
         market = market
-        selectedTile = player.headOffice.pos
+        selectedTile = Some player.headOffice.pos
         playerAction = Overview }
