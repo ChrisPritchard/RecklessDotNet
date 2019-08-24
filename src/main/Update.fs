@@ -27,16 +27,7 @@ let private updateTargets orderComponent tile targets (market: Market) =
         else
             { targets with otherOffice = Some (transform ox.office) }
     | _ -> failwith "invalid component for selected tile"
-
-let private applyOrder order targets (market: Market) =
-    market
-    //{ market with 
-    //    player = {
-    //        market.player with
-    //            orders = (order.displayName, targets)::market.player.orders 
-    //            // TODO: how to fold targets over player offices for order selection or transformation?
-    //    } }
-
+    
 let defaultOrderCategory = "Corporate"
 
 let update message model = 
@@ -64,7 +55,7 @@ let update message model =
         let newTargets = updateTargets orderComponent model.selectedTile targets model.market
         if componentIndex = order.components.Length - 1 then
             { model with 
-                market = applyOrder order newTargets model.market
+                //turnOrders = (corporation, executive, order, targets)::model.turnOrders // todo: derive corp and exec
                 playerAction = Overview
                 selectedTile = Some model.market.player.headOffice.pos }, Cmd.none
         else
