@@ -52,7 +52,7 @@ let update message model =
         { model with playerAction = Overview }, Cmd.none
 
     | SelectOrder order, OrderTypeSelect _ -> 
-        let targets = { corp = order.corpTransform model.market.player; ownOffice = None; otherOffice = None }
+        let targets = { ownOffice = None; otherOffice = None }
         { model with 
             selectedTile = None
             playerAction = TargetOrder (order, targets, 0) }, Cmd.none

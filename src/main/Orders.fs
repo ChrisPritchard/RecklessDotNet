@@ -16,8 +16,8 @@ open Model
 
 let buildProductOrder = {
     displayName = "Build New Product"
-    corpCondition = fun corp -> corp.ideas > 0
-    corpTransform = fun corp -> { corp with ideas = corp.ideas - 1 }
+    baseCost = 0
+    ideaCost = 1
     components = [|
         OfficeTransform (
             "Select one of your Buildings to receive the new Product department",
@@ -39,8 +39,8 @@ let otherDepBuildOrders =
     ] |> List.map (fun (display, cost, dep, name) ->
         {
             displayName = display
-            corpCondition = fun corp -> corp.cash >= cost
-            corpTransform = fun corp -> { corp with cash = corp.cash - cost }
+            baseCost = cost
+            ideaCost = 0
             components = [|
                 OfficeTransform (
                     sprintf "Select one of your Buildings to receive the new %s department" name,
@@ -51,8 +51,9 @@ let otherDepBuildOrders =
 
 let buildBuildingOrder = {
     displayName = "Build New Building"
-    corpCondition = fun corp -> corp.cash >= 7500
-    corpTransform = fun corp -> { corp with cash = corp.cash - 7500 } // TODO: add new office
+    baseCost = 7500
+    ideaCost = 0 
+    // TODO: add new office
     components = [|
         // tileselect
         // department select
@@ -64,8 +65,8 @@ let buildBuildingOrder = {
 
 let downSizeOrder = {
     displayName = "Downsize Department"
-    corpCondition = fun _ -> true // TODO: cost?
-    corpTransform = id 
+    baseCost = 1000 // TODO source real value
+    ideaCost = 0
     components = [|
         OfficeTransform (
             "Select one of your Buildings to downsize a deparment in",
@@ -78,8 +79,8 @@ let downSizeOrder = {
 
 let transferOrder = {
     displayName = "Transfer Department"
-    corpCondition = fun _ -> true // TODO: cost?
-    corpTransform = id 
+    baseCost = 1000 // TODO source real value
+    ideaCost = 0
     components = [|
         OfficeTransform (
             "Select one of your Buildings to transfer a deparment from",
@@ -95,11 +96,9 @@ let transferOrder = {
 
 let researchIdeaOrder = {
     displayName = "Research Idea"
-    corpCondition = fun corp -> corp.cash >= 1000
-    corpTransform = fun corp -> 
-                    { corp with 
-                        cash = corp.cash - 1000
-                        ideas = corp.ideas + 1 }
+    baseCost = 1000 // TODO source real value
+    ideaCost = 0
+    // TODO: add idea
     components = [|
         OfficeTransform (
             "Select one of your Buildings containing a Research deparment",

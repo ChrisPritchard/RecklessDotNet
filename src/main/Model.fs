@@ -126,8 +126,8 @@ and OfficeInfo =
 
 and Order = 
     {   displayName: string
-        corpCondition: Corporation -> bool
-        corpTransform: Corporation -> Corporation
+        baseCost: int
+        ideaCost: int
         components: OrderComponent [] }
 and OrderComponent =
     | OfficeTransform of description: string * condition:(Office -> bool -> bool) * action:(Office -> Office)
@@ -141,7 +141,6 @@ and PlayerAction =
     | OrderTypeSelect of activeCategory: string
     | TargetOrder of Order * OrderTargets * componentIndex: int
 and OrderTargets = {
-        corp: Corporation
         ownOffice: Office option
         otherOffice: Office option
     }

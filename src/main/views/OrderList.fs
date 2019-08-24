@@ -6,13 +6,17 @@ open Main.Model
 open Main.Orders
 open Main.Update
 
+let private canAfford baseCost ideaCost corp =
+    corp.cash >= baseCost // TODO: allow for debt
+    && corp.ideas >= ideaCost
+
 let private validOrdersFor corp =
     ordersByCategory 
     |> List.map (fun (category, orders) ->
         category, 
         orders |> List.map (fun order ->
             order, 
-            order.corpCondition corp &&
+            canAfford order.baseCost order.ideaCost corp &&
             order.components 
             |> Array.forall (function
                 | OfficeTransform (_, checkOffice, _) -> 

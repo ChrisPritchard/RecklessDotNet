@@ -31,7 +31,7 @@ let contentFor (model: MainModel) order componentIndex dispatch =
                     text [ alignment 1. 0. ] "Total Cost: "                    
                 ]
                 col [] [
-                    text [] "TODO"//(string order.baseCost)
+                    text [] (string order.baseCost)
                     text [] "TODO"//(string (order.totalCost currentTargets))                    
                 ]
                 col [] [
