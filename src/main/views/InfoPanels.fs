@@ -24,7 +24,7 @@ let corpInfo (corporation: Corporation) =
             ])
     ]
 
-let executiveInfo executive isPlayer dispatch = 
+let executiveInfo (turnOrders: ConfirmedOrder list) executive isPlayer dispatch = 
     row [ width (pct 0.3); defaultPadding ] [
         col [] [
             yield row [ height (pct 0.18) ] [ ]
@@ -35,7 +35,7 @@ let executiveInfo executive isPlayer dispatch =
             if isPlayer then
                 yield button [ 
                     defaultMargin; height (pct 0.21)
-                    enabled true// TODO (executive.orders.Length < executive.maxOrders) 
+                    enabled (Seq.length (turnOrders |> Seq.filter (fun o -> o.executive = executive)) < executive.maxOrders) 
                     onclick (fun _ -> dispatch (ViewOrders executive)) ] "Orders"
                 yield button [ defaultMargin; height (pct 0.21); enabled false ] "Corp Report"
         ]
@@ -117,7 +117,7 @@ let contentFor model dispatch =
         | _ -> corp.ceo
     [
         corpInfo corp
-        executiveInfo executive (corp = model.market.player) dispatch
+        executiveInfo model.turnOrders executive (corp = model.market.player) dispatch
         selectedInfo selected
         col [ padding (px 10); ] [
             row [ height (pct 0.8) ] []
