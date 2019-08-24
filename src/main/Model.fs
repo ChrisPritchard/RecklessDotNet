@@ -7,7 +7,6 @@ type Executive = {
     lastName: string
     experience: int
     level: int
-    orders: (string * OrderTargets) list
     maxOrders: int
 }
 and Corporation = {
@@ -17,6 +16,7 @@ and Corporation = {
     ideas: int
     headOffice: Office
     colour: Colour
+    debtLimit: int
 }
 with 
     member corp.allOffices =
@@ -30,12 +30,6 @@ with
     member corp.ceo =
         let (_, _, exec) = List.head corp.allOffices
         exec.Value
-    member corp.allExecutivesOrders =
-        corp.allOffices 
-        |> List.choose (fun (_, _, exec) -> 
-            exec 
-            |> Option.map (fun e -> 
-                e, e.orders, e.orders.Length < e.maxOrders))
 and Office = {
     x: int
     y: int
@@ -135,7 +129,8 @@ and OrderComponent =
 and MainModel = 
     {   market: Market
         selectedTile: (int * int) option
-        playerAction: PlayerAction }
+        playerAction: PlayerAction
+        turnOrders: (Corporation * Executive * Order * OrderTargets) list }
 and PlayerAction =
     | Overview
     | OrderTypeSelect of activeCategory: string

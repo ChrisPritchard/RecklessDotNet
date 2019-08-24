@@ -10,21 +10,18 @@ let playerExec = {
     lastName = "Aquinas"
     experience = 3
     level = 6 
-    orders = []
     maxOrders = 2 }
 let evilExec = { 
     firstName = "Quinton"
     lastName = "Charlemagne"
     experience = 2
     level = 4
-    orders = []
     maxOrders = 2 }
 let jadeExec = { 
     firstName = "Satya"
     lastName = "Vishal"
     experience = 1
     level = 3
-    orders = []
     maxOrders = 2 }
 
 let private startMarket = 
@@ -90,6 +87,7 @@ let player = {
     ideas = 1
     headOffice = aquinasHeadOffice
     colour = Colour.Yellow
+    debtLimit = 10000
 }
 
 let private others = [
@@ -100,6 +98,7 @@ let private others = [
         ideas = 2
         headOffice = evilHeadOffice
         colour = Colour.Purple
+        debtLimit = 10000
     }
     {   
         displayName = "Jade Systems"
@@ -108,6 +107,7 @@ let private others = [
         ideas = 3
         headOffice = jadeHeadOffice
         colour =Colour. Green
+        debtLimit = 10000
     }
 ]
 
@@ -119,4 +119,5 @@ let init () =
     { 
         market = market
         selectedTile = Some player.headOffice.pos
-        playerAction = Overview }
+        playerAction = Overview
+        turnOrders = [] }

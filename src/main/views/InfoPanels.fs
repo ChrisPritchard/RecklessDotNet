@@ -35,7 +35,7 @@ let executiveInfo executive isPlayer dispatch =
             if isPlayer then
                 yield button [ 
                     defaultMargin; height (pct 0.21)
-                    enabled (executive.orders.Length < executive.maxOrders) 
+                    enabled true//(executive.orders.Length < executive.maxOrders) 
                     onclick (fun _ -> dispatch ViewOrders) ] "Orders"
                 yield button [ defaultMargin; height (pct 0.21); enabled false ] "Corp Report"
         ]
