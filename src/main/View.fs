@@ -11,10 +11,10 @@ let renderUserInterface (model: MainModel) dispatch =
         match model.playerAction with
         | Overview -> 
             Views.InfoPanels.contentFor model dispatch
-        | OrderTypeSelect activeCategory ->
+        | OrderTypeSelect (_, activeCategory) ->
             Views.OrderList.contentFor model activeCategory dispatch
-        | TargetOrder (order, _, componentIndex) ->
-            Views.CurrentOrder.contentFor model order componentIndex dispatch
+        | TargetOrder orderState ->
+            Views.CurrentOrder.contentFor model orderState.order orderState.componentIndex dispatch
         | _ -> []
 
     let style = [

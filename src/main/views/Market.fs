@@ -134,8 +134,8 @@ let renderMarket model dispatch =
         match model.playerAction, model.selectedTile with
         | Overview, Some selectedTile | TargetOrder _, Some selectedTile ->
             yield! renderHighlight model.market selectedTile
-        | TargetOrder (order, _, componentIndex), None ->
-            match order.components.[componentIndex] with
+        | TargetOrder state, None ->
+            match state.orderComponent with
             | OfficeTransform (_, checkOffice, _) ->
                 yield! renderHighlightOffices checkOffice model.market
         | _ -> ()

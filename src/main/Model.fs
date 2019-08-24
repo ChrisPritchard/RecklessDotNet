@@ -130,11 +130,24 @@ and MainModel =
     {   market: Market
         selectedTile: (int * int) option
         playerAction: PlayerAction
-        turnOrders: (Corporation * Executive * Order * OrderTargets) list }
+        turnOrders: ConfirmedOrder list }
 and PlayerAction =
     | Overview
-    | OrderTypeSelect of activeCategory: string
-    | TargetOrder of Order * OrderTargets * componentIndex: int
+    | OrderTypeSelect of executive: Executive * activeCategory: string
+    | TargetOrder of OrderTargetState
+and ConfirmedOrder = {
+        corporation: Corporation
+        executive: Executive
+        order: Order
+        targets: OrderTargets
+    }
+and OrderTargetState = {
+        executive: Executive
+        order: Order
+        targets: OrderTargets
+        componentIndex: int
+    }
+    with member __.orderComponent = __.order.components.[__.componentIndex]
 and OrderTargets = {
         ownOffice: Office option
         otherOffice: Office option
