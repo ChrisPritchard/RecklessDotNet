@@ -7,7 +7,7 @@ open Main.Orders
 open Main.Update
 
 let private canAfford baseCost ideaCost corp =
-    corp.cash >= baseCost // TODO: allow for debt
+    corp.cash + corp.debtLimit >= baseCost
     && corp.ideas >= ideaCost
 
 let private validOrdersFor corp =
