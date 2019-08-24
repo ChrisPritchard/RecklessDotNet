@@ -33,9 +33,10 @@ let executiveInfo (turnOrders: ConfirmedOrder list) executive isPlayer dispatch 
             yield text [ height (pct 0.13) ] executive.lastName
 
             if isPlayer then
+                let canGiveOrders = Seq.length (turnOrders |> Seq.filter (fun o -> o.executive = executive)) < executive.maxOrders
                 yield button [ 
                     defaultMargin; height (pct 0.21)
-                    enabled (Seq.length (turnOrders |> Seq.filter (fun o -> o.executive = executive)) < executive.maxOrders) 
+                    enabled canGiveOrders
                     onclick (fun _ -> dispatch (ViewOrders executive)) ] "Orders"
                 yield button [ defaultMargin; height (pct 0.21); enabled false ] "Corp Report"
         ]
