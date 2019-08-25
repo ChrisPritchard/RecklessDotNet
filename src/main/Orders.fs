@@ -58,5 +58,5 @@ let ordersByCategory =
     ]
 
 let orderConditions = 
-    (buildBuildingOrder, [])::(downSizeOrder, [])::(transferOrder, [])::buildOrders
+    (buildBuildingOrder, [])::(downSizeOrder, [])::(transferOrder, [])::(researchIdeaOrder, [])::buildOrders
     |> Map.ofList
