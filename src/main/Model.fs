@@ -121,36 +121,26 @@ and OfficeInfo =
 and Order = 
     {   displayName: string
         baseCost: int
-        ideaCost: int
-        components: OrderComponent [] }
-and OrderComponent =
-    | OfficeTransform of description: string * condition:(Office -> bool -> bool) * action:(Office -> Office)
+        ideaCost: int }
+and OrderCondition =
+    | OfficeCondition of description: string * condition: (Office -> bool -> bool) * transform: (Office -> Office)
+and OrderTransform =
+    | OfficeTransform of Office * transform: (Office -> Office)
 
 and MainModel = 
     {   market: Market
         selectedTile: (int * int) option
         playerAction: PlayerAction
-        turnOrders: ConfirmedOrder list }
+        turnOrders: (Corporation * AppliedOrder) list }
 and PlayerAction =
     | Overview
     | OrderTypeSelect of executive: Executive * activeCategory: string
-    | TargetOrder of OrderTargetState
-and ConfirmedOrder = {
-        corporation: Corporation
+    | TargetOrder of AppliedOrder
+and AppliedOrder = {
         executive: Executive
         order: Order
-        targets: OrderTargets
-    }
-and OrderTargetState = {
-        executive: Executive
-        order: Order
-        targets: OrderTargets
-        componentIndex: int
-    }
-    with member __.orderComponent = __.order.components.[__.componentIndex]
-and OrderTargets = {
-        ownOffice: Office option
-        otherOffice: Office option
+        conditions: OrderCondition list
+        transforms: OrderTransform list
     }
 
 let departmentCost = 
