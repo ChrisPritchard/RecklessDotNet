@@ -45,7 +45,7 @@ let contentFor (model: MainModel) appliedOrder dispatch =
                 ]
             ]
         ]
-        InfoPanels.selectedInfo selected
+        InfoPanels.selectedInfo model.turnOrders selected
         col [ padding (px 10); ] [
             match model.selectedTile with
             | None ->

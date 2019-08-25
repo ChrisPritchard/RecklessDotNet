@@ -24,6 +24,7 @@ let colours = {|
     temp = Colour.Magenta
     background = Colour.DarkGray
     text = Colour.White
+    itemChangedText = Colour.Red
     button = Colour.Blue
     buttonDisabled = Colour.Gray
     buttonHover = Colour.LightBlue

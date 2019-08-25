@@ -60,3 +60,13 @@ let ordersByCategory =
 let orderConditions = 
     (buildBuildingOrder, [])::(downSizeOrder, [])::(transferOrder, [])::(researchIdeaOrder, [])::buildOrders
     |> Map.ofList
+
+let newDepartments office turnOrders = 
+    let newOffice = 
+        (office, turnOrders |> Seq.collect (fun (_, o) -> o.transforms))
+        ||> Seq.fold (fun newOffice transform ->
+            match transform with
+            | OfficeTransform (o, t) when o = office ->
+                t newOffice
+            | _ -> newOffice)
+    newOffice.departments |> List.except (office.departments)

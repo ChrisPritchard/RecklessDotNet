@@ -5,6 +5,7 @@ open Xelmish.Viewables
 open Xelmish.UI
 open Constants
 open Main.Model
+open Main.Orders
 open Main.Update
 
 let corpInfo (corporation: Corporation) = 
@@ -56,7 +57,7 @@ let departmentLabels departments =
     | [] -> otherLabels
     | _ -> (sprintf "%i Products" (List.length products))::otherLabels
 
-let selectedInfo selected =
+let selectedInfo turnOrders selected =
     
     let tilePosFor (info: DrawInfo) = info.x + ((info.width - tileWidth) / 2), info.y + (info.height - (tileHeight*2))
 
@@ -89,12 +90,17 @@ let selectedInfo selected =
                     yield! Market.renderOffice tx (ty - tileHeight * 2) tileWidth (tileHeight * 3) oi.corporation.colour oi.headOffice
                     ])
             ]
+
             let right = [
                 yield text [ height (pct 0.18) ] (sprintf "Cash Flow: %i     Q: %i" 0 oi.quality)
                 yield row [ height (pct 0.1) ] []
                 yield! oi.office.departments
                 |> departmentLabels
                 |> List.map (text [ height (pct 0.1) ])
+
+                yield! newDepartments oi.office turnOrders
+                |> departmentLabels
+                |> List.map (text [ height (pct 0.1); colour colours.itemChangedText ])
             ]
             left, right
         | _ -> [], []
@@ -122,7 +128,7 @@ let contentFor model dispatch =
     [
         corpInfo corp
         executiveInfo canGiveOrders executive (corp = model.market.player) dispatch
-        selectedInfo selected
+        selectedInfo model.turnOrders selected
         col [ padding (px 10); ] [
             row [ height (pct 0.8) ] []
             button [ defaultMargin; enabled false ] "="
