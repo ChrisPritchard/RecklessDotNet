@@ -24,7 +24,7 @@ let corpInfo (corporation: Corporation) =
             ])
     ]
 
-let executiveInfo (turnOrders: ConfirmedOrder list) executive isPlayer dispatch = 
+let executiveInfo canGiveOrders executive isPlayer dispatch = 
     row [ width (pct 0.3); defaultPadding ] [
         col [] [
             yield row [ height (pct 0.18) ] [ ]
@@ -33,7 +33,6 @@ let executiveInfo (turnOrders: ConfirmedOrder list) executive isPlayer dispatch 
             yield text [ height (pct 0.13) ] executive.lastName
 
             if isPlayer then
-                let canGiveOrders = Seq.length (turnOrders |> Seq.filter (fun o -> o.executive = executive)) < executive.maxOrders
                 yield button [ 
                     defaultMargin; height (pct 0.21)
                     enabled canGiveOrders
@@ -116,9 +115,13 @@ let contentFor model dispatch =
         match selected with
         | Some (OfficeInfo o) -> o.executive.Value
         | _ -> corp.ceo
+    let canGiveOrders = 
+        model.turnOrders 
+        |> Seq.filter (fun (c, o) -> c = corp && o.executive = executive)
+        |> Seq.length |> fun l -> l < executive.maxOrders
     [
         corpInfo corp
-        executiveInfo model.turnOrders executive (corp = model.market.player) dispatch
+        executiveInfo canGiveOrders executive (corp = model.market.player) dispatch
         selectedInfo selected
         col [ padding (px 10); ] [
             row [ height (pct 0.8) ] []

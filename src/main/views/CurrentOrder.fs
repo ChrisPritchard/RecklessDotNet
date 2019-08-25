@@ -13,17 +13,18 @@ let wrapText (text: string) charsPerRow =
         else line + " " + word, acc)
     |> fun (line, acc) -> List.rev (line::acc) |> List.toArray
 
-let contentFor (model: MainModel) order componentIndex dispatch = 
+let contentFor (model: MainModel) appliedOrder dispatch = 
     let corp = model.market.player
     let selected = model.selectedTile |> Option.bind model.market.atTile
 
     [    
         col [ width (pct 0.6) ] [
-            text [ fontSize 25.; height (pct 0.18); defaultPadding ] order.displayName
+            text [ fontSize 25.; height (pct 0.18); defaultPadding ] appliedOrder.order.displayName
             row [ height (pct 0.5); defaultPadding ] [
-                match order.components.[componentIndex] with
-                | OfficeTransform (description, _, _) ->
+                match appliedOrder.conditions with
+                | OfficeCondition (description, _, _)::_ ->
                     yield paragraph [ defaultPadding ] (wrapText description 45)
+                | _ -> ()
             ]
             row [] [
                 col [] [
@@ -31,7 +32,7 @@ let contentFor (model: MainModel) order componentIndex dispatch =
                     text [ alignment 1. 0. ] "Total Cost: "                    
                 ]
                 col [] [
-                    text [] (string order.baseCost)
+                    text [] (string appliedOrder.order.baseCost)
                     text [] "TODO"//(string (order.totalCost currentTargets))                    
                 ]
                 col [] [

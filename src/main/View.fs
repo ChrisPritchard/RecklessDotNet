@@ -14,7 +14,7 @@ let renderUserInterface (model: MainModel) dispatch =
         | OrderTypeSelect (_, activeCategory) ->
             Views.OrderList.contentFor model activeCategory dispatch
         | TargetOrder orderState ->
-            Views.CurrentOrder.contentFor model orderState.order orderState.componentIndex dispatch
+            Views.CurrentOrder.contentFor model orderState dispatch
         | _ -> []
 
     let style = [

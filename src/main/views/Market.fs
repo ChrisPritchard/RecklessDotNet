@@ -135,9 +135,10 @@ let renderMarket model dispatch =
         | Overview, Some selectedTile | TargetOrder _, Some selectedTile ->
             yield! renderHighlight model.market selectedTile
         | TargetOrder state, None ->
-            match state.orderComponent with
-            | OfficeTransform (_, checkOffice, _) ->
+            match state.conditions with
+            | OfficeCondition (_, checkOffice, _)::_ ->
                 yield! renderHighlightOffices checkOffice model.market
+            | _ -> ()
         | _ -> ()
 
         yield onclickpoint (fun mousePos -> 
