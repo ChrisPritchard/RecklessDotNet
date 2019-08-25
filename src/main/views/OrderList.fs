@@ -17,9 +17,9 @@ let private validOrdersFor corp =
         orders |> List.map (fun order ->
             order, 
             canAfford order.baseCost order.ideaCost corp &&
-            order.components 
-            |> Array.forall (function
-                | OfficeTransform (_, checkOffice, _) -> 
+            orderConditions.[order]
+            |> List.forall (function
+                | OfficeCondition (_, checkOffice, _) -> 
                     corp.allOffices 
                     |> List.exists (fun (office, _, _) -> checkOffice office true))))
 
