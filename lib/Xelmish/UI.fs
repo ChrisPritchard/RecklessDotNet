@@ -38,6 +38,7 @@ and GlobalStyle = {
 }
 and ButtonColours = {
     text: Colour
+    disabledText: Colour
     defaultBackground: Colour
     disabledBackground: Colour
     hoverBackground: Colour option
@@ -83,6 +84,7 @@ let fontSize s = GlobalStyle (fun style -> { style with fontSize = s })
 let colour s = GlobalStyle (fun style -> { style with colour = s })
 let backgroundColour s = GlobalStyle (fun style -> { style with backgroundColour = s })
 let buttonTextColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with text = s } })
+let buttonDisabledTextColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with disabledText = s } })
 let buttonBackgroundColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with defaultBackground = s } })
 let buttonDisabledColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with disabledBackground = s } })
 let buttonHoverColour s = GlobalStyle (fun style -> { style with buttonColours = { style.buttonColours with hoverBackground = Some s } })
@@ -201,9 +203,13 @@ let private renderButton globalStyle (x, y) (width, height) text =
 
         spriteBatch.Draw(loadedAssets.whiteTexture, rect x y width height, backgroundColour)
 
+        let textColour = 
+            if not globalStyle.enabled then globalStyle.buttonColours.disabledText
+            else globalStyle.buttonColours.text
+
         drawText 
             loadedAssets spriteBatch 
-            globalStyle.fontName globalStyle.fontSize (0.5, 0.5) globalStyle.buttonColours.text 
+            globalStyle.fontName globalStyle.fontSize (0.5, 0.5) textColour 
             (x, y) (width, height) text)
 
 let private renderBorder (x, y) (width, height) borderWidth borderColour = 
@@ -288,6 +294,7 @@ let renderUI showDebugOutlines defaultFont (x, y) (width, height) rootElement =
         backgroundColour = Colour.Transparent
         buttonColours = {
             text = Colour.Black
+            disabledText = Colour.Gray
             defaultBackground = Colour.Gray
             disabledBackground = Colour.LightGray
             hoverBackground = None

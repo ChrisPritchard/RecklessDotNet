@@ -25,9 +25,10 @@ let colours = {|
     temp = Colour.Magenta
     background = Colour (50, 50, 50)
     text = Colour.White
+    textDisabled = Colour.Gray
     itemChangedText = Colour.Red
-    button = Colour.Blue
-    buttonDisabled = Colour.Gray
-    buttonHover = Colour.LightBlue
-    buttonPressed = Colour.DarkBlue
+    button = Colour (0, 0, 200)
+    buttonDisabled = Colour (0, 0, 50)
+    buttonHover = Colour (0, 0, 255)
+    buttonPressed = Colour (0, 0, 150)
 |}

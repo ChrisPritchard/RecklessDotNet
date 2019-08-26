@@ -21,6 +21,7 @@ let renderUserInterface (model: MainModel) dispatch =
         colour colours.text
         backgroundColour colours.background 
         buttonTextColour colours.text
+        buttonDisabledTextColour colours.textDisabled
         buttonBackgroundColour colours.button
         buttonDisabledColour colours.buttonDisabled
         buttonHoverColour colours.buttonHover
