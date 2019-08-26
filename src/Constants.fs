@@ -21,8 +21,9 @@ let defaultPadding = padding (px 5)
 let defaultMargin = margin (px 5)
 
 let colours = {|
+    clearColour = Colour.DarkGray
     temp = Colour.Magenta
-    background = Colour.DarkGray
+    background = Colour (50, 50, 50)
     text = Colour.White
     itemChangedText = Colour.Red
     button = Colour.Blue

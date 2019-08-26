@@ -33,7 +33,7 @@ let renderUserInterface (model: MainModel) dispatch =
             row style body
         ]
 
-    renderUI true "defaultFont" (0, 0) (windowWidth, windowHeight) all
+    renderUI false "defaultFont" (0, 0) (windowWidth, windowHeight) all
 
 let view model dispatch =
     [   yield setSmoothSampling ()

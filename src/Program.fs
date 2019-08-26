@@ -36,6 +36,6 @@ let main _ =
 
     Program.mkProgram init update view
     |> Program.withConsoleTrace
-    |> Xelmish.Program.runSimpleGameLoop assets windowSize Colour.WhiteSmoke
+    |> Xelmish.Program.runSimpleGameLoop assets windowSize colours.clearColour
 
     0
